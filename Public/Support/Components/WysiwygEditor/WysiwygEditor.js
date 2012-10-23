@@ -464,8 +464,8 @@ function WysiwygEditorObject() {
 	self.contentRendersWholeDocument = false;
 	self.readOnly = false;
 	self.twoRowToolbar = false;
-	self.defaultFontFamily = '';
-	self.defaultFontSize = '';
+	self.defaultFontFamily = 'Verdana';
+	self.defaultFontSize = '12pt';
 	self.languages = [];
 	self.images = [];
 	self.onEvent = function( type, callback ) {
@@ -994,7 +994,6 @@ function WysiwygEditorObject() {
 				WysiwygEditor.addToolbarItemGroup(row, textareaName + '-toolbar-content', function( group ) {
 					WysiwygEditorLinkToolbarItem(self, group);
 					WysiwygEditorImageToolbarItem(self, group);
-					//WysiwygEditorVideoToolbarItem(self, group);
 					WysiwygEditorHTMLToolbarItem(self, group);
 					WysiwygEditorHorizontalLineToolbarItem(self, group);
 				});
@@ -1576,6 +1575,9 @@ function WysiwygEditorLinkToolbarItem( editor, group ) {
 		if( editor.hideImagePopup ) {
 			editor.hideImagePopup();
 		}
+		if( editor.hideInsertHTMLPopup ) {
+			editor.hideInsertHTMLPopup();
+		}
 		if( Element.visible(editor.linkPopup) ) {
 			editor.hideLinkPopup();
 		} else {
@@ -1643,41 +1645,23 @@ function WysiwygEditorHTMLToolbarItem( editor, group ) {
 				div.style.marginBottom = '2px';
 				div.style.cursor = 'pointer';
 				
-				div.appendChild(WysiwygEditor.createElement('div', function( div ) {
-				
-					div.style.display='block';
-					  
-					div.style.height='7px';
-					
-				}));
-				
-				
-				
-				
-				div.appendChild(WysiwygEditor.createElement('span', function( span ) {
-					span.style.marginLeft='10px';
-					
-					  
-				}));
-				
 				
 				div.appendChild(WysiwygEditor.createElement('textarea', function( ta ) {
 					ta.style.width = '410px';
-					ta.style.height = '80px';
+					ta.style.height = '90px';
+					ta.style.margin='9px';
 					
 					htmlTextArea = ta;
 				
 			      }));
-				// end of new add after 10 oct 2012 
 				
-						
-				
-				// other html
 				
 				div.appendChild(WysiwygEditor.createItemPopupFooter(function( footer, footerContainer ) {
 					
+					footerContainer.style.marginTop = '0px';
+					
 					WysiwygEditor.addItemPopupFooterButton(footer, I('Insert'), uriForApplicationImageResource('submit_infoga.png'), '#96D754', function() {
-						// edit on 11 oct 2012
+						
 							
 						var node = WysiwygEditor.createElement('span', function( span ) {
 								
@@ -1865,6 +1849,10 @@ function WysiwygEditorImageToolbarItem( editor, group ) {
 		if( editor.hideLinkPopup ) {
 			editor.hideLinkPopup();
 		}
+		if( editor.hideInsertHTMLPopup ) {
+			editor.hideInsertHTMLPopup();
+		}
+
 		if( Element.visible(editor.imagePopup) ) {
 			editor.hideImagePopup();
 		} else {
