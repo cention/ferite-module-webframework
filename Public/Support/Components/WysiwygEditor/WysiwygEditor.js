@@ -2736,6 +2736,12 @@ function ComponentWyiswygEditor( id ) {
 		return document.getElementById(self.identifier() + '.WysiwygEditorToolbar');
 	};
 	
+	self.getState = function( state ) {
+		if( state == self._defaultState )
+			return self._editor.getData();
+		return self._states[state];
+	}
+
 	self.empty = function() {
 		var value = self.getState('text-value');
 		value = value.stripTags();
