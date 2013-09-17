@@ -1178,10 +1178,13 @@ function WysiwygEditorObject() {
 		}
 	};
 	self.getData = function() {
-		if( self.spellcheck ) {
-			self.spellcheck.finish(self.contentElement);
+		if( self.contentElement ) {
+			if( self.spellcheck ) {
+				self.spellcheck.finish(self.contentElement);
+			}
+			return self.contentElement.innerHTML;
 		}
-		return self.contentElement.innerHTML;
+		return '';
 	};
 	self.enableEditableContent = function() {
 		if( self.readOnly == false && self.contentElement ) {
@@ -2740,7 +2743,14 @@ function ComponentWyiswygEditor( id ) {
 		if( state == self._defaultState )
 			return self._editor.getData();
 		return self._states[state];
-	}
+	};
+	var previousSetState = self.setState;
+	self.setState = function( state, value ) {
+		if( state == self._defaultState ) {
+			self._editor.setData(value);
+		}
+		previousSetState(state, value);
+	};
 
 	self.empty = function() {
 		var value = self.getState('text-value');
