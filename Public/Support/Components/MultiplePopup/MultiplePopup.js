@@ -173,8 +173,10 @@ function ComponentMultiplePopup( id ) {
 		return id;
 	};
 	self.showList = function() {
-		var iconWidth = 0;
+		self.action('show');
 		
+		var iconWidth = 0;
+
 		if( self.doneNode ) {
 			self.doneNode.className = 'done';
 		}
@@ -262,6 +264,7 @@ function ComponentMultiplePopup( id ) {
 		}
 	};
 	self.hideList = function() {
+		self.action('hide');
 		self.listNode.style.display = 'none';
 		self.showingList = false;
 		// This causes browser window to flash in Linux/Firefox (3.5.9)
