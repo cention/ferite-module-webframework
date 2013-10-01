@@ -2738,10 +2738,11 @@ function ComponentWyiswygEditor( id ) {
 	self.toolbarNode = function() {
 		return document.getElementById(self.identifier() + '.WysiwygEditorToolbar');
 	};
-	
 	self.getState = function( state ) {
-		if( state == self._defaultState )
-			return self._editor.getData();
+		if( state == self._defaultState ) {
+			var value = self._editor.getData();
+			return (value ? value : self._states[state]);
+		}
 		return self._states[state];
 	};
 	var previousSetState = self.setState;
