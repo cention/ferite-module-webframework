@@ -647,6 +647,7 @@ namespace modifies GUIKit {
 					 'scriptaculous/slider', 
 					 'scriptaculous/sound', 
 					 'scriptaculous/scriptaculous', 
+					 'ckeditor/ckeditor',
 					 'jquery.titlealert',
 					 'jquery.spellchecker',
 					 'rangy-core',
@@ -655,7 +656,7 @@ namespace modifies GUIKit {
 					 'htmlparser',
 					 'Component/Component.js' ];
 		function requiredJavascriptExceptions 
-			return [ 'ckeditor/ckeditor' ]; 
+			return [];
 
 		function getJavascriptIncludes {
 			string compressed = application.virtualName + '-Uncompressed';
