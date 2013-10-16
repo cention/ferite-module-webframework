@@ -1,0 +1,45 @@
+.wfDragDropSelectContainer td.buttons {
+	padding-left: 10px;
+	padding-right: 10px;
+	width: 10px;
+}
+.wfDragDropSelectContainer td.buttons img {
+	margin-bottom: 10px;
+	cursor: pointer;
+}
+.wfDragDropSelect {
+	list-style-type: none;
+	padding: 0;
+	/* padding-top: 4px;
+	padding-left: 4px;
+	padding-right: 4px; */
+	margin: 0;
+	border: 1px solid #888;
+	border-top: 1px solid #000;
+	min-width: 200px;
+	min-height: 50px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	background-color: #fff;
+	/* -webkit-box-shadow: inset 0px 1px 1px 1px rgba(136, 136, 136, 0.5);
+	box-shadow: inset 0px 1px 0px 0px rgba(136, 136, 136, 0.5); */
+}
+.wfDragDropSelect li {
+	padding: 0;
+	margin: 0;
+	margin-bottom: 4px;
+ 	/* background: #f2f2f2; */
+	cursor: default;
+	/* border: 1px solid #888; */
+	padding: 4px;
+	-webkit-user-select: none; /* Chrome/Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+ */
+	/* Rules below not implemented in browsers yet */
+	-o-user-select: none;
+	user-select: none;
+}
+.wfDragDropSelect li.selected {
+	background-color: #80ceff;
+
+}
