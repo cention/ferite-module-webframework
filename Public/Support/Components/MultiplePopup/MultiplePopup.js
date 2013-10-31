@@ -297,11 +297,11 @@ function ComponentMultiplePopup( id ) {
 
 			if( checkbox ) {
 				checkbox.onclick = function(event) {
+					self._selectItemsByValue(value);
+					self.doneNode.className = 'donewaiting';
 					CancelEvent(event);
 				};
 				checkbox.onchange = function(event) {
-					self._selectItemsByValue(value);
-					self.doneNode.className = 'donewaiting';
 					CancelEvent(event);
 				};
 			}
