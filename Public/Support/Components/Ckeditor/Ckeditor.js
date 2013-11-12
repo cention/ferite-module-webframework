@@ -1,10 +1,10 @@
 function ComponentCkeditor( id ) {
-	var self = new Component(id);
-
+	var self = new ComponentTextfield(id);
+	
 	self.setDefaultState('text-value');
 	self.setState('text-value', '');
 	
-	self.editor = null;
+	self.editor = CKEDITOR.instances[id];
 	self.editorIsReady = false;
 	self.editorToolbar = 'OneRow';
 	self.haveUnsetData = false;
@@ -15,7 +15,7 @@ function ComponentCkeditor( id ) {
 		shiftEnterMode: CKEDITOR.ENTER_P,
 		colorButton_enableMore: false,
 		resize_dir: 'both',
-		resize_enabled: true,
+		/*resize_enabled: true,*/
 		fontSize_sizes:
 			'8/8pt;' +
 			'9/9pt;' +
@@ -46,6 +46,10 @@ function ComponentCkeditor( id ) {
 			'Trebuchet MS/Trebuchet MS, Helvetica, sans-serif;' +
 			'Verdana/Verdana, Geneva, sans-serif',
 		toolbar_Empty: [],
+		toolbar_SingleRow: [
+			[ 'Cention_SpellCheckLanguageSelector' ], 
+			[ 'Cention_SpellCheck' ]
+		],
 		toolbar_OneRow: [
 			[ 'Bold', 'Italic', 'Underline', 'Strike' ],
 			[ 'NumberedList', 'BulletedList' ],
@@ -101,19 +105,22 @@ function ComponentCkeditor( id ) {
 	};
 	
 	self.setLanguages = function( list ) {
-		self.config.spellCheckLanguages = list;
+	    self.config.spellCheckLanguages = list;
 	};
 	self.setImages = function( list ) {
 		if( self.editor ) {
 			self.editor.___fileArchiveImages = list;
 		}
 	};
-	/*self.setShowResize = function( value ) {
-		if( value )
-			self.config.resize_enabled = true;
-		else
-			self.config.resize_enabled = false;	
-	};*/
+	self.setShowResize = function( resize ) {
+	    if( resize == true )
+		self.config.resize_enabled = true;
+	    else
+		self.config.resize_enabled = false;	
+	};
+	self.setItemHeight = function( height ){
+		self.config.height = height;
+	};
 	self.showBasicToolbar = function() { };
 	self.showAdvancedToolbar = function() {};
 	self.setTwoRowToolbar = function( value ) {
@@ -128,7 +135,12 @@ function ComponentCkeditor( id ) {
 			self.config.toolbar = self.editorToolbar;
 		}
 	};
-	
+	self.setSimpleToolbar = function( value ) {
+		if( !value ) {
+			self.editorToolbar = 'SingleRow';
+			self.config.toolbar = self.editorToolbar;
+		}
+	};
 	self.setReadOnly = function( value ) {};
 	self.setEnabled = function( value ) {};
 	
@@ -186,6 +198,7 @@ function ComponentCkeditor( id ) {
 				self.haveUnsetData = false;
 			}
 		});
+				
 		self.editor.on('contentDomUnload', function() {
 			self.editorIsReady = false;
 		});
