@@ -66,8 +66,8 @@ function ComponentCkeditor( id ) {
 			[ 'Indent', 'Outdent', 'Blockquote' ],
 			[ 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ], [ 'PasteFromWord' ],
 			[ 'Link', 'Cention_Image', 'HorizontalRule' ],
-			[ 'Font' ], [ 'FontSize' ],
-			[ 'TextColor', 'BGColor' ], ['Youtube'], '/',
+			[ 'Font' ], [ 'FontSize' ],'/',
+			[ 'TextColor', 'BGColor' ], ['Youtube'], 
 			[ 'Cention_SpellCheckLanguageSelector' ], [ 'Cention_SpellCheck' ], ['Resize']
 		],
 		toolbar: 'OneRow',
