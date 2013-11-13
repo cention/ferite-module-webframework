@@ -45,7 +45,6 @@ function dragEndHandler ( evt )
 }
 mujibur = CKEDITOR.tools.addFunction( function( $event ){ 
     //if ( !c )
-    console.log('Mujibur:' + self.identifier() );
     c = b.getResizable();
     startSize = { width : c.$.offsetWidth || 0, height : c.$.offsetHeight || 0 };
     origin = { x : $event.screenX, y : $event.screenY };
