@@ -39,9 +39,13 @@ function dragEndHandler ( evt )
 	      Math.max( a.resize_minHeight, Math.min( internalHeight, a.resize_maxHeight ) ) 
 	    );
     
-    mcam.fireCallbackRequest('RecordTextAreaSizes', function(value){}, {
+    /*mcam.fireCallbackRequest('RecordTextAreaSizes', function(value){}, {
 	'question': '' + jQuery('#cke_QuestionWysiwyg iframe').contents().height(),
 	'answer': '' + jQuery('#cke_AnswerWysiwyg iframe').contents().height()
+    });*/
+    mcam.fireCallbackRequest('RecordTextAreaSizes', function(value){}, {
+	'question': '' + jQuery('#cke_1_contents').height(),
+	'answer': '' + jQuery('#cke_2_contents').height()
     });
 }
 mujibur = CKEDITOR.tools.addFunction( function( $event ){ 
