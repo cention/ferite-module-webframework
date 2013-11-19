@@ -31,13 +31,34 @@
   color: #000;
   background: #ddd;
 }
+/**edited by Mujibur: November 15, 2013**/
+.spellchecker-suggestbox .footer .ignore-all
+{
+  display: none;
+}
+
+.spellchecker-suggestbox .footer .ignore-forever a
+{
+  outline: none;
+  cursor: pointer;
+  color: #333;
+  padding: 3px 6px;
+  display: block;
+  text-decoration: none;
+}
+.spellchecker-suggestbox .footer .ignore-forever a:hover {
+  color: #000;
+  background: #ddd;
+}
+/**End**/
 .spellchecker-suggestbox .footer {
   border-top: 1px solid #ddd;
 }
+/* //Stated disabled by Mujibur: Nov 15, 2013
 .spellchecker-suggestbox .footer .ignore-all,
 .spellchecker-suggestbox .footer .ignore-forever {
   display: none;
-}
+}*/
 .spellchecker-word-highlight {
   color: red;
   cursor: pointer;

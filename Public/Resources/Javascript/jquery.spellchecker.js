@@ -17,7 +17,7 @@
     },
     local: {
       requestError: 'There was an error processing the request.',
-      ignoreWord: 'Ignore word',
+      ignoreWord: 'Ignore',
       ignoreAll: 'Ignore all',
       ignoreForever: 'Add to dictionary',
       loading: 'Loading...',
@@ -261,8 +261,10 @@
     var click = 'click.' + pluginName;
     this.container.on(click, this.onContainerClick.bind(this));
     this.container.on(click, '.ignore-word', selectWordHandler.call(this, 'ignore.word'));
-    this.container.on(click, '.ignore-all', this.handler('ignore.all'));
-    this.container.on(click, '.ignore-forever', this.handler('ignore.forever'));
+    //this.container.on(click, '.ignore-all', this.handler('ignore.all'));
+    this.container.on(click, '.ignore-all', selectWordHandler.call(this, 'ignore.all'));
+    //this.container.on(click, '.ignore-forever', this.handler('ignore.forever'));
+    this.container.on(click, '.ignore-forever', selectWordHandler.call(this, 'ignore.forever'));
     this.container.on(click, '.words a', selectWordHandler.call(this, 'select.word'));
     $('html').on(click, this.onWindowClick.bind(this));
     if (this.element[0].nodeName === 'BODY') {
@@ -274,19 +276,29 @@
 
     var local = this.config.local;
 
-    this.container = $([
+  /*  this.container = $([
       '<div class="' + pluginName + '-suggestbox">',
       ' <div class="footer">',
       '   <a href="#" class="ignore-word">' + local.ignoreWord + '</a>',
       '   <a href="#" class="ignore-all">' + local.ignoreAll + '</a>',
-      '   <a href="#" class="ignore-forever">' + local.ignoreForever + '</a>',
+      '<div class="full"><div class="left-div"><img src='+ uriForServerImageResource('Components/WysiwygEditor/add.png') + '></div><div class="right-div"><a href="#" class="ignore-forever">' + local.ignoreForever + '</a></div></div>',
       ' </div>',
+      '</div>'
+    ].join('')).appendTo(this.body);*/
+    
+    this.container = $([
+      '<div class="' + pluginName + '-suggestbox">',
+      ' <div class="footer"><table width="100%">',
+      '<tr><td><img src='+ uriForServerImageResource('Components/Ckeditor/ignore.png') + '></td><td><a href="#" class="ignore-word">' + local.ignoreWord + '</a></td></tr>',
+      '<a href="#" class="ignore-all">' + local.ignoreAll + '</a>',
+      '<tr><td><img src='+ uriForServerImageResource('Components/Ckeditor/add.png') + '></td><td><a href="#" class="ignore-forever">' + local.ignoreForever + '</a></td></tr>',
+      '</table> </div>',
       '</div>'
     ].join('')).appendTo(this.body);
 
     this.words = $([
-      '<div class="words">',
-      '</div>'
+      '<div class="words"><table>',
+      '</table></div>'
     ].join('')).prependTo(this.container);
 
     this.loadingMsg = $([
@@ -301,15 +313,20 @@
   SuggestBox.prototype.addWords = function(words) {
 
     var html;
-
+    
     if (!words.length) {
       html = '<em>' + this.config.local.noSuggestions + '</em>';
     } else {
       html = $.map(words, function(word) {
-        return '<a href="#">' + word + '</a>';
+        return '<tr><td><img src='+ uriForServerImageResource('Components/Ckeditor/replace.png') + '></td><td><a href="#">' + word + '</a></td></tr>';
       }).slice(0, this.config.suggestBox.numWords).join('');
     }
-
+   /* @Mujibur: Need to do that later.
+    * html += '<tr><td><img src='+ uriForServerImageResource('Components/Ckeditor/replace.png') + '></td><td class="moreItems">More</td></tr>'; 
+   html += $.map(words, function(word) {
+        return '<tr style="display: none;" id="moreWords"><td><img src='+ uriForServerImageResource('Components/Ckeditor/replace.png') + '></td><td><a href="#">' + word + '</a></td></tr>';
+      }).slice(5, words.length).join('');
+    */
     this.words.html(html);
   };
 
@@ -317,7 +334,7 @@
     this.wordElement = $(wordElement);
     getWords(word, this.onGetWords.bind(this));
   };
-
+   
   SuggestBox.prototype.loading = function(show) {
     this.footer.hide();
     this.words.html(show ? this.loadingMsg.clone() : '');
@@ -395,7 +412,7 @@
   var WebService = function(config) {
 
     this.config = config;
-
+    
     this.defaultConfig = {
       url: config.webservice.path,
       type: 'POST',
@@ -414,7 +431,6 @@
   WebService.prototype.makeRequest = function(config) {
 
     var defaultConfig = $.extend(true, {}, this.defaultConfig);
-
     return $.ajax($.extend(true, defaultConfig, config));
   };
 
@@ -625,6 +641,9 @@
   HtmlParser.prototype.ignoreWord = function(oldWord, replacement) {
     this.replaceWord(oldWord, replacement);
   };
+  HtmlParser.prototype.ignoreForever = function(oldWord, replacement) {
+    this.replaceWord(oldWord, replacement);
+  };
 
   /* Spellchecker
    *************************/
@@ -695,6 +714,7 @@
   SpellChecker.prototype.bindEvents = function() {
     this.on('check.fail', this.onCheckFail.bind(this));
     this.suggestBox.on('ignore.word', this.onIgnoreWord.bind(this));
+    this.suggestBox.on('ignore.forever', this.onIgnoreForever.bind(this));
     this.suggestBox.on('select.word', this.onSelectWord.bind(this));
     this.incorrectWords.on('select.word', this.onIncorrectWordSelect.bind(this));
   };
@@ -778,6 +798,12 @@
     e.preventDefault();
     this.replaceWord(this.incorrectWord, this.incorrectWord);
   };
+
+  SpellChecker.prototype.onIgnoreForever = function(e, word, element) {
+    e.preventDefault();
+    mcam.fireCallbackRequest('spell_check_learn_word', null, { word: this.incorrectWord, language: this.language });
+    this.replaceWord(this.incorrectWord, this.incorrectWord);
+   };
 
   SpellChecker.prototype.onIncorrectWordSelect = function(e, word, element, incorrectWords) {
     e.preventDefault();
