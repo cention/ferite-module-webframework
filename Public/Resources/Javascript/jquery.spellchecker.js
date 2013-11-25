@@ -8,7 +8,6 @@
 
   /* Config
    *************************/
-
   var defaultConfig = {
     lang: 'en',
     webservice: {
@@ -19,7 +18,7 @@
       requestError: 'There was an error processing the request.',
       ignoreWord: 'Ignore',
       ignoreAll: 'Ignore all',
-      ignoreForever: 'Add to dictionary',
+      ignoreForever: 'Add to word list',
       loading: 'Loading...',
       noSuggestions: '(No suggestions)'
     },
@@ -261,9 +260,7 @@
     var click = 'click.' + pluginName;
     this.container.on(click, this.onContainerClick.bind(this));
     this.container.on(click, '.ignore-word', selectWordHandler.call(this, 'ignore.word'));
-    //this.container.on(click, '.ignore-all', this.handler('ignore.all'));
     this.container.on(click, '.ignore-all', selectWordHandler.call(this, 'ignore.all'));
-    //this.container.on(click, '.ignore-forever', this.handler('ignore.forever'));
     this.container.on(click, '.ignore-forever', selectWordHandler.call(this, 'ignore.forever'));
     this.container.on(click, '.words a', selectWordHandler.call(this, 'select.word'));
     $('html').on(click, this.onWindowClick.bind(this));
@@ -275,23 +272,12 @@
   SuggestBox.prototype.createBox = function() {
 
     var local = this.config.local;
-
-  /*  this.container = $([
-      '<div class="' + pluginName + '-suggestbox">',
-      ' <div class="footer">',
-      '   <a href="#" class="ignore-word">' + local.ignoreWord + '</a>',
-      '   <a href="#" class="ignore-all">' + local.ignoreAll + '</a>',
-      '<div class="full"><div class="left-div"><img src='+ uriForServerImageResource('Components/WysiwygEditor/add.png') + '></div><div class="right-div"><a href="#" class="ignore-forever">' + local.ignoreForever + '</a></div></div>',
-      ' </div>',
-      '</div>'
-    ].join('')).appendTo(this.body);*/
-    
     this.container = $([
       '<div class="' + pluginName + '-suggestbox">',
       ' <div class="footer"><table width="100%">',
-      '<tr><td><img src='+ uriForServerImageResource('Components/Ckeditor/ignore.png') + '></td><td><a href="#" class="ignore-word">' + local.ignoreWord + '</a></td></tr>',
+      '<tr><td><img src='+ uriForServerImageResource('Components/Ckeditor/ignore.png') + '></td><td><a href="#" class="ignore-word">' + I(local.ignoreWord) + '</a></td></tr>',
       '<a href="#" class="ignore-all">' + local.ignoreAll + '</a>',
-      '<tr><td><img src='+ uriForServerImageResource('Components/Ckeditor/add.png') + '></td><td><a href="#" class="ignore-forever">' + local.ignoreForever + '</a></td></tr>',
+      '<tr><td><img src='+ uriForServerImageResource('Components/Ckeditor/add.png') + '></td><td><a href="#" class="ignore-forever">' + I(local.ignoreForever) + '</a></td></tr>',
       '</table> </div>',
       '</div>'
     ].join('')).appendTo(this.body);
@@ -654,7 +640,7 @@
 
     this.elements = $(elements).attr('spellcheck', 'false');
     this.config = $.extend(true, defaultConfig, config);
-
+    this.language = config.lang;
     this.setupWebService();
     this.setupParser();
 
