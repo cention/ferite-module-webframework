@@ -289,7 +289,7 @@
 
     this.loadingMsg = $([
       '<div class="loading">',
-      this.config.local.loading,
+      I(this.config.local.loading),
       '</div>'
     ].join(''));
 
@@ -301,7 +301,7 @@
     var html;
     
     if (!words.length) {
-      html = '<em>' + this.config.local.noSuggestions + '</em>';
+      html = '<em>' + I(this.config.local.noSuggestions) + '</em>';
     } else {
       html = $.map(words, function(word) {
         return '<tr><td><img src='+ uriForServerImageResource('Components/Ckeditor/replace.png') + '></td><td><a href="#">' + word + '</a></td></tr>';
