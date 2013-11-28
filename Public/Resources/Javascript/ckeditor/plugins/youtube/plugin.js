@@ -16,7 +16,7 @@
 
 			editor.ui.addButton( 'Youtube',
 			{
-				label : editor.lang.youtube.button,
+				label : I(editor.lang.youtube.button),
 				toolbar : 'insert',
 				command : 'youtube',
 				icon : this.path + 'images/icon.png'
@@ -27,7 +27,7 @@
 				var video;
 
 				return {
-					title : editor.lang.youtube.title,
+					title : I(editor.lang.youtube.title),
 					minWidth : 500,
 					minHeight : 200,
 					contents :
@@ -38,7 +38,7 @@
 								[{
 									id : 'txtEmbed',
 									type : 'textarea',
-									label : editor.lang.youtube.txtEmbed,
+									label : I(editor.lang.youtube.txtEmbed),
 									autofocus : 'autofocus',
 									onChange : function ( api )
 									{
@@ -70,7 +70,7 @@
 								},
 								{
 									type : 'html',
-									html : editor.lang.youtube.or + '<hr>'
+									html : I(editor.lang.youtube.or) + '<hr>'
 								},
 								{
 									type : 'hbox',
@@ -80,7 +80,7 @@
 										{
 											id : 'txtUrl',
 											type : 'text',
-											label : editor.lang.youtube.txtUrl,
+											label : I(editor.lang.youtube.txtUrl),
 											onChange : function ( api )
 											{
 												if ( this.getValue().length > 0 )
@@ -116,7 +116,7 @@
 											type : 'text',
 											id : 'txtWidth',
 											width : '60px',
-											label : editor.lang.youtube.txtWidth,
+											label : I(editor.lang.youtube.txtWidth),
 											'default' : '640',
 											validate : function ()
 											{
@@ -140,7 +140,7 @@
 											type : 'text',
 											id : 'txtHeight',
 											width : '60px',
-											label : editor.lang.youtube.txtHeight,
+											label : I(editor.lang.youtube.txtHeight),
 											'default' : '360',
 											validate : function ()
 											{
