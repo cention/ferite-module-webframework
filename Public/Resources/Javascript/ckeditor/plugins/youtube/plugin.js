@@ -161,54 +161,6 @@
 											}
 										}
 									]
-								},/*
-								{
-									type : 'hbox',
-									widths : [ '55%', '45%' ],
-									children :
-									[
-										{
-											id : 'chkRelated',
-											type : 'checkbox',
-											'default' : 'checked',
-											label : editor.lang.youtube.chkRelated
-										},
-										{
-											id : 'chkOlderCode',
-											type : 'checkbox',
-											label : editor.lang.youtube.chkOlderCode
-										}
-									]
-								},*/
-								{
-									type : 'hbox',
-									widths : [ '55%', '45%' ],
-									children :
-									[
-										{
-											id : 'chkPrivacy',
-											type : 'checkbox',
-											label : editor.lang.youtube.chkPrivacy
-										}/*,
-										{
-											id : 'txtStartAt',
-											type : 'text',
-											label : editor.lang.youtube.txtStartAt,
-											validate : function ()
-											{
-												if ( this.getValue() )
-												{
-													var str = this.getValue();
-													
-													if ( !/^(?:(?:([01]?\d|2[0-3]):)?([0-5]?\d):)?([0-5]?\d)$/i.test( str ) )
-													{
-														alert( editor.lang.youtube.invalidTime );
-														return false;
-													}
-												}
-											}
-										}*/
-									]
 								}
 							]
 						}
