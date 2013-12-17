@@ -1,4 +1,14 @@
 var WysiwygEditor = {
+	browserIsInternetExplorer: function() {
+		if( Prototype.Browser.IE ) {
+			return true;
+		} else if( Prototype.Browser.Gecko /* IE 11 and Firefox */ ) {
+			var evt = document.createEvent("KeyboardEvent");
+			if( !evt.initKeyEvent )
+				return true;
+		}
+		return false;
+	},
 	createElement: function( tagName, creator, otherDocument ) {
 		var useDocument = (otherDocument ? otherDocument : document);
 		var element = useDocument.createElement(tagName);
@@ -267,7 +277,7 @@ var WysiwygEditor = {
 				});
 			});
 			baseColumn.style.height = '20px';
-			baseColumn.style.padding = (Prototype.Browser.IE ? '2px' : '5px');
+			baseColumn.style.padding = (WysiwygEditor.browserIsInternetExplorer() ? '2px' : '5px');
 			baseColumn.style.cursor = 'pointer';
 			baseColumn.style.whiteSpace = 'nowrap';
 			baseColumn.appendChild(table);
@@ -662,7 +672,7 @@ function WysiwygEditorObject() {
 					self.fireEvent('keyup');
 					self.fireEvent('change');
 				}
-				if( _('Hotkeys') && Prototype.Browser.Gecko ) {
+				if( _('Hotkeys') && Prototype.Browser.Gecko && !WysiwygEditor.browserIsInternetExplorer() ) {
 					var evt = document.createEvent("KeyboardEvent");
 					evt.initKeyEvent('keyup', true, true, window,
 						event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, event.keyCode, event.charCode);
@@ -682,12 +692,12 @@ function WysiwygEditorObject() {
 			};
 			
 			// Setup specifc things for Internet Explorer
-			if( Prototype.Browser.IE ) {
+			if( WysiwygEditor.browserIsInternetExplorer() ) {
 				// Prevent Internet Explorer to insert its own line
 				// break which is a new <p>.
 				// We should only prevent this if we the selection
 				// is not inside a <ol></ol> or <ul></ul> element.
-				self.contentElement.attachEvent('onkeypress', function( event ) {
+				var onkeypress = function( event ) {
 					if( event.keyCode == 13 /* enter */ ) {
 						var selection = rangy.getIframeSelection(self.iframe);
 						var range = selection.getRangeAt(0);
@@ -706,22 +716,43 @@ function WysiwygEditorObject() {
 						}
 					}
 					return true;
-				});
-				self.contentElement.attachEvent('onbeforepaste', function( event ) {
+				};
+				var onbeforepaste = function( event ) {
 					self.updateSelection();
 					self.fireEvent('beforepaste');
 					CancelEvent(event);
 					return false;
-				});
-				self.contentElement.attachEvent('onpaste', function( event ) {
+				};
+				var onpaste = function( event ) {
 					CancelEvent(event);
 					return false;
-				});
+				};
+				if( self.contentElement.attachEvent ) {
+					self.contentElement.attachEvent('onkeypress', function( event ) {
+						return onkeypress(event);
+					});
+					self.contentElement.attachEvent('onbeforepaste', function( event ) {
+						return onbeforepaste(event);
+					});
+					self.contentElement.attachEvent('onpaste', function( event ) {
+						return onpaste(event);
+					});
+				} else {
+					self.contentElement.onkeypress = function( event ) {
+						return onkeypress(event);
+					};
+					self.contentElement.onbeforepaste = function( event ) {
+						return onbeforepaste(event);
+					};
+					self.contentElement.onpaste = function( event ) {
+						return onpaste(event);
+					};
+				}
 			} else if( Prototype.Browser.Gecko ) {
 				var fireEvent = function( event ) {
 					if( _('Hotkeys') ) {
 						var evt = document.createEvent("KeyboardEvent");
-						evt.initKeyEvent('keydown', true, true, window,
+						evt.initKeyEvent('keypress', true, true, window,
 							event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, event.keyCode, event.charCode);
 						document.dispatchEvent(evt);
 					}
@@ -750,7 +781,7 @@ function WysiwygEditorObject() {
 				var fireEvent = function( event ) {
 					if( _('Hotkeys') ) {
 						var evt = document.createEvent("Events");
-						evt.initEvent('keydown', true, true, window);
+						evt.initEvent('keypress', true, true, window);
 						evt.view = window;
 						evt.altKey = event.altKey;
 						evt.ctrlKey = event.ctrlKey;
@@ -922,7 +953,7 @@ function WysiwygEditorObject() {
 							//var position = Element.cumulativeScrollOffset(contentNode.lastChild);
 							//self.contentElement.scrollTop = position[1];
 							
-							if( Prototype.Browser.Gecko ) {
+							if( Prototype.Browser.Gecko && !WysiwygEditor.browserIsInternetExplorer() ) {
 								var evt = self.iframeDocument.createEvent("KeyboardEvent");
 								evt.initKeyEvent("keypress", true, true, self.iframeWindow, 0, 0, 0, 0, 0, " ".charCodeAt(0));
 								self.contentElement.dispatchEvent(evt);
@@ -1001,7 +1032,7 @@ function WysiwygEditorObject() {
 				self.iframeDocument = self.iframeDocument.document;
 			}
 
-			if( Prototype.Browser.IE ) {
+			if( WysiwygEditor.browserIsInternetExplorer() ) {
 				self.iframeDocument.open();
 				self.iframeDocument.write('<html>' +
 					'<head>' +
@@ -1380,7 +1411,7 @@ function WysiwygEditorFontToolbarDropDown( editor, toolbar ) {
 		if( container ) {
 			var found = false;
 			var fontFamily;
-			if( Prototype.Browser.IE ) {
+			if( WysiwygEditor.browserIsInternetExplorer() ) {
 				if( container.tagName.toLowerCase() == 'font' ) {
 					fontFamily = container.getAttribute('face');
 				}
@@ -1484,7 +1515,7 @@ function WysiwygEditorFontSizeToolbarDropDown( editor, toolbar ) {
 		} else {
 			var node = WysiwygEditor.createElement('span', function( span ) {
 				span.style.fontSize = (item.size + 'pt');
-				if( Prototype.Browser.IE ) {
+				if( WysiwygEditor.browserIsInternetExplorer() ) {
 					span.appendChild(editor.iframeDocument.createTextNode(' '));
 				} else if( Prototype.Browser.WebKit ) {
 					span.appendChild(editor.iframeDocument.createTextNode('\u200B'));
@@ -1496,7 +1527,7 @@ function WysiwygEditorFontSizeToolbarDropDown( editor, toolbar ) {
 			var range = editor.latestSelectionRange;
 			range.collapse(false);
 			range.insertNode(node);
-			if( Prototype.Browser.IE ) {
+			if( WysiwygEditor.browserIsInternetExplorer() ) {
 				range.collapseToPoint(node.firstChild, 1);
 			} else if( Prototype.Browser.WebKit ) {
 				range.setStartAfter(node.firstChild);
@@ -1511,7 +1542,7 @@ function WysiwygEditorFontSizeToolbarDropDown( editor, toolbar ) {
 				editor.contentElement.focus();
 			} catch( e ) { }
 			
-			if( Prototype.Browser.IE ) {
+			if( WysiwygEditor.browserIsInternetExplorer() ) {
 				Element.remove(node.firstChild);
 			}
 		}
@@ -1595,7 +1626,7 @@ function WysiwygEditorLinkToolbarItem( editor, group ) {
 							div.style.cursor = 'pointer';
 							div.appendChild(WysiwygEditor.createElement('input', function( input ) {
 								input.setAttribute('type', 'radio');
-								input.style.verticalAlign = (Prototype.Browser.IE ? 'middle' : 'bottom');
+								input.style.verticalAlign = (WysiwygEditor.browserIsInternetExplorer() ? 'middle' : 'bottom');
 								input.style.marginRight = '0px';
 								webAddressRadioButton = input;
 							}));
@@ -1609,7 +1640,7 @@ function WysiwygEditorLinkToolbarItem( editor, group ) {
 							div.style.cursor = 'pointer';
 							div.appendChild(WysiwygEditor.createElement('input', function( input ) {
 								input.setAttribute('type', 'radio');
-								input.style.verticalAlign = (Prototype.Browser.IE ? 'middle' : 'bottom');
+								input.style.verticalAlign = (WysiwygEditor.browserIsInternetExplorer() ? 'middle' : 'bottom');
 								input.style.marginRight = '0px';
 								emailAddressRadioButton = input;
 							}));
@@ -2554,7 +2585,9 @@ function WysiwygEditorSpellCheckToolbarItems( editor, toolbar ) {
 	var hotkey = function(description) {
 		if( _('Hotkeys') ) {
 			var action = editor.id + '.spellcheck';
-			_('Hotkeys').registeredKeysMap[action].description = description;
+			if( _('Hotkeys').registeredKeysMap[action] ) {
+				_('Hotkeys').registeredKeysMap[action].description = description;
+			}
 		}
 	};
 	var start = function() {
