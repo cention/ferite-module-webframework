@@ -1,16 +1,20 @@
 <table cellpadding="1" cellspacing="1" border="0" id="[ID]" [StyleClass:class="[]"] style="[Style]">
+	<thead>
 	<tr id="[ID].Headers">
 		[@ColumnHeaders:
 			<th id="[ID]"[StyleClass: class="[]"] style="[Style:[]];[Sortable:cursor:pointer;][!Sortable:cursor:default;]" [Sortable:onclick="_('[.ID]')._setSortColumn('[<ID]')"] nowrap="nowrap">[TextValue]</th>
 		]
 	</tr>
+</thead>
+<tbody>
 [@Rows:
-	<tr [ID:onclick="_('[.ID]').action('row-clicked', '[]');" rowid="[]"]>
+	<tr [ID:onclick="_('[.ID]').action('row-clicked', '[]');" rowid="[]" id="[.ID].row.[]"]>
 		[@Columns:
 			[!ItemRendersColumn:<td [<ID:id="[]"] [<StyleClass:class="[]"] [<Style:style="[]"] [<IgnoreClicks] nowrap="nowrap">[<ItemRender]</td>]
 			[ItemRendersColumn:[<ItemRender]]
 		]
 	</tr> ]
+</tbody>
 [HaveTotals:
 	<tr class="TotalRow">
 		[@Totals:
@@ -25,16 +29,16 @@
 		[@ColumnHeaders:{ id:'[ID]', label:'[TextValue]', align:'[Align:[]][!Align:left]', maxlength:[MaxLength], ignoreClicks:[IgnoreClicks], sortable:[Sortable], width:'[Width]', visible:[Visible] },]
 		{}%%%]%%%);
 	_('[ID]').setState('sorting.internal', [sortable]); 
-[Map:_('[.ID]').setColumnMap([]);
-][InitialSort:_('[.ID]').setSortColumn('[]','[.InitialSortDirection]');
-][SecondarySort:_('[.ID]').setState('sorting.secondary', '[]');
-][AutoSort:_('[.ID]').setState('sorting.automatic-after-update', true);
-]
+[Map:_('[.ID]').setColumnMap([]);]
+[InitialSort:_('[.ID]').setSortColumn('[]','[.InitialSortDirection]');]
+[SecondarySort:_('[.ID]').setState('sorting.secondary', '[]');]
+[AutoSort:_('[.ID]').setState('sorting.automatic-after-update', true);]
 	_('[ID]').setRowDefaultStyle([DefaultStyle]);
 [WantRowClick:_('[.ID]').registerAction('row-clicked', function( row ){
 	mcam.fireForegroundEvent('[.ID]', '__GUIKit__.EvRowClicked', '' + row);
 });]
-	_('[ID]').updateHeaders();
-	_('[ID]').activate();
+_('[ID]').updateHeaders();
+_('[ID]').activate();
 </script>
+
 
