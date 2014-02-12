@@ -676,9 +676,9 @@ namespace modifies GUIKit {
 			
 			if( Config.Debug or (not compressedURI) ) {
 				.requiredJavascript().append(GUIKit.requiredJavascriptHeaders()).each() using ( js ) {
-					string uri = uriForJavascriptResource((js - '.js'));
+					string uri = __uriFor( 'Support', js, 'Components' );
 					if( not uri ) {
-						uri = __uriFor( 'Support', js, 'Components' );
+						uri = uriForJavascriptResource((js - '.js'));
 					}
 					uri and headers += HTML.javascriptHeader(uri);
 				};
