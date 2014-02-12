@@ -1,5 +1,5 @@
 <table cellpadding="1" cellspacing="1" border="0" id="[ID]" [StyleClass:class="[]"] style="[Style]">
-	<thead>
+<thead>
 	<tr id="[ID].Headers">
 		[@ColumnHeaders:
 			<th id="[ID]"[StyleClass: class="[]"] style="[Style:[]];[Sortable:cursor:pointer;][!Sortable:cursor:default;]" [Sortable:onclick="_('[.ID]')._setSortColumn('[<ID]')"] nowrap="nowrap">[TextValue]</th>
@@ -37,8 +37,6 @@
 [WantRowClick:_('[.ID]').registerAction('row-clicked', function( row ){
 	mcam.fireForegroundEvent('[.ID]', '__GUIKit__.EvRowClicked', '' + row);
 });]
-_('[ID]').updateHeaders();
-_('[ID]').activate();
+	_('[ID]').updateHeaders();
+	_('[ID]').activate();
 </script>
-
-
