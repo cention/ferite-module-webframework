@@ -272,7 +272,7 @@ function ComponentTable( id ) {
 		newTableRow.sourceObjectID = row.id;
 
 		if( previousRow == null ) {
-			if( body.childNodes.length == 1 ) {
+			if( body.childNodes.length == 0 ) {
 				body.appendChild(newTableRow);
 			} else {
 				body.insertBefore(newTableRow,body.firstChild.nextSibling);
