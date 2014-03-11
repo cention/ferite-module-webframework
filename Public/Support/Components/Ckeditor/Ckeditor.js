@@ -11,7 +11,7 @@ function ComponentCkeditor( id ) {
 	
 	self.config = {
 		skin: 'cention',
-		enterMode: CKEDITOR.ENTER_BR,
+		enterMode: ( CKEDITOR.env.webkit || CKEDITOR.env.safari ? CKEDITOR.ENTER_P : CKEDITOR.ENTER_BR),
 		shiftEnterMode: CKEDITOR.ENTER_P,
 		colorButton_enableMore: false,
 		resize_dir: 'both',
