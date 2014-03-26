@@ -1,0 +1,23 @@
+namespace modifies GUIKit {
+	
+	class DragDropSelect extends GUIKit.CAbstractList {
+
+		function component() {
+			return 'DragDropSelect';
+		}
+
+		function render() {
+			if( .visible() ) {
+				array  values = .generateTemplateAttributes('wfDragDropSelect');
+				if( .source ) {
+					values['Items'] = .source.items(.id, values);
+					values['Selected'] = .source.selected();
+					values['LeftArrow'] = uriForImageResource('arrow_left.gif');
+					values['RightArrow'] = uriForImageResource('arrow_right.gif');
+				}
+				return GUIKit.ViewTemplate.renderPath( .template(), values );
+			}
+			return "";
+		}
+	}
+}

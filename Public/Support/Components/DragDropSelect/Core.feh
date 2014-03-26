@@ -1,0 +1,1 @@
+GUIKit.Component.register( 'DragDropSelect', [ 'AbstractList' ], 'GUIKit.DragDropSelect' );
