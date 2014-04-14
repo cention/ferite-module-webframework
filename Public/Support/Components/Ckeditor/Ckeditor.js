@@ -100,7 +100,7 @@ function ComponentCkeditor( id ) {
 			'pastefromword,' + 
 			'resize,' +
 			'youtube',
-		contentsCss: WFServerURI + 'Resources/CSS/jquery.spellchecker.css',
+		contentsCss: [WFServerURI + 'Resources/CSS/jquery.spellchecker.css', WFServerURI + 'Resources/Javascript/ckeditor/contents.css'],
 		spellCheckLanguages: []
 	};
 	
