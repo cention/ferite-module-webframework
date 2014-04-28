@@ -11,7 +11,7 @@
 <input type="hidden" class="debug" name="[ID]%%%[%%%selected%%%]%%%" value="" id="FormValue_[ID]_Selected" />
 <input type="hidden" class="debug" name="[ID]%%%[%%%order%%%]%%%" value="" id="FormValue_[ID]_Order" />
 <script type="text/javascript" charset="utf-8">
-	SetComponent('[ID]', ComponentList('[ID]'));
+	SetComponent('[ID]', ComponentDragDropSelect('[ID]'));
 	[@Selected: _('[.ID]').selectItemsByValue('[]'); ]
 	_('[ID]').activate();
 	Sortable.create('[ID]_Source', {

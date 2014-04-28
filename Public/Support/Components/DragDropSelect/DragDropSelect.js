@@ -1,4 +1,4 @@
-function ComponentList( id ) {
+function ComponentDragDropSelect( id ) {
 	var self = new _ComponentAbstractList(id);
 	
 	self._multiple = true;
