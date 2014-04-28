@@ -200,7 +200,7 @@ function ComponentMultiplePopup( id ) {
 			setWidth: false,
 			setHeight: false,
 			offsetTop: buttonNodeHeight - extraTopOffset });
-		self.listNode.style.minWidth = self.node().offsetWidth + iconWidth - 1 + 'px';
+		self.listNode.style.minWidth = Element.getWidth(self.buttonNode) + 'px';
 		self.showingList = true;
 		
 		if( document.body.onclick ) {
