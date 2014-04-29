@@ -8,30 +8,19 @@
 .tabview li.tab {
 	float:left;
 	margin:0;
-	padding:0;
+	padding: 5px;
 	display:block;
 	color:#444;
 	text-decoration:none;
 	font-weight:bold;
 	background:#ddd;
-	margin:0;
-	padding: 5px;
 	border-left:1px solid #fff;
 	border-top:1px solid #fff;
 	border-right:1px solid #888;
 	cursor:default;
 }
-.tabview li.icon {
-	float:left;
-	margin:0;
-	padding:0;
-	display:block;
-	cursor:pointer;
-}
-.tabview li.icon img {
-	margin-left:4px;
-	margin-top:4px;
-	padding-top:2px;
+.tabview li.addbutton {
+	-moz-user-select: none;
 }
 .tabviewcontents {
 	display:none;

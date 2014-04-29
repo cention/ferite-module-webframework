@@ -1,0 +1,30 @@
+<table border="0" cellpadding="0" cellspacing="0" class="wfDragDropSelectContainer">
+	<tr>
+		<td><ul id="[ID]_Source" [StyleClass:class="[]"] [Style:style="[]"]> [@Items: []] </ul></td>
+		<td class="buttons">
+			<img id="[ID]_RightArrow" src="[RightArrow]" border="0" />
+			<img id="[ID]_LeftArrow" src="[LeftArrow]" border="0" />
+		</td>
+		<td class="target"><ul id="[ID]" [StyleClass:class="[]"] [Style:style="[]"]></ul></td>
+	</tr>
+</table>
+<input type="hidden" class="debug" name="[ID]%%%[%%%selected%%%]%%%" value="" id="FormValue_[ID]_Selected" />
+<input type="hidden" class="debug" name="[ID]%%%[%%%order%%%]%%%" value="" id="FormValue_[ID]_Order" />
+<script type="text/javascript" charset="utf-8">
+	SetComponent('[ID]', ComponentDragDropSelect('[ID]'));
+	[@Selected: _('[.ID]').selectItemsByValue('[]'); ]
+	_('[ID]').activate();
+	Sortable.create('[ID]_Source', {
+		containment: %%%[%%% '[ID]', '[ID]_Source' %%%]%%%,
+		dropOnEmpty: true,
+		constraint: '',
+		onUpdate: function() { _('[ID]').propagateChange(); }
+	});
+	Sortable.create('[ID]', {
+		containment: %%%[%%% '[ID]', '[ID]_Source' %%%]%%%,
+		dropOnEmpty: true,
+		constraint: '',
+		onUpdate: function() { _('[ID]').propagateChange(); }
+	});
+	[EventCode]
+</script>

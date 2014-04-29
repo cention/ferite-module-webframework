@@ -44,7 +44,6 @@ function _ComponentTabViewItem( tabview, id, contents ) {
 				closeButton.src = uriForApplicationImageResource('black_cross.gif');
 				closeButton.width = 6;
 				closeButton.height = 6;
-				closeButton.style.verticalAlign = 'middle';
 				closeButton.style.marginLeft = '5px';
 				closeButton.onclick = function( event ) {
 					GetComponent(self.getState('tabview')).action('remove-tab', self.identifier());

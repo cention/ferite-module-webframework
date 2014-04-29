@@ -906,7 +906,7 @@ function I(k) {
 
 function wfStringExpand( format ) {
 	var i = 0;
-	for( i = 0; i < 8; i++ ) {
+	for( i = 0; i < (arguments.length - 1); i++ ) {
 		var o = new RegExp('{(' + i + ')(:(.*?))?}', 'g');
 		var arg = ('' + arguments[i+1]).replace(/\$/g, '___DOLLAR_SIGN___');
 		var after = format.replace(o, arg);

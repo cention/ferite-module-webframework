@@ -19,6 +19,25 @@ function ComponentList( id, multiple, mutable ) {
 	self.itemDeselect = function( item ) {
 		item.selected = false;
 	};
+	self.addItem = function( value, display ) {
+		var items = self.itemsByValue(value);
+		if( items.length == 0 ) {
+			var item = document.createElement('li');
+			item.setAttribute('value', value);
+			item.innerHTML = display;
+			self.node().appendChild(item);
+			self.updateSelected();
+			self.updateVisual();
+			self.applyEventHandlers();
+		}
+	};
+	self.removeItem = function( value ) {
+		var items = self.itemsByValue(value);
+		for( var i = 0; i < items.length; ++i ) {
+			self.node().removeChild(items[i]);
+		}
+		self.updateSelected();
+	};
 	self.updateFormValue = function() {
 		if(node = byId('FormValue_' + self.identifier() + '_Order'))
 			node.value = self.orderFormValue();
@@ -41,11 +60,16 @@ function ComponentList( id, multiple, mutable ) {
 		});
 		previousUpdateVisual();
 	};
+	self.applyEventHandlers = function() {
+		if( self.getState('mutable') ) {
+			self.itemsEach( function( index, item ) {
+				self.attachClickActionWithValue(item, self.identifier(), item);
+			});
+		}		
+	};
 	self.setMultiple( multiple );
 	if( self.getState('mutable') ) {
-		self.itemsEach( function( index, item ) {
-			self.attachClickActionWithValue(item, self.identifier(), item);
-		});
+		self.applyEventHandlers();
 		self.registerAction('click', function( event, item ) {
 			self.selectItem(item);
 		});
