@@ -184,8 +184,6 @@ function ComponentMultiplePopup( id ) {
 	self.showList = function() {
 		self.action('show');
 		
-		var iconWidth = 0;
-
 		if( self.doneNode ) {
 			self.doneNode.className = 'done';
 		}
@@ -231,10 +229,17 @@ function ComponentMultiplePopup( id ) {
 		
 		var nodeDimensions = Element.getDimensions(self.node());
 		var nodeCumulativeOffset = Element.cumulativeOffset(self.node());
-		var maxHeight = (viewportHeight - nodeCumulativeOffset.top - 35);
 		var actualWidth = nodeDimensions.width;
 		var actualHeight = nodeDimensions.height;
+		var listButtonsTotalHeight = 0;
+		var maxHeight = (viewportHeight - nodeCumulativeOffset.top - 35);
+
+		if( self.selectAllNode )  listButtonsTotalHeight += Element.getHeight(self.selectAllNode);
+		if( self.selectNoneNode ) listButtonsTotalHeight += Element.getHeight(self.selectNoneNode);
+		if( self.doneNode )       listButtonsTotalHeight += Element.getHeight(self.doneNode);
 		
+		maxHeight -= listButtonsTotalHeight;
+
 		// Tobias 2011-08-16: I think active is first set to false here and then to true
 		// to prevent updateVisual function to run when the states are set.
 		self._active = false;
@@ -245,7 +250,7 @@ function ComponentMultiplePopup( id ) {
 		if( maxHeight < 100 ) { // List goes above button
 			// Calculate new max height
 			var buttonNodeCumulativeOffset = Element.cumulativeOffset(self.buttonNode);
-			maxHeight = buttonNodeCumulativeOffset.top - 25;
+			maxHeight = buttonNodeCumulativeOffset.top - listButtonsTotalHeight - 25;
 			if( maxHeight < actualHeight ) {
 				self.node().style.height = '' + maxHeight + 'px';
 			}
