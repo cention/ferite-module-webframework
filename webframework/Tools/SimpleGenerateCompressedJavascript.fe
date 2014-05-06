@@ -96,8 +96,6 @@ applicationJavaScriptFiles = [
 //	'Resources/Javascript/overview.js',
 //	'Resources/Javascript/plugins.js',
 	'Resources/Javascript/quickask.js',
-	'Resources/Javascript/reports.js',
-	'Resources/Javascript/reports/drilldown.js',
 	'Resources/Javascript/richtext.js',
 //	'Resources/Javascript/routing.js',
 //	'Resources/Javascript/salutation.js',
@@ -108,7 +106,6 @@ applicationJavaScriptFiles = [
 //	'Resources/Javascript/systemgroup.js',
 	'Resources/Javascript/validation.js',
 	'Resources/Javascript/workingTimeCalendar.js',
-	'Resources/Javascript/3rdParty/Chart.js',
 	// Components
 	'Support/Components/AnswerPageBox/AnswerPageBox.js',
 	'Support/Components/AnswerPageTextBox/AnswerPageTextBox.js',
