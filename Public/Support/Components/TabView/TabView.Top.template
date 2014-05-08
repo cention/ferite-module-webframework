@@ -1,10 +1,11 @@
 <div id="[ID]Wrapper">
-	<ul id="[ID]" class="tabview" style="clear:both">
+	<ul id="[ID]" class="tabview" style="[Style];clear:both">
 [@Tabs:	<li id="[ID]" class="tab"><span id="[ID].label">[TextValue]</span></li>
 ]
-[showAddTabButton:	<li id="[.ID].AddTabButton" class="icon"><img src="[.addTabButtonIcon]" /></li>
+[showAddTabButton:	<li id="[.ID].AddTabButton" class="tab addbutton">+</li>
 ]
 	</ul>
+	<div style="border-bottom:1px solid #ccc;clear:both;"></div>
 	<div style="clear:both;"></div>
 	<script type="text/javascript" charset="utf-8">
 		SetComponent('[ID]', ComponentTabView('[ID]'));

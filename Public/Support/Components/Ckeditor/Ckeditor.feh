@@ -6,14 +6,14 @@ namespace modifies GUIKit {
 		[attribute boolean twoRowToolbar false 'Whether toolbar items should be on two rows'];
 		[attribute string spellCheckKey 'K' 'What key to use for the hotkey for spell check'];
 
-		[style_attribute string 'font-family' '' 'The family to use for font'];
-
 		array _images;
 		array _languages;
 		string _selectedLanguage;
 		number _height;
 		boolean _resize;
 		boolean _simpleToolbar;
+		string _fontSize;
+		string _fontFamily;
 		
 		function setLanguages( array items )
 			._languages = items;
@@ -29,7 +29,11 @@ namespace modifies GUIKit {
 		    ._height = height;
 		function setSimpleToolbar(boolean simpleToolbar)
 		    ._simpleToolbar = simpleToolbar;
-		    
+		function setFontSize(string fontSize)
+			._fontSize = fontSize;
+		function setFontFamily( string fontFamily)
+			._fontFamily = fontFamily;
+
 		function render() {
 			if( .visible() ) {
 				array values = .generateTemplateAttributes('wfCkeditor');
@@ -52,6 +56,8 @@ namespace modifies GUIKit {
 				values['ItemHeight'] = JSON.valueToJSON(._height);
 				values['ShowResize'] = JSON.valueToJSON(._resize);
 				values['SimpleToolbar'] = JSON.valueToJSON(._simpleToolbar);
+				values['FontSize'] = JSON.valueToJSON(._fontSize);
+				values['FontFamily'] = JSON.valueToJSON(._fontFamily);
 				values['JavascriptSafeTextValue'] = JSON.escape(values['TextValue']);
 				return GUIKit.ViewTemplate.renderPath(path, values);
 			}

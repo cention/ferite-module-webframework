@@ -104,6 +104,20 @@ function ComponentCkeditor( id ) {
 		spellCheckLanguages: []
 	};
 	
+	self.setFontSize = function( size ){
+		if( size ){
+			self.config.fontSize_defaultLabel = ''+size;
+			CKEDITOR.addCss( '.cke_editable{ font-size: '+ size +'; }' );
+		}
+	};
+	
+	self.setFontFamily = function( family ){
+		if( family ){
+			self.config.font_defaultLabel = ''+family;
+			CKEDITOR.addCss( '.cke_editable{ font-family: '+ family +'; }' );
+		}
+	}
+
 	self.setLanguages = function( list ) {
 	    self.config.spellCheckLanguages = list;
 	};

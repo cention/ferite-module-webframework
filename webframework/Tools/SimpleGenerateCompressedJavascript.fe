@@ -46,6 +46,7 @@ webframeworkJavaScriptFiles = [
 	'Support/Components/Checkbox/Checkbox.js',
 	'Support/Components/Ckeditor/Ckeditor.js',
 	'Support/Components/Combobox/Combobox.js',
+	'Support/Components/DragDropSelect/DragDropSelect.js',
 	'Support/Components/FormControl/FormControl.js',
 	'Support/Components/FormSelect/FormSelect.js',
 	'Support/Components/Helper/Helper.js',

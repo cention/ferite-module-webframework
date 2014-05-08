@@ -11,6 +11,8 @@
 	_('[ID]').setLanguages([Languages]);
 	_('[ID]').setState('text-value', "[JavascriptSafeTextValue]");
 	_('[ID]').setItemHeight([ItemHeight]);
+	_('[ID]').setFontSize([FontSize]);
+	_('[ID]').setFontFamily([FontFamily]);
 	_('[ID]').activate();
 	_('[ID]').setImages([Images]); /* This needs to come after activate() */
 </script>
