@@ -105,6 +105,7 @@ applicationJavaScriptFiles = [
 //	'Resources/Javascript/systemgroup.js',
 	'Resources/Javascript/validation.js',
 	'Resources/Javascript/workingTimeCalendar.js',
+	'Resources/Javascript/detector.js',
 	// Components
 	'Support/Components/AnswerPageBox/AnswerPageBox.js',
 	'Support/Components/AnswerPageTextBox/AnswerPageTextBox.js',
