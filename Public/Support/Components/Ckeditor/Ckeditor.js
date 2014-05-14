@@ -11,7 +11,7 @@ function ComponentCkeditor( id ) {
 	
 	self.config = {
 		skin: 'cention',
-		enterMode: CKEDITOR.ENTER_BR,
+		enterMode: ( CKEDITOR.env.gecko ? CKEDITOR.ENTER_BR : CKEDITOR.ENTER_P),
 		shiftEnterMode: CKEDITOR.ENTER_P,
 		colorButton_enableMore: false,
 		resize_dir: 'both',
@@ -100,10 +100,23 @@ function ComponentCkeditor( id ) {
 			'pastefromword,' + 
 			'resize,' +
 			'youtube',
-		contentsCss: WFServerURI + 'Resources/CSS/jquery.spellchecker.css',
+		contentsCss: [WFServerURI + 'Resources/CSS/jquery.spellchecker.css', WFServerURI + 'Resources/Javascript/ckeditor/contents.css'],
 		spellCheckLanguages: []
 	};
 	
+	self.setFontSize = function( size ){
+		if( size ){
+			self.config.fontSize_defaultLabel = ''+size;
+			CKEDITOR.addCss( '.cke_editable{ font-size: '+ size +'; }' );
+		}
+	};
+	
+	self.setFontFamily = function( family ){
+		if( family ){
+			self.config.font_defaultLabel = ''+family;
+			CKEDITOR.addCss( '.cke_editable{ font-family: '+ family +'; }' );
+		}
+	};
 	self.setLanguages = function( list ) {
 	    self.config.spellCheckLanguages = list;
 	};
