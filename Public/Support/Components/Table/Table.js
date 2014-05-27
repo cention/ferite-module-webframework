@@ -213,8 +213,8 @@ function ComponentTable( id ) {
 		var rowStyle = {};
 		var styles = '';
 		var classes = '';
-		
-		[ 'className', 'fg', 'bg', 'bold', 'underline', 'italic', 'strike', 'smallcaps' ].each(function( attr ){
+		var Warningcount = 0;
+		[ 'className', 'fg', 'bg', 'bold', 'underline', 'italic', 'strike', 'smallcaps','themeWarning' ].each(function( attr ){
 			if( defaultStyle[attr] ) rowStyle[attr] = defaultStyle[attr];
 			if( row.style && row.style[attr] ) rowStyle[attr] = row.style[attr];
 		});
@@ -230,6 +230,9 @@ function ComponentTable( id ) {
 			if( rowStyle.strike ) styles += "text-decoration:line-through;";
 			if( rowStyle.smallcaps ) styles += "font-variant:small-caps;";
 		}
+
+		Warningcount = ((columns.length * 50)/100);
+		Warningcount = Math.ceil( Warningcount );
 
 		for( j = 0; j < columns.length; j++ ) {
 			var cancelClickEvent = '';
@@ -257,6 +260,12 @@ function ComponentTable( id ) {
 			
 				if( cellStyles ) {
 					cellStyles = ' style="' + cellStyles + (browser == 'Internet Explorer' ? 'padding:0px;padding-left:2px;padding-right:2px;' : 'padding:2px;padding-left:4px;padding-right:4px;') + 'height:16px;" nowrap="nowrap"';
+				}
+
+				if( rowStyle.themeWarning && rowStyle.themeWarning != 'undefined' ){
+					if( j <= Warningcount ){
+						cellStyles = ' style="color:'+rowStyle.fg+';background-color:#ff8285;padding:2px;padding-left:4px;padding-right:4px;height:16px;" nowrap="nowrap"';		
+					}
 				}
 			
 				html += 
