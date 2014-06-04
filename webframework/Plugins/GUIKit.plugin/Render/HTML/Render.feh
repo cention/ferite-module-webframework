@@ -193,6 +193,7 @@ namespace modifies GUIKit
 				else if( element.getElementName() == "head")
 				{
 					array chunks = [];
+					chunks[] = "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=Edge\" />";
 					chunks[] = "<style xmlns=\"http://www.w3.org/1999/xhtml\" type=\"text/css\" media=\"screen\">
 									<!--
 									@import url( ${uriForCSSResource('Default')} );
