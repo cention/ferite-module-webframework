@@ -338,7 +338,8 @@ namespace Cache {
 					} else {
 						value = defaultValue;
 					}
-				} handle {
+				} handle (e) {
+					.printStackTrace(e);
 					value = defaultValue;
 				}
 			};
@@ -351,7 +352,8 @@ namespace Cache {
 					} else {
 						value = defaultValue;
 					}
-				} handle {
+				} handle (e) {
+					.printStackTrace(e);
 					value = defaultValue;
 				}
 			};
@@ -392,5 +394,11 @@ namespace Cache {
 				memcached.default_cache.delete(key);
 			};
 		}
+	}
+	function printStackTrace(object e) {
+		Console.printlnErr(e.str);
+		e.backtrace().each() using ( t ) {
+			Console.printlnErr("\t${t['file']}:${t['line']} → ${t['container']}.${t['function']}");
+		};
 	}
 }
