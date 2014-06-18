@@ -331,29 +331,29 @@ namespace Cache {
 			}
 
 			wf_profile("Cache.load.$key") using {
-				monitor {
-					if( block ) {
+				if( block ) {
+					monitor {
 						value = block.invoke();
 						memcached.serializeSet(key, value, expire);
-					} else {
+					} handle (e) {
+						.printStackTrace(e);
 						value = defaultValue;
 					}
-				} handle (e) {
-					.printStackTrace(e);
+				} else {
 					value = defaultValue;
 				}
 			};
 		} 
 		else {
 			wf_profile("Cache.ignore.$key") using {
-				monitor {
-					if( block ) {
+				if( block ) {
+					monitor {
 						value = block.invoke();
-					} else {
+					} handle (e) {
+						.printStackTrace(e);
 						value = defaultValue;
 					}
-				} handle (e) {
-					.printStackTrace(e);
+				} else {
 					value = defaultValue;
 				}
 			};
