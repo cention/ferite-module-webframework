@@ -635,11 +635,12 @@ namespace modifies GUIKit {
 		function getHeaders() {
 			return 
 				GUIKit.requiredCSSHeaders() +
-				HTML.stylesheetHeader(uriForCSSResource('jquery.spellchecker'));
+				HTML.stylesheetHeader(uriForCSSResource('jquery.spellchecker')) +
+				HTML.stylesheetHeader(uriForCSSResource('jquery-ui'));
 		}
 		function requiredJavascript
 			return [ /* 1st Party Titles */ 'Debug', 'General', 'Validator', 'Hotkey', 'MCAM', 
-					 /* 3rd Party Titles */ 'jquery', 'jquery-extensions', 'JSON2', 'prototype',
+					 /* 3rd Party Titles */ 'jquery', 'jquery-extensions', 'JSON2', 'prototype','jquery-ui',
 					 'scriptaculous/builder', 
 					 'scriptaculous/effects', 
 					 'scriptaculous/dragdrop', 
