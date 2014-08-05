@@ -13,6 +13,8 @@ function ComponentCkeditor( id ) {
 		skin: 'cention',
 		enterMode: ( CKEDITOR.env.gecko ? CKEDITOR.ENTER_BR : CKEDITOR.ENTER_P),
 		shiftEnterMode: CKEDITOR.ENTER_P,
+		disableNativeSpellChecker: false,
+		browserContextMenuOnCtrl: true,
 		colorButton_enableMore: false,
 		resize_dir: 'both',
 		/*resize_enabled: true,*/
