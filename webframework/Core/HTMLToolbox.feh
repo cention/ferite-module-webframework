@@ -149,6 +149,12 @@ namespace HTML {
 	}
 	function twoStepTango( string left, string right )
 		return "$left <span class=\"wfSystemHint\">($right)</span>";
+	function translateSpecialCharacters( string html ) {
+		html = Regexp.replaceAll('&', html, '&amp;');
+		html = Regexp.replaceAll('<', html, '&lt;');
+		html = Regexp.replaceAll('>', html, '&gt;');
+		return html;
+	}
 }
 /**
  * @end
