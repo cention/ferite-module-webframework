@@ -659,6 +659,7 @@ namespace modifies GUIKit {
 			return ['ckeditor/ckeditor'];
 
 		function getJavascriptIncludes {
+			string version = '?=v' + Date.date(Date.now()).format('%Y%m%d');
 			string compressed = application.virtualName + '-Uncompressed';
 			string compressedURI = uriForJavascriptResource('Generated/' + compressed);
 			
@@ -671,7 +672,7 @@ namespace modifies GUIKit {
 				if( not uri ) {
 					uri = __uriFor( 'Support', js, 'Components' );
 				}
-				uri and headers += HTML.javascriptHeader(uri);
+				uri and headers += HTML.javascriptHeader(uri + version);
 			};
 			headers += "<!-- Runtime generated $compressed: $compressedURI -->";
 			
@@ -681,14 +682,14 @@ namespace modifies GUIKit {
 					if( not uri ) {
 						uri = uriForJavascriptResource((js - '.js'));
 					}
-					uri and headers += HTML.javascriptHeader(uri);
+					uri and headers += HTML.javascriptHeader(uri + version);
 				};
 			} else {
-				headers += HTML.javascriptHeader(compressedURI);
+				headers += HTML.javascriptHeader(compressedURI + version);
 			}
 						
 			if( translationURI ) {
-				headers += HTML.javascriptHeader(translationURI);
+				headers += HTML.javascriptHeader(translationURI + version);
 				headers += HTML.javascriptChunk("WFI18NCatalog = '${I18N.desiredCatalog}';");
 			}
 			

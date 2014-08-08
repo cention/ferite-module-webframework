@@ -42,7 +42,7 @@ namespace Database {
 		
 		if( dbc != null )
 		{
-			.debug_print( query );
+			//.debug_print( query );
 			result = dbc.query( query );
 			if( result != null )
 			{
