@@ -80,8 +80,9 @@ function MCAM() { // Multiple Channel AJAX Mechanism
 							if( requesterEvent.failureCallback )
 								requesterEvent.failureCallback();
 						}
-					} else if( requester.status != 404 && requester.status > 0 ) {
-						this.outputSystem.errorBox('All going wrong -> ' + requester.status + ' : ' + requesterEvent.mcamURL, '');
+					} else if( requester.status != 404 ) {
+						if( requester.status > 0 )
+							this.outputSystem.errorBox('All going wrong -> ' + requester.status + ' : ' + requesterEvent.mcamURL, '');
 						if( requesterEvent.failureCallback )
 							requesterEvent.failureCallback();
 					}
