@@ -94,6 +94,11 @@ function _ComponentAbstractList( id ) {
 			return self.itemIsSelected(item);
 		});
 	};
+	self.extraSelectedFormValue = function() {
+		return self.formValueForDecision( function( item ) {
+			return self.extraItemIsSelected(item);
+		});
+	};
 	self.orderFormValue = function() {
 		return self.formValueForDecision( function( item ) {
 			return true;

@@ -2,17 +2,26 @@
 	<tr>
 		<td><ul id="[ID]_Source" [StyleClass:class="[]"] [Style:style="[]"]> [@Items: []] </ul></td>
 		<td class="buttons">
-			<img id="[ID]_RightArrow" src="[RightArrow]" border="0" />
-			<img id="[ID]_LeftArrow" src="[LeftArrow]" border="0" />
+			<img id="[ID]_RightArrow" src="/webframework-public/Resources/Images/arrow_right.gif" border="0" />
+			<img id="[ID]_LeftArrow" src="/webframework-public/Resources/Images/arrow_left.gif" border="0" />
 		</td>
-		<td class="target"><ul id="[ID]" [StyleClass:class="[]"] [Style:style="[]"]></ul></td>
+		<td class="target"><ul id="[ID]" [StyleClass:class="[]"] [Style:style="[]"]> [@Selected: []] </ul></td>
+	[!normalBox:
+		<td class="buttons">
+			<img id="[ID]_RightArrow1" src="/webframework-public/Resources/Images/arrow_right.gif" border="0" />
+			<img id="[ID]_LeftArrow1" src="/webframework-public/Resources/Images/arrow_left.gif" border="0" />
+		</td>
+		<td class="target"><ul id="[ID]_Target" [StyleClass:class="[]"] [Style:style="[]"]>[@extraSelected: []]</ul></td>
+	]
 	</tr>
 </table>
 <input type="hidden" class="debug" name="[ID]%%%[%%%selected%%%]%%%" value="" id="FormValue_[ID]_Selected" />
+<input type="hidden" class="debug" name="[ID]%%%[%%%extraSelected%%%]%%%" value="" id="FormValue_[ID]_extraSelected" />
 <input type="hidden" class="debug" name="[ID]%%%[%%%order%%%]%%%" value="" id="FormValue_[ID]_Order" />
 <script type="text/javascript" charset="utf-8">
 	SetComponent('[ID]', ComponentDragDropSelect('[ID]'));
-	[@Selected: _('[.ID]').selectItemsByValue('[]'); ]
+	[@Selected: _('[.ID]').selectItemsByValue('[]'); ]	
+	[@extraSelected: _('[.ID]').selectItemsByValue('[]'); ]	
 	_('[ID]').activate();
 	Sortable.create('[ID]_Source', {
 		containment: %%%[%%% '[ID]', '[ID]_Source' %%%]%%%,
@@ -21,10 +30,18 @@
 		onUpdate: function() { _('[ID]').propagateChange(); }
 	});
 	Sortable.create('[ID]', {
-		containment: %%%[%%% '[ID]', '[ID]_Source' %%%]%%%,
+		containment: %%%[%%% '[ID]_Target', '[ID]_Source' %%%]%%%,
 		dropOnEmpty: true,
 		constraint: '',
 		onUpdate: function() { _('[ID]').propagateChange(); }
 	});
+	if ( ![normalBox:true][!normalBox:false] ) {
+		Sortable.create('[ID]_Target', {
+			containment: %%%[%%% '[ID]', '[ID]_Target' %%%]%%%,
+			dropOnEmpty: true,
+			constraint: '',
+			onUpdate: function() { _('[ID]').propagateChange(); }
+		});
+	}	
 	[EventCode]
 </script>

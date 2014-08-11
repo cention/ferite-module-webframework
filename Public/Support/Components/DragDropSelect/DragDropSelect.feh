@@ -1,19 +1,86 @@
 namespace modifies GUIKit {
-	
+	class DragDropSelectDataSource {
+		array _items;
+		object _combobox;
+		array _selectedItem;
+		array _extraSelectedItem;
+		array real_left_source;
+		array real_right_source;
+		array real_extra_source;
+		
+		function constructor( object combobox ) {
+			._combobox = combobox;
+		}
+		function append() {			
+			._items.each() using ( item ) {
+				if( not ._selectedItem.valueExists(item[0]) ) {
+					if( not ._extraSelectedItem.valueExists(item[0]) ) {
+					      .real_left_source[] = item;
+					}	
+					else {
+					      .real_extra_source[] = item;
+					}
+				} 
+				else {
+					.real_right_source[] = item;
+				}
+			};
+		}	
+	}
 	class DragDropSelect extends GUIKit.CAbstractList {
-
+	
+		[attribute boolean normalBox true 'Three list box if false'];
+		
+		object dragdata;
+		
 		function component() {
 			return 'DragDropSelect';
 		}
-
+		
+		function createObject() {
+			if( not .dragdata ) {
+				.dragdata = new GUIKit.DragDropSelectDataSource( self );
+			}
+		}
+                function setData( array data ) { 
+                        .createObject();
+			.dragdata._items = data;
+                }
+                function setSelected( array data ) {
+			.createObject();		
+			.dragdata._selectedItem = data;
+                }
+                function setExtraSelected( array data ) {
+			.createObject();			
+			.dragdata._extraSelectedItem = data;
+                }
+                function setItems() {
+			 .setDataSource(.dragdata.real_left_source);
+                }              
+                function setSelectedItems() {
+                         .setDataSource(.dragdata.real_right_source);
+                }
+                function setExtraSelectedItems() {
+                         .setDataSource(.dragdata.real_extra_source);
+                }
+                function selectedItems() {
+			  return .dragdata._selectedItem;
+                }
+                function extraSelectedItems() {
+			  return .source._extraSelected;
+                }
+		
 		function render() {
 			if( .visible() ) {
 				array  values = .generateTemplateAttributes('wfDragDropSelect');
 				if( .source ) {
+				       .dragdata.append();				       
+				        .setItems();
 					values['Items'] = .source.items(.id, values);
-					values['Selected'] = .source.selected();
-					values['LeftArrow'] = uriForImageResource('arrow_left.gif');
-					values['RightArrow'] = uriForImageResource('arrow_right.gif');
+					.setSelectedItems();
+					values['Selected'] = .source.items(.id, values);
+					.setExtraSelectedItems();
+					values['extraSelected'] = .source.items(.id, values);
 				}
 				return GUIKit.ViewTemplate.renderPath( .template(), values );
 			}

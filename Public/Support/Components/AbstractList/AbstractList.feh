@@ -10,7 +10,7 @@ namespace modifies GUIKit {
 
 	class CSimpleListDataSource {
 		string _classname;
-		array  _items, _selected, _separators, _order;
+		array  _items, _selected, _separators, _order, _extraSelected;
 		object _list;
 		
 		constructor( object list, string klass ) {
@@ -22,6 +22,7 @@ namespace modifies GUIKit {
 			._items = [];
 			._selected = [];
 			._order = [];
+			._extraSelected = [];
 		}
 		function _create {
 			void klass = Class.locate('GUIKit.' + ._classname);
@@ -109,7 +110,7 @@ namespace modifies GUIKit {
 		function order
 			return ._order;
 		function setOrder( array ids ) 
-			._order = ids;
+			._order = ids;			
 	}
 
 	class CAbstractList extends GUIKit.AbstractComponent {
@@ -196,7 +197,7 @@ namespace modifies GUIKit {
 				.source.setOrder(.order());
 			} else if( id == 'itemclass' and .source ) {
 				.source._classname = .itemclass();
-			}
+			} 
 		}
 		function handleFormValue( string value ) {
 			._createDataSource();
@@ -208,6 +209,8 @@ namespace modifies GUIKit {
 				.setSelected(value['selected']);
 			if( value.keyExists('order') ) 
 				.setOrder(value['order']);
+			if( value.keyExists('extraSelected') ) 	
+			       .source._extraSelected = JSON.parse(value['extraSelected']);
 		}
 		function renderEvent( string event ) {
 			if( event == GUIKit.EvChange )
