@@ -2,14 +2,14 @@
 	<tr>
 		<td><ul id="[ID]_Source" [StyleClass:class="[]"] [Style:style="[]"]> [@Items: []] </ul></td>
 		<td class="buttons">
-			<img id="[ID]_RightArrow" src="/webframework-public/Resources/Images/arrow_right.gif" border="0" />
-			<img id="[ID]_LeftArrow" src="/webframework-public/Resources/Images/arrow_left.gif" border="0" />
+			<img id="[ID]_RightArrow" src="[RightArrow]" border="0" />
+			<img id="[ID]_LeftArrow"  src="[LeftArrow]"  border="0" />
 		</td>
 		<td class="target"><ul id="[ID]" [StyleClass:class="[]"] [Style:style="[]"]> [@Selected: []] </ul></td>
 	[!normalBox:
 		<td class="buttons">
-			<img id="[ID]_RightArrow1" src="/webframework-public/Resources/Images/arrow_right.gif" border="0" />
-			<img id="[ID]_LeftArrow1" src="/webframework-public/Resources/Images/arrow_left.gif" border="0" />
+			<img id="[ID]_RightArrow1" src="[RightArrow]" border="0" />
+			<img id="[ID]_LeftArrow1"  src="[LeftArrow]"  border="0" />
 		</td>
 		<td class="target"><ul id="[ID]_Target" [StyleClass:class="[]"] [Style:style="[]"]>[@extraSelected: []]</ul></td>
 	]

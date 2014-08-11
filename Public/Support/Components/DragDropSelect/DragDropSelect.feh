@@ -81,6 +81,9 @@ namespace modifies GUIKit {
 					values['Selected'] = .source.items(.id, values);
 					.setExtraSelectedItems();
 					values['extraSelected'] = .source.items(.id, values);
+					values['LeftArrow'] = uriForImageResource('arrow_left.gif');
+                                        values['RightArrow'] = uriForImageResource('arrow_right.gif');
+
 				}
 				return GUIKit.ViewTemplate.renderPath( .template(), values );
 			}
