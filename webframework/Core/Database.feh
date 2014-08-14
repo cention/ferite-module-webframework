@@ -65,11 +65,19 @@ namespace Database {
 	}
 	
 	function queryAllResults( string query ) {
+		return .queryToArray(query,true);
+	}
+	
+	function queryToArray( string query ) {
+		return .queryToArray(query,false);
+	}
+	
+	function queryToArray( string query, boolean flatten ) {
 		array  returnValue, row;
 		object result = .query(query);
 		
 		while( row = result.nextRecord() ) {
-			if( Array.size(row) == 1 )
+			if ( flatten && Array.size(row) == 1 )
 				returnValue[] = row[0];
 			else
 				returnValue[] = row;
