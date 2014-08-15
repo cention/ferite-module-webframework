@@ -264,7 +264,7 @@ function ComponentTable( id ) {
 
 				if( rowStyle.themeWarning && rowStyle.themeWarning != 'undefined' ){
 					if( j <= Warningcount ){
-						cellStyles = ' style="color:'+rowStyle.fg+';background-color:#ff8285;padding:2px;padding-left:4px;padding-right:4px;height:16px;" nowrap="nowrap"';		
+						cellStyles = (browser == 'Internet Explorer' ? 'style="color:'+ rowStyle.fg +';background-color:#ff8285;padding:0px;padding-left:2px;padding-right:2px;height:16px;" nowrap="nowrap"' : ' style="color:'+ rowStyle.fg +';background-color:#ff8285;padding:2px;padding-left:4px;padding-right:4px;height:16px;" nowrap="nowrap"');
 					}
 				}
 			
