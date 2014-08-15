@@ -30,19 +30,23 @@ function ComponentDragDropSelect( id ) {
 		return item.getAttribute('value');
 	};
 	self.itemSelect = function( item, arrow ) {
-		if(item.parentNode.id == self.identifier() + '_Source' && arrow == '_RightArrow')
-			self.node().appendChild(item);
-		if(item.parentNode.id == self.identifier() && arrow == '_RightArrow1') {
-		        if( byId(self.identifier() + '_Target') ) {
-				byId(self.identifier() + '_Target').appendChild(item);
+		for(i=0;i < item.length;i++ ) {
+			if(item[i].parentNode.id == self.identifier() + '_Source' && arrow == '_RightArrow')
+				self.node().appendChild(item[i]);
+			if(item[i].parentNode.id == self.identifier() && arrow == '_RightArrow1') {
+				if( byId(self.identifier() + '_Target') ) {
+					byId(self.identifier() + '_Target').appendChild(item[i]);
+				}
 			}
 		}
 	};
 	self.itemDeselect = function( item, arrow ) {
-		if(item.parentNode.id == self.identifier() && arrow == '_LeftArrow')
-			byId(self.identifier() + '_Source').appendChild(item);
-		if(item.parentNode.id == self.identifier() + '_Target' && arrow == '_LeftArrow1')
-			self.node().appendChild(item);
+		for(i=0;i<item.length;i++) {
+			if(item[i].parentNode.id == self.identifier() && arrow == '_LeftArrow')
+				byId(self.identifier() + '_Source').appendChild(item[i]);
+			if(item[i].parentNode.id == self.identifier() + '_Target' && arrow == '_LeftArrow1')
+				self.node().appendChild(item[i]);
+		}
 	};
 	self.updateFormValue = function() {	        
 		if(node = byId('FormValue_' + self.identifier() + '_Order'))
@@ -71,17 +75,24 @@ function ComponentDragDropSelect( id ) {
 		}
 	};
 
-	self._currentSelectedItem = null;
+	self._currentSelectedItem = Array();
 	self.itemsEach( function( index, item ) {
 		self.attachMouseDownActionWithValue(item, self.identifier(), item);
 	});
-	self.registerAction('click', function( event, item ) {
-		if( self._currentSelectedItem )
-			self._currentSelectedItem.className = '';
-		item.className = 'selected';
-		self._currentSelectedItem = item;
+	self.registerAction('click', function( event, item ) {			    
+		if (event.ctrlKey || event.shiftKey) {
+			item.className = 'selected';
+			self._currentSelectedItem.push(item);
+		} 
+		else {	    
+			for(i=0;i<self._currentSelectedItem.length;++i)
+				self._currentSelectedItem[i].className = '';	    
+			
+			self._currentSelectedItem.clear();
+			item.className ='selected';
+			self._currentSelectedItem.push(item);
+		}
 	});
-
 	byId(self.identifier() + '_LeftArrow').onclick = function() {
 		if( self._currentSelectedItem ) {
 			self.itemDeselect(self._currentSelectedItem, '_LeftArrow');
