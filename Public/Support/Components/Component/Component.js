@@ -93,6 +93,14 @@ function Component( identifier ) {
 			};
 		}
 	};
+	self.attachKeyUpAction = function( node, target ) {
+		if( node ) {
+			node.onkeyup = function( e ) {
+				e = e || window.event;
+				return GetComponent(target).action('keyup', e);
+			};
+		}
+	};
 	self.disableSelection = function(element) {
 		element.onselectstart = function() {
 			return false;
