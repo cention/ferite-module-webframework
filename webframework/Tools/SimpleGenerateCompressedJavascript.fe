@@ -83,7 +83,7 @@ applicationJavaScriptFiles = [
 //	'Resources/Javascript/editprofile.js',
 	'Resources/Javascript/errands.js',
 //	'Resources/Javascript/exports.js',
-//	'Resources/Javascript/externalexperts.js',
+	'Resources/Javascript/externalexperts.js',
 	'Resources/Javascript/general_grid.js',
 //	'Resources/Javascript/getParam.js',
 //	'Resources/Javascript/groups.js',
