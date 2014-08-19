@@ -2,14 +2,14 @@
 	<tr>
 		<td><ul id="[ID]_Source" [StyleClass:class="[]"] [Style:style="[]"]> [@Items: []] </ul></td>
 		<td class="buttons">
-			<img id="[ID]_RightArrow" src="[RightArrow]" border="0" />
-			<img id="[ID]_LeftArrow"  src="[LeftArrow]"  border="0" />
+			<img id="[ID]_FristRightArrow" src="[RightArrow]" border="0" />
+			<img id="[ID]_FristLeftArrow"  src="[LeftArrow]"  border="0" />
 		</td>
 		<td class="target"><ul id="[ID]" [StyleClass:class="[]"] [Style:style="[]"]> [@Selected: []] </ul></td>
 	[!normalBox:
 		<td class="buttons">
-			<img id="[ID]_RightArrow1" src="[RightArrow]" border="0" />
-			<img id="[ID]_LeftArrow1"  src="[LeftArrow]"  border="0" />
+			<img id="[ID]_SecondRightArrow" src="[RightArrow]" border="0" />
+			<img id="[ID]_SeceondLeftArrow"  src="[LeftArrow]"  border="0" />
 		</td>
 		<td class="target"><ul id="[ID]_Target" [StyleClass:class="[]"] [Style:style="[]"]>[@extraSelected: []]</ul></td>
 	]
@@ -33,7 +33,7 @@
 		containment: %%%[%%% '[ID]_Target', '[ID]_Source' %%%]%%%,
 		dropOnEmpty: true,
 		constraint: '',
-		onUpdate: function() { _('[ID]').propagateChange(); }
+		onUpdate: function() { _('[ID]').propagateChange();}
 	});
 	if ( ![normalBox:true][!normalBox:false] ) {
 		Sortable.create('[ID]_Target', {
@@ -42,6 +42,6 @@
 			constraint: '',
 			onUpdate: function() { _('[ID]').propagateChange(); }
 		});
-	}	
+	}
 	[EventCode]
 </script>

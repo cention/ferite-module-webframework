@@ -31,9 +31,9 @@ function ComponentDragDropSelect( id ) {
 	};
 	self.itemSelect = function( item, arrow ) {
 		for(i=0;i < item.length;i++ ) {
-			if(item[i].parentNode.id == self.identifier() + '_Source' && arrow == '_RightArrow')
+			if(item[i].parentNode.id == self.identifier() + '_Source' && arrow == '_FristRightArrow')
 				self.node().appendChild(item[i]);
-			if(item[i].parentNode.id == self.identifier() && arrow == '_RightArrow1') {
+			if(item[i].parentNode.id == self.identifier() && arrow == '_SecondRightArrow') {
 				if( byId(self.identifier() + '_Target') ) {
 					byId(self.identifier() + '_Target').appendChild(item[i]);
 				}
@@ -42,9 +42,9 @@ function ComponentDragDropSelect( id ) {
 	};
 	self.itemDeselect = function( item, arrow ) {
 		for(i=0;i<item.length;i++) {
-			if(item[i].parentNode.id == self.identifier() && arrow == '_LeftArrow')
+			if(item[i].parentNode.id == self.identifier() && arrow == '_FristLeftArrow')
 				byId(self.identifier() + '_Source').appendChild(item[i]);
-			if(item[i].parentNode.id == self.identifier() + '_Target' && arrow == '_LeftArrow1')
+			if(item[i].parentNode.id == self.identifier() + '_Target' && arrow == '_SeceondLeftArrow')
 				self.node().appendChild(item[i]);
 		}
 	};
@@ -74,53 +74,106 @@ function ComponentDragDropSelect( id ) {
 			};
 		}
 	};
-
 	self._currentSelectedItem = Array();
 	self.itemsEach( function( index, item ) {
-		self.attachMouseDownActionWithValue(item, self.identifier(), item);
+		self.attachMouseDownActionWithValue( item, self.identifier(), item);
 	});
-	self.registerAction('click', function( event, item ) {			    
-		if (event.ctrlKey || event.shiftKey) {
+	var lastChecked = null;
+	self.registerAction('click', function( event, item ) {		  
+		var listItem = Array();
+		var itemAsSelected = Array();
+		
+		if (event.ctrlKey) {
 			item.className = 'selected';
 			self._currentSelectedItem.push(item);
 		} 
-		else {	    
+		else if (event.shiftKey) {
+			listItem = self.getItemByCatagory(item);
+			itemAsSelected = self.getValuesBetween(listItem,lastChecked,item);
+			for(i=0;i<itemAsSelected.length;++i) {
+				itemAsSelected[i].className ='selected';
+				self._currentSelectedItem.push(itemAsSelected[i]);
+			}
+		}
+		else    {	    
 			for(i=0;i<self._currentSelectedItem.length;++i)
 				self._currentSelectedItem[i].className = '';	    
 			
 			self._currentSelectedItem.clear();
 			item.className ='selected';
 			self._currentSelectedItem.push(item);
+			lastChecked = item;
 		}
 	});
-	byId(self.identifier() + '_LeftArrow').onclick = function() {
+	byId(self.identifier() + '_FristLeftArrow').onclick = function() {
 		if( self._currentSelectedItem ) {
-			self.itemDeselect(self._currentSelectedItem, '_LeftArrow');
+			self.itemDeselect(self._currentSelectedItem, '_FristLeftArrow');
 			self.propagateChange();
 		}
 	};
-	byId(self.identifier() + '_RightArrow').onclick = function() {
+	byId(self.identifier() + '_FristRightArrow').onclick = function() {
 		if( self._currentSelectedItem ) {
-			self.itemSelect(self._currentSelectedItem, '_RightArrow');
+			self.itemSelect(self._currentSelectedItem, '_FristRightArrow');
 			self.propagateChange();
 		}
 	};
-	if( byId(self.identifier() + '_LeftArrow1') != null ) {	  
-		byId(self.identifier() + '_LeftArrow1').onclick = function() {
+	if( byId(self.identifier() + '_SeceondLeftArrow') != null ) {	  
+		byId(self.identifier() + '_SeceondLeftArrow').onclick = function() {
 			if( self._currentSelectedItem ) {
-				self.itemDeselect(self._currentSelectedItem, '_LeftArrow1');
+				self.itemDeselect(self._currentSelectedItem, '_SeceondLeftArrow');
 				self.propagateChange();
 			}
 		};
 	}
-	if( byId(self.identifier() + '_RightArrow1') != null ) {
-		byId(self.identifier() + '_RightArrow1').onclick = function() {
+	if( byId(self.identifier() + '_SecondRightArrow') != null ) {
+		byId(self.identifier() + '_SecondRightArrow').onclick = function() {
 			if( self._currentSelectedItem ) {
-				self.itemSelect(self._currentSelectedItem, '_RightArrow1');
+				self.itemSelect(self._currentSelectedItem, '_SecondRightArrow');
 				self.propagateChange();
 			}
 		};
 	}
+	self.getValuesBetween = function( array, a, b ) {
+		var i1 = array.indexOf(a);
+		var i2 = array.indexOf(b);
+		var i;
+		var r = [];
+
+		if (i1 == -1 || i2 == -1) {
+			return r;
+		}
+		if (i1 > i2) {
+			var t = i2;
+			i2 = i1;
+			i1 = t;
+		}
+		for (i = i1; i <= i2; i++) {
+			r.push(array[i]);
+		}
+		return r;
+        };
+	self.clearSelected = function( list ) {
+	        if( list ) {
+			for(i=0;i<list.length;++i)
+			self._currentSelectedItem[i].className = '';
+			self._currentSelectedItem.clear();			
+		}
+	};
+        self.getItemByCatagory = function( item ) {
+		var list = Array();
+		var listArray = Array();
+		if (self.itemIsSelected(item))
+			list = byId(self.identifier()).getElementsByTagName("li");
+		else if (self.extraItemIsSelected(item))
+			list = byId(self.identifier() + '_Target').getElementsByTagName("li");
+		else 
+			list = byId(self.identifier() + '_Source').getElementsByTagName("li");
+		
+		for(var i = 0; i < list.length; ++i)
+				listArray.push(list[i]);
+		
+		return listArray; 
+	};	
 	self.updateSelected();
 	
 	return self;
