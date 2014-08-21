@@ -19,7 +19,7 @@
 
 // returns an array of elements that are in state activated.
 function getActivatedElementIds() {
-  activated = [].concat($$('.selected'));
+  activated = [].concat($$('.activated'));
   activated = activated.pluck('id').uniq();
   return activated;
 }
@@ -28,34 +28,34 @@ function getActivatedElementIds() {
 function prepareMultidrag(element) {
   element.observe('mousedown', function(e) {
     if (e.shiftKey &&
-        !element.hasClassName('selected') &&
-        $$('.selected').size() > 0) {
+        !element.hasClassName('activated') &&
+        $$('.activated').size() > 0) {
       activateSiblings(element.previousSiblings()) ||
         activateSiblings(element.nextSiblings());
     }
-    element.toggleClassName('selected');
+    element.toggleClassName('activated');
   });
 }
  
 // activates the elements of the given siblings array till the first activated
 // element is found (needed for shift click)
 function activateSiblings(siblings) {
-  if (!siblings.find(function(s) { return s.hasClassName('selected') })) {
+  if (!siblings.find(function(s) { return s.hasClassName('activated') })) {
     return false;
   }
   siblings.each(function(s) {
-      if (s.hasClassName('selected')) { throw $break; }
-      s.addClassName('selected');
+      if (s.hasClassName('activated')) { throw $break; }
+      s.addClassName('activated');
     });
   return true;
 }
  
 function deactivateAll() {
-  $$('.selected').each(function(e) { e.removeClassName('selected'); });
+  $$('.activated').each(function(e) { e.removeClassName('activated'); });
 }
  
 function activateAll() {
-  Draggables.drags.each(function(d) { d.element.addClassName('selected'); });
+  Draggables.drags.each(function(d) { d.element.addClassName('activated'); });
 }
 
 // the effect to apply when drag revert happens: this places to element
@@ -90,8 +90,8 @@ var MultidragObserver = Class.create({
   // called on drag start: displays a info box on the draggable showing how many
   // elements are activated for this drag if this is a multi element drag
   onStart: function(eventName, draggable, domEvent) {
-    draggable.element.addClassName('selected');
-   // draggable._clone.addClassName('selected');
+    draggable.element.addClassName('activated');
+   // draggable._clone.addClassName('activated');
     activated = getActivatedElementIds();
     if (activated.length > 1) {
       info = new Element('div', { 'class': 'dragcount' });
@@ -135,7 +135,7 @@ var MultisortObserver = Class.create({
     // drop the other activated elements near the just dropped draggable
     rightSibling = draggable.element;
     parentNode = draggable.element.parentNode;
-    $$('.selected').each(function(e) {
+    $$('.activated').each(function(e) {
       if (draggable.element.id != e.id) {
         id = e.id.substring(1+e.id.indexOf('_'));
         if (this.lastSequence.indexOf(id) < origindex) {

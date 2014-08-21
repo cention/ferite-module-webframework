@@ -66,13 +66,14 @@ function ComponentDragDropSelect( id ) {
 	};
 	self.selectedItem = function() {
 		var selected = self.getState('selected.list');
+		console.log(selected);
 		return selected[0];
 	};
 	
 	self.selectedItems = function() {
 		var currentSelectedItem = Array();
 		self.itemsEach(function(index, item) {
-			if (item.hasClassName('selected')) {
+			if (item.hasClassName('activated')) {
 				currentSelectedItem.push(item);
 			}
 		});
@@ -95,18 +96,18 @@ function ComponentDragDropSelect( id ) {
 		var itemAsSelected = Array();
 	        var currentSelectedItem = self.selectedItems();
 		if (event.ctrlKey) {
-			item.className = 'selected';
+			item.className = 'activated';
 		} 
 		else if (event.shiftKey) {
 			listItem = self.getItemByCatagory(item);
 			itemAsSelected = self.getValuesBetween(listItem,lastChecked,item);			
 			self.clearSelected();
 			for(i=0;i<itemAsSelected.length;++i)
-				itemAsSelected[i].className ='selected';				
+				itemAsSelected[i].className ='activated';				
 		}
 		else {	    
 			self.clearSelected();	    			
-			item.className ='selected';
+			item.className ='activated';
 			lastChecked = item;
 		}
 	});

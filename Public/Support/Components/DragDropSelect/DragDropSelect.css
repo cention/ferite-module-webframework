@@ -39,7 +39,7 @@
 	-o-user-select: none;
 	user-select: none;
 }
-.wfDragDropSelect li.selected {
+.wfDragDropSelect li.activated {
 	background-color: #80ceff;
 
 }
