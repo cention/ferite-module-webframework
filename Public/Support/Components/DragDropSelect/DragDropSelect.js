@@ -29,7 +29,8 @@ function ComponentDragDropSelect( id ) {
 	self.itemValue = function( item ) {
 		return item.getAttribute('value');
 	};
-	self.itemSelect = function( item, arrow ) {
+	self.itemSelect = function( arrow ) {
+		var item = self.selectedItems();
 		for(i=0;i < item.length;i++ ) {
 			if(item[i].parentNode.id == self.identifier() + '_Source' && arrow == '_FristRightArrow')
 				self.node().appendChild(item[i]);
@@ -40,7 +41,8 @@ function ComponentDragDropSelect( id ) {
 			}
 		}
 	};
-	self.itemDeselect = function( item, arrow ) {
+	self.itemDeselect = function( arrow ) {
+		var item = self.selectedItems();
 		for(i=0;i<item.length;i++) {
 			if(item[i].parentNode.id == self.identifier() && arrow == '_FristLeftArrow')
 				byId(self.identifier() + '_Source').appendChild(item[i]);
@@ -66,71 +68,69 @@ function ComponentDragDropSelect( id ) {
 		var selected = self.getState('selected.list');
 		return selected[0];
 	};
+	
+	self.selectedItems = function() {
+		var currentSelectedItem = Array();
+		self.itemsEach(function(index, item) {
+			if (item.hasClassName('selected')) {
+				currentSelectedItem.push(item);
+			}
+		});
+		return currentSelectedItem;
+	}
 	self.attachMouseDownActionWithValue = function( node, target, value ) {
 		if( node ) {
-			node.onmousedown = function( e ) {
+			node.onclick = function( e ) {
 				e = e || window.event;
 				return GetComponent(target).action('click', e, value);
 			};
 		}
 	};
-	self._currentSelectedItem = Array();
-	self.itemsEach( function( index, item ) {
-		self.attachMouseDownActionWithValue( item, self.identifier(), item);
+	self.itemsEach( function( index, item ) {	
+		self.attachMouseDownActionWithValue( item, self.identifier(), item);	  
 	});
 	var lastChecked = null;
 	self.registerAction('click', function( event, item ) {		  
 		var listItem = Array();
 		var itemAsSelected = Array();
-		
+	        var currentSelectedItem = self.selectedItems();
 		if (event.ctrlKey) {
 			item.className = 'selected';
-			self._currentSelectedItem.push(item);
 		} 
 		else if (event.shiftKey) {
 			listItem = self.getItemByCatagory(item);
-			itemAsSelected = self.getValuesBetween(listItem,lastChecked,item);
-			for(i=0;i<itemAsSelected.length;++i) {
-				itemAsSelected[i].className ='selected';
-				self._currentSelectedItem.push(itemAsSelected[i]);
-			}
+			itemAsSelected = self.getValuesBetween(listItem,lastChecked,item);			
+			self.clearSelected();
+			for(i=0;i<itemAsSelected.length;++i)
+				itemAsSelected[i].className ='selected';				
 		}
-		else    {	    
-			for(i=0;i<self._currentSelectedItem.length;++i)
-				self._currentSelectedItem[i].className = '';	    
-			
-			self._currentSelectedItem.clear();
+		else {	    
+			self.clearSelected();	    			
 			item.className ='selected';
-			self._currentSelectedItem.push(item);
 			lastChecked = item;
 		}
 	});
 	byId(self.identifier() + '_FristLeftArrow').onclick = function() {
-		if( self._currentSelectedItem ) {
-			self.itemDeselect(self._currentSelectedItem, '_FristLeftArrow');
-			self.propagateChange();
-		}
+		self.itemDeselect('_FristLeftArrow');
+		self.propagateChange();
+		
 	};
 	byId(self.identifier() + '_FristRightArrow').onclick = function() {
-		if( self._currentSelectedItem ) {
-			self.itemSelect(self._currentSelectedItem, '_FristRightArrow');
-			self.propagateChange();
-		}
+		self.itemSelect('_FristRightArrow');
+		self.propagateChange();
+
 	};
 	if( byId(self.identifier() + '_SeceondLeftArrow') != null ) {	  
 		byId(self.identifier() + '_SeceondLeftArrow').onclick = function() {
-			if( self._currentSelectedItem ) {
-				self.itemDeselect(self._currentSelectedItem, '_SeceondLeftArrow');
-				self.propagateChange();
-			}
+			self.itemDeselect('_SeceondLeftArrow');
+			self.propagateChange();
 		};
 	}
 	if( byId(self.identifier() + '_SecondRightArrow') != null ) {
 		byId(self.identifier() + '_SecondRightArrow').onclick = function() {
-			if( self._currentSelectedItem ) {
-				self.itemSelect(self._currentSelectedItem, '_SecondRightArrow');
-				self.propagateChange();
-			}
+			self.itemSelect('_SecondRightArrow');
+			self.propagateChange();
+
 		};
 	}
 	self.getValuesBetween = function( array, a, b ) {
@@ -152,12 +152,10 @@ function ComponentDragDropSelect( id ) {
 		}
 		return r;
         };
-	self.clearSelected = function( list ) {
-	        if( list ) {
-			for(i=0;i<list.length;++i)
-			self._currentSelectedItem[i].className = '';
-			self._currentSelectedItem.clear();			
-		}
+	self.clearSelected = function() {
+		var item = self.selectedItems();
+		for(i=0;i<item.length;++i)
+		item[i].className = '';				
 	};
         self.getItemByCatagory = function( item ) {
 		var list = Array();
@@ -170,10 +168,11 @@ function ComponentDragDropSelect( id ) {
 			list = byId(self.identifier() + '_Source').getElementsByTagName("li");
 		
 		for(var i = 0; i < list.length; ++i)
-				listArray.push(list[i]);
+			listArray.push(list[i]);
 		
 		return listArray; 
 	};	
+	
 	self.updateSelected();
 	
 	return self;

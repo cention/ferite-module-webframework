@@ -22,26 +22,35 @@
 	SetComponent('[ID]', ComponentDragDropSelect('[ID]'));
 	[@Selected: _('[.ID]').selectItemsByValue('[]'); ]	
 	[@extraSelected: _('[.ID]').selectItemsByValue('[]'); ]	
-	_('[ID]').activate();
+	_('[ID]').activate(); 
+
+        Draggables.addObserver(new MultisortObserver($('[ID]_Source')));
 	Sortable.create('[ID]_Source', {
 		containment: %%%[%%% '[ID]', '[ID]_Source' %%%]%%%,
 		dropOnEmpty: true,
 		constraint: '',
-		onUpdate: function() { _('[ID]').propagateChange(); }
+		onUpdate: function() { _('[ID]').propagateChange(); }		     
 	});
+	Draggables.addObserver(new MultidragObserver($('[ID]_Source')));
+	
+	Draggables.addObserver(new MultisortObserver($('[ID]')));
 	Sortable.create('[ID]', {
 		containment: %%%[%%% '[ID]_Target', '[ID]_Source' %%%]%%%,
 		dropOnEmpty: true,
 		constraint: '',
-		onUpdate: function() { _('[ID]').propagateChange();}
+		onUpdate: function() { _('[ID]').propagateChange(); }
 	});
+	Draggables.addObserver(new MultidragObserver($('[ID]')));
+			
 	if ( ![normalBox:true][!normalBox:false] ) {
+		Draggables.addObserver(new MultisortObserver($('[ID]_Target')));
 		Sortable.create('[ID]_Target', {
 			containment: %%%[%%% '[ID]', '[ID]_Target' %%%]%%%,
 			dropOnEmpty: true,
 			constraint: '',
 			onUpdate: function() { _('[ID]').propagateChange(); }
 		});
+		Draggables.addObserver(new MultidragObserver($('[ID]_Target')));
 	}
 	[EventCode]
 </script>
