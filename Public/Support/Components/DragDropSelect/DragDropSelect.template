@@ -23,13 +23,16 @@
 	[@Selected: _('[.ID]').selectItemsByValue('[]'); ]	
 	[@extraSelected: _('[.ID]').selectItemsByValue('[]'); ]	
 	_('[ID]').activate(); 
-
+	
         Draggables.addObserver(new MultisortObserver($('[ID]_Source')));
 	Sortable.create('[ID]_Source', {
 		containment: %%%[%%% '[ID]', '[ID]_Source' %%%]%%%,
 		dropOnEmpty: true,
 		constraint: '',
-		onUpdate: function() { _('[ID]').propagateChange(); }		     
+		onUpdate: function() {
+			_('[ID]').clearSelected(); 
+			_('[ID]').propagateChange(); 
+		}		     
 	});
 	Draggables.addObserver(new MultidragObserver($('[ID]_Source')));
 	
@@ -38,7 +41,10 @@
 		containment: %%%[%%% '[ID]_Target', '[ID]_Source' %%%]%%%,
 		dropOnEmpty: true,
 		constraint: '',
-		onUpdate: function() { _('[ID]').propagateChange(); }
+		onUpdate: function() {
+			_('[ID]').clearSelected(); 
+			_('[ID]').propagateChange(); 
+		}
 	});
 	Draggables.addObserver(new MultidragObserver($('[ID]')));
 			
@@ -48,7 +54,10 @@
 			containment: %%%[%%% '[ID]', '[ID]_Target' %%%]%%%,
 			dropOnEmpty: true,
 			constraint: '',
-			onUpdate: function() { _('[ID]').propagateChange(); }
+			onUpdate: function() {
+				_('[ID]').clearSelected(); 
+				_('[ID]').propagateChange(); 
+			}
 		});
 		Draggables.addObserver(new MultidragObserver($('[ID]_Target')));
 	}
