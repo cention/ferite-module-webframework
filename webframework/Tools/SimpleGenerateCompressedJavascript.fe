@@ -29,6 +29,7 @@ webframeworkJavaScriptFiles = [
 	'Resources/Javascript/scriptaculous/controls.js',
 	'Resources/Javascript/scriptaculous/slider.js',
 	'Resources/Javascript/scriptaculous/sound.js',
+	'Resources/Javascript/scriptaculous/multidrag.js'
 	'Resources/Javascript/scriptaculous/scriptaculous.js',
 	'Resources/Javascript/jquery.titlealert.js',
 	'Resources/Javascript/jquery.spellchecker.js',
