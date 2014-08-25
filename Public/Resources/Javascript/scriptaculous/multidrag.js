@@ -105,6 +105,7 @@ var MultidragObserver = Class.create({
   onStart: function(eventName, draggable, domEvent) {
     //draggable.element.addClassName('activated');
    // draggable._clone.addClassName('activated');
+    $$('.dragcount').each(function(e) { e.remove() });
     activated = getActivatedElementIds();
     if (activated.length > 1) {
       info = new Element('div', { 'class': 'dragcount' });
