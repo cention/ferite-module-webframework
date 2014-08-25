@@ -68,8 +68,7 @@ function ComponentDragDropSelect( id ) {
 		var selected = self.getState('selected.list');
 		console.log(selected);
 		return selected[0];
-	};
-	
+	};	
 	self.selectedItems = function() {
 		var currentSelectedItem = Array();
 		self.itemsEach(function(index, item) {
@@ -79,42 +78,10 @@ function ComponentDragDropSelect( id ) {
 		});
 		return currentSelectedItem;
 	}
-	self.attachMouseDownActionWithValue = function( node, target, value ) {
-		if( node ) {
-			node.onclick = function( e ) {
-				e = e || window.event;
-				return GetComponent(target).action('click', e, value);
-			};
-		}
-	};
-	self.itemsEach( function( index, item ) {	
-		self.attachMouseDownActionWithValue( item, self.identifier(), item);	  
-	});
-	var lastChecked = null;
-	self.registerAction('click', function( event, item ) {		  
-		var listItem = Array();
-		var itemAsSelected = Array();
-	        var currentSelectedItem = self.selectedItems();
-		if (event.ctrlKey) {
-			item.className = 'activated';
-		} 
-		else if (event.shiftKey) {
-			listItem = self.getItemByCatagory(item);
-			itemAsSelected = self.getValuesBetween(listItem,lastChecked,item);			
-			self.clearSelected();
-			for(i=0;i<itemAsSelected.length;++i)
-				itemAsSelected[i].className ='activated';				
-		}
-		else {	    
-			self.clearSelected();	    			
-			item.className ='activated';
-			lastChecked = item;
-		}
-	});
+	
 	byId(self.identifier() + '_FristLeftArrow').onclick = function() {
 		self.itemDeselect('_FristLeftArrow');
-		self.propagateChange();
-		
+		self.propagateChange();		
 	};
 	byId(self.identifier() + '_FristRightArrow').onclick = function() {
 		self.itemSelect('_FristRightArrow');
@@ -131,49 +98,8 @@ function ComponentDragDropSelect( id ) {
 		byId(self.identifier() + '_SecondRightArrow').onclick = function() {
 			self.itemSelect('_SecondRightArrow');
 			self.propagateChange();
-
 		};
-	}
-	self.getValuesBetween = function( array, a, b ) {
-		var i1 = array.indexOf(a);
-		var i2 = array.indexOf(b);
-		var i;
-		var r = [];
-
-		if (i1 == -1 || i2 == -1) {
-			return r;
-		}
-		if (i1 > i2) {
-			var t = i2;
-			i2 = i1;
-			i1 = t;
-		}
-		for (i = i1; i <= i2; i++) {
-			r.push(array[i]);
-		}
-		return r;
-        };
-	self.clearSelected = function() {
-		var item = self.selectedItems();
-		for(i=0;i<item.length;++i)
-		item[i].className = '';				
-	};
-        self.getItemByCatagory = function( item ) {
-		var list = Array();
-		var listArray = Array();
-		if (self.itemIsSelected(item))
-			list = byId(self.identifier()).getElementsByTagName("li");
-		else if (self.extraItemIsSelected(item))
-			list = byId(self.identifier() + '_Target').getElementsByTagName("li");
-		else 
-			list = byId(self.identifier() + '_Source').getElementsByTagName("li");
-		
-		for(var i = 0; i < list.length; ++i)
-			listArray.push(list[i]);
-		
-		return listArray; 
-	};	
-	
+	}		
 	self.updateSelected();
 	
 	return self;

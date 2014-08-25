@@ -29,8 +29,7 @@
 		containment: %%%[%%% '[ID]', '[ID]_Source' %%%]%%%,
 		dropOnEmpty: true,
 		constraint: '',
-		onUpdate: function() {
-			_('[ID]').clearSelected(); 
+		onUpdate: function() { 
 			_('[ID]').propagateChange(); 
 		}		     
 	});
@@ -42,7 +41,6 @@
 		dropOnEmpty: true,
 		constraint: '',
 		onUpdate: function() {
-			_('[ID]').clearSelected(); 
 			_('[ID]').propagateChange(); 
 		}
 	});
@@ -55,7 +53,6 @@
 			dropOnEmpty: true,
 			constraint: '',
 			onUpdate: function() {
-				_('[ID]').clearSelected(); 
 				_('[ID]').propagateChange(); 
 			}
 		});

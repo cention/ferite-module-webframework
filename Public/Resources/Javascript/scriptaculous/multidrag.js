@@ -74,23 +74,36 @@ function immediateRevertEffect(element, top_offset, left_offset) {
 // scripty draggable observer that paints a box on the current draggable,
 // indicating how many objects are activated currently
 var MultidragObserver = Class.create({
-  initialize: function(container) {
+    initialize: function(container) {
     // reset all droppables on container click
-    Event.observe(container, 'click', function(e) {
-        if (container.id == e.element().id) {
-          deactivateAll();
-        }
-      });
-    // add mouse down listener to activate draggables
-    Draggables.drags.each(function(draggable) {
-      prepareMultidrag(draggable.element);
-    });
-  },
+	Event.observe(container, 'click', function(e) {
+		if (container.id == e.element().id) {
+			deactivateAll();
+		}
+		$$('.activated').each(function(e) {
+			if (container.id != e.parentNode.id) {
+				deactivateAll();
+			}
+		});
+		if (e.shiftKey || e.ctrlKey && !e.element().hasClassName('activated') && $$('.activated').size() > 0) {
+			activateSiblings(e.element().previousSiblings()) || 
+			activateSiblings(e.element().nextSiblings());
+		} 
+		else deactivateAll(); 
+	        if(e.element().id != container.id) {
+			e.element().addClassName('activated');
+		}
+	});
+	// add mouse down listener to activate draggables
+	//Draggables.drags.each(function(draggable) {
+	  //prepareMultidrag(draggable.element);
+	//});
+    },
  
   // called on drag start: displays a info box on the draggable showing how many
   // elements are activated for this drag if this is a multi element drag
   onStart: function(eventName, draggable, domEvent) {
-    draggable.element.addClassName('activated');
+    //draggable.element.addClassName('activated');
    // draggable._clone.addClassName('activated');
     activated = getActivatedElementIds();
     if (activated.length > 1) {
