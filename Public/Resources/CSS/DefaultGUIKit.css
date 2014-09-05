@@ -387,7 +387,7 @@ div.wfTabViewCornerTopRight img {
 .wfHotkeyDialog {
 	position: absolute;
 	text-align: center;
-	z-index: 10;
+	z-index: 999;
 	background-color:#000;
 	-moz-opacity: 0.9;
 	opacity:.90;

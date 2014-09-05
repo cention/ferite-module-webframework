@@ -15,6 +15,7 @@ function ComponentHotkeys( id ) {
 	self.registeredKeysMap = {};
 	self.previousEnterAction = null;
 	self.previousEscAction = null;
+	self.lastActiveElement;
 	
 	self.performHotkeyAction = function() {
 		if( self.getState('current-action') ) {
@@ -65,6 +66,9 @@ function ComponentHotkeys( id ) {
 	
 	self.displayHotkeyWindow = function( direct ) {
 		if( $(self.identifier() + '_Dialog').style.display == 'none' ) {
+			self.lastActiveElement = document.activeElement;
+			document.activeElement.blur();
+			
 			mcam.log('showing dialog');
 			$(self.identifier() + '_Available').innerHTML = '';
 			$(self.identifier() + '_Available').style.display = 'none';
@@ -116,9 +120,17 @@ function ComponentHotkeys( id ) {
 			
 			Hotkeys.add("Enter", function() {
 				self.performHotkeyAction();
+				if(self.lastActiveElement) {
+					self.lastActiveElement.focus();
+					self.lastActiveElement = null;
+				}
 			});
 			Hotkeys.add("Esc", function() {
 				self.cancelHotkeyAction();
+				if(self.lastActiveElement) {
+					self.lastActiveElement.focus();
+					self.lastActiveElement = null;
+				}
 			});
 		}
 		if( self.timeout ) {
