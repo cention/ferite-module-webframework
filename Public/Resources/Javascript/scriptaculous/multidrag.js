@@ -85,9 +85,12 @@ var MultidragObserver = Class.create({
 				deactivateAll();
 			}
 		});
-		if (e.shiftKey || e.ctrlKey && !e.element().hasClassName('activated') && $$('.activated').size() > 0) {
+		if (e.shiftKey && !e.element().hasClassName('activated') && $$('.activated').size() > 0) {
 			activateSiblings(e.element().previousSiblings()) || 
 			activateSiblings(e.element().nextSiblings());
+		} 
+		else if (e.ctrlKey && !e.element().hasClassName('activated') && $$('.activated').size() > 0) {
+			e.element().addClassName('activated');
 		} 
 		else deactivateAll(); 
 	        if(e.element().id != container.id) {
