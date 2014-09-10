@@ -103,7 +103,7 @@ applicationJavaScriptFiles = [
 	'Resources/Javascript/richtext.js',
 //	'Resources/Javascript/routing.js',
 //	'Resources/Javascript/salutation.js',
-	'Resources/Javascript/selectbox.js',
+	'Resources/Javascript/cention_selectbox.js',
 //	'Resources/Javascript/signature.js',
 	'Resources/Javascript/spellcheck.js',
 	'Resources/Javascript/submittedErrand.js',
