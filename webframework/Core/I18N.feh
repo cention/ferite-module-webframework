@@ -94,9 +94,7 @@ namespace modifies String {
 	 * @warning Uses the Config.DateFormat variable
 	 */
 	function formatDateTime( number date ) {
-		number localOffset = (Config.TimeZoneOffset * 60);
-		number localDate = date + localOffset + Date.localDate(date).tm_gmtoff; // Ideally this will be per user at somepoint.
-		return Date.localDate(localDate).format(Config.DateFormat + ' %H:%M');
+		return Date.localDate(date).format(Config.DateFormat + ' %H:%M');
 	}
 	/**
 	 * @function formatTime
