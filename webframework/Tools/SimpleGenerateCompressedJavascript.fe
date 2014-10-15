@@ -114,6 +114,7 @@ applicationJavaScriptFiles = [
 	'Resources/Javascript/detector.js',
 	'Resources/Javascript/tablesorter.js',
 	'Resources/Javascript/3rdParty/Chart.js',
+	'Resources/Javascript/3rdParty/jquery.sparkline.js',
 	// Components
 	'Support/Components/AnswerPageBox/AnswerPageBox.js',
 	'Support/Components/AnswerPageTextBox/AnswerPageTextBox.js',
