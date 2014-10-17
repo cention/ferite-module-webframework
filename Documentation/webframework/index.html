@@ -453,7 +453,7 @@ chris:Tools$</pre></td></tr></table><p class="para">				The output is nice and v
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.SubmitButton.registerEventHook( self, "buttonClick", GUIKit.EvClick );
 &nbsp;&nbsp;&nbsp;&nbsp;}
 &nbsp;&nbsp;&nbsp;&nbsp;function buttonClick( object sender, string extra ) {
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.TextBox.setTextValue('Date: ' + Date.date(Date.GMTnow()));
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.TextBox.setTextValue('Date: ' + Date.date(Date.now()));
 &nbsp;&nbsp;&nbsp;&nbsp;}
 }
 return TestPage;</pre></td></tr></table><p class="para">			With the page file looking like this:		</p><table width="100%" cellspacing=0 cellpadding=0><tr><td align="right" width="50"><pre class="code-linesleft">1<br />2<br />3<br /></pre></td><td><pre class="code-linesright">A background event result:
