@@ -27,7 +27,7 @@ class ReportedErrorsPage extends GUIKit.Page {
 	}
 	function loadList {
 		array list = [];
-		webframework.RecordedError.listInDateRange( Date.GMTnow() - (.dayCount * 24 * 60 * 60), Date.GMTnow() ).each() using ( value ) {
+		webframework.RecordedError.listInDateRange( Date.now() - (.dayCount * 24 * 60 * 60), Date.now() ).each() using ( value ) {
 			list.unshift([ 'id' => value.id, 'TextValue' => "[${value.id}] ${value.action} - ${HTML.bold(value.message)} &raquo; ${formatDateTime(value.timeOccurred)}" ]);
 		};
 		.ErrorList.setDataSource(list, .resetData);
@@ -76,7 +76,7 @@ class ReportedErrorsPage extends GUIKit.Page {
 		o.setValue('action', values['action']);
 		o.setValue('backtrace', Regexp.replaceAll("\n", values['backtrace'], "<br />\n"));
 		o.setValue('custom_values', 'Logged in user: ' + user.toName() + ' (' + user.username + ')<br />' + Core.DumpValues("<br />"));
-		o.setValue('timeOccurred', Date.GMTnow());
+		o.setValue('timeOccurred', Date.now());
 		o.setValue('error', '');
 		o.save();
 		return '';
