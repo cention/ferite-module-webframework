@@ -111,6 +111,7 @@ applicationJavaScriptFiles = [
 	'Resources/Javascript/validation.js',
 	'Resources/Javascript/workingTimeCalendar.js',
 	'Resources/Javascript/detector.js',
+	'Resources/Javascript/tablesorter.js',
 	'Resources/Javascript/3rdParty/Chart.js',
 	// Components
 	'Support/Components/AnswerPageBox/AnswerPageBox.js',
