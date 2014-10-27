@@ -2192,7 +2192,7 @@ function WysiwygEditorColorToolbarItem( editor, group, name, icon, title, comman
 				div.appendChild(colorsTable);
 				div.appendChild(WysiwygEditor.createElement('div', function( div ) {
 					div.className = 'WysiwygEditorMoreColorsButton';
-					div.innerHTML = I('More Colours...');
+					div.innerHTML = I('More Colors...');
 					div.align = 'center';
 					div.onmousedown = item.onselectstart = function() { return false; };
 					div.unselectable = true;
