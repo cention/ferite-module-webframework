@@ -59,12 +59,12 @@ function ComponentBackgroundFileUploader( id ) {
 		form.parentNode.removeChild(form);
 	};
 	
-	self.finishUpload = function( id ) {
+	self.finishUpload = function( id, size  ) {
 		if( id ) {
 			self._items.push(id);
 			self.updateFormValue();
 		}
-		self.action('finishUpload', id);
+		self.action('finishUpload', id, size);
 	};
 	
 	self.remove = function( id ) {

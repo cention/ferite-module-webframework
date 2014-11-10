@@ -40,6 +40,7 @@ webframeworkJavaScriptFiles = [
 	'Resources/Javascript/rangy-cssclassapplier.js',
 //	'Resources/Javascript/rangy-serializer.js',
 	'Resources/Javascript/htmlparser.js',
+	'Resources/Javascript/soundmanager2-nodebug-jsmin.js',
 	// Components
 	'Support/Components/Component/Component.js',
 	'Support/Components/AbstractList/AbstractList.js',
@@ -111,6 +112,7 @@ applicationJavaScriptFiles = [
 	'Resources/Javascript/validation.js',
 	'Resources/Javascript/workingTimeCalendar.js',
 	'Resources/Javascript/detector.js',
+	'Resources/Javascript/tablesorter.js',
 	'Resources/Javascript/3rdParty/Chart.js',
 	// Components
 	'Support/Components/AnswerPageBox/AnswerPageBox.js',
