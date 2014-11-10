@@ -281,7 +281,7 @@ class Application {
 			o.setValue('action', application.action);
 			o.setValue('backtrace', bt);
 			o.setValue('custom_values', customErrorValue);
-			o.setValue('timeOccurred', Date.GMTnow());
+			o.setValue('timeOccurred', Date.now());
 			o.setValue('error', capturedError);
 			o.save();
 			wasAbleToSaveMessage = I('Error was successfully reported. Please contact support giving them the id {0:id} and as much information as possible including what you were doing. This will help them track the problem more efficiently.').expand('' + o.id);

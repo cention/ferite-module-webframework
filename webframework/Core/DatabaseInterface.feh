@@ -128,7 +128,7 @@ namespace DatabaseInterface {
 		}
 		
 		function save() {
-			.timestampLastUpdate = Date.GMTnow();
+			.timestampLastUpdate = Date.now();
 			return super.save();
 		}
 		static function load( number id ) {
@@ -417,7 +417,7 @@ namespace DatabaseInterface {
 		}
 
 		function save() {
-			.timestampLastTimeStored = Date.GMTnow();
+			.timestampLastTimeStored = Date.now();
 			return super.save();
 		}
 		static function load( number id ) {

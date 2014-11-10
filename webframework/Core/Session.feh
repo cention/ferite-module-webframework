@@ -183,7 +183,7 @@ namespace ViewState {
 			viewState.setValue('user_id', user.id);
 			viewState.setValue('action', page);
 			viewState.setValue('content', String.base64encode(Serialize.toNative(Cache.display.generateViewState(Cache.persistence))));
-			viewState.setValue('timestampLastTimeStored', Date.GMTnow());
+			viewState.setValue('timestampLastTimeStored', Date.now());
 			viewState.save();
 		}
 	}

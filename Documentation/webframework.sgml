@@ -1554,7 +1554,7 @@ class tasksApplication extends Application {
 		.SubmitButton.registerEventHook( self, "buttonClick", GUIKit.EvClick );
 	}
 	function buttonClick( object sender, string extra ) {
-		.TextBox.setTextValue('Date: ' + Date.date(Date.GMTnow()));
+		.TextBox.setTextValue('Date: ' + Date.date(Date.now()));
 	}
 }
 return TestPage; </code>
