@@ -12,6 +12,7 @@ namespace modifies GUIKit {
 		}
 		number date = 0;
 		string image;
+		string timeZoneName;
 		function handleFormValue( string value ) {
 			number v = value.toNumber();
 			value != '' and .date = v;
@@ -35,14 +36,26 @@ namespace modifies GUIKit {
 		function setImage( string value ) {
 			.image = value;
 		}
+		function setTimeZone(string theZone) {
+			.timeZoneName = theZone;
+		}
+		function getTimeZone() {
+			return .timeZoneName;
+		}
 		function render() {
 			if( .visible() ) {
 				array values = .generateTemplateAttributes('wfCalendar');
 				values['ID'] = .id;
 				values['HumanID'] = .id + 'Human';
 				values['HumanDate'] = I('Not Set');
-				if( .date > 0 )
-					values['HumanDate'] = formatDate(.date);
+				if( .date > 0 ){
+					if(.timeZoneName){
+						values['HumanDate'] = formatDateTZ(.date, .timeZoneName);
+					}
+					else{
+						values['HumanDate'] = formatDate(.date);
+					}
+				}
 				values['EventCodeRaw'] = "CalendarPopup('${.id}',${.date});";		
 				values['EventCode'] = 
 				"onclick=\"CalendarPopup('${.id}',isNaN(parseInt(\$('${.id}').value)) ? 0 : parseInt(\$('${.id}').value)); return false\"";
