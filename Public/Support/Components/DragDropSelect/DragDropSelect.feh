@@ -42,39 +42,39 @@ namespace modifies GUIKit {
 				.dragdata = new GUIKit.DragDropSelectDataSource( self );
 			}
 		}
-                function setData( array data ) { 
-                        .createObject();
+		function setData( array data ) {
+			.createObject();
 			.dragdata._items = data;
-                }
-                function setSelected( array data ) {
+		}
+		function setSelected( array data ) {
 			.createObject();		
 			.dragdata._selectedItem = data;
-                }
-                function setExtraSelected( array data ) {
+		}
+		function setExtraSelected( array data ) {
 			.createObject();			
 			.dragdata._extraSelectedItem = data;
-                }
-                function setItems() {
-                         if(.dragdata) {
+		}
+		function setItems() {
+			if(.dragdata) {
 				.setDataSource(.dragdata.real_left_source);
-			 }
-                }              
-                function setSelectedItems() {
-			  if(.dragdata) {
+			}
+		}
+		function setSelectedItems() {
+			if(.dragdata) {
 				.setDataSource(.dragdata.real_right_source);
-                          }
-                }
-                function setExtraSelectedItems() {
-			 if(.dragdata) {
+			}
+		}
+		function setExtraSelectedItems() {
+			if(.dragdata) {
 				.setDataSource(.dragdata.real_extra_source);
-                         }
-                }
-                function selectedItems() {
-			  return .dragdata._selectedItem;
-                }
-                function extraSelectedItems() {
-			  return .source._extraSelected;
-                }
+			}
+		}
+		function selectedItems() {
+			return .dragdata._selectedItem;
+		}
+		function extraSelectedItems() {
+			return .source._extraSelected;
+		}
 		
 		function render() {
 			if( .visible() ) {
@@ -83,15 +83,14 @@ namespace modifies GUIKit {
 					if(.dragdata) {
 						.dragdata.append();
 					}
-				        .setItems();
+					.setItems();
 					values['Items'] = .source.items(.id, values);
 					.setSelectedItems();
 					values['Selected'] = .source.items(.id, values);
 					.setExtraSelectedItems();
 					values['extraSelected'] = .source.items(.id, values);
 					values['LeftArrow'] = uriForImageResource('arrow_left.gif');
-                                        values['RightArrow'] = uriForImageResource('arrow_right.gif');
-
+					values['RightArrow'] = uriForImageResource('arrow_right.gif');
 				}
 				return GUIKit.ViewTemplate.renderPath( .template(), values );
 			}
