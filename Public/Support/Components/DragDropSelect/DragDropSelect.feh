@@ -25,11 +25,33 @@ namespace modifies GUIKit {
 					.real_right_source[] = item;
 				}
 			};
-		}	
+			if( not ._combobox.sortSelected() ) {
+				array right, extra;
+				._selectedItem.each() using ( selectedID ) {
+					.real_right_source.each() using ( item ) {
+						if( item[0] == selectedID ) {
+							right[] = item;
+							return false;
+						}
+					};
+				};
+				._extraSelectedItem.each() using ( selectedID ) {
+					.real_extra_source.each() using ( item ) {
+						if( item[0] == selectedID ) {
+							right[] = item;
+							return false;
+						}
+					};
+				};
+				.real_right_source = right;
+				.real_extra_source = extra;
+			}
+		}
 	}
 	class DragDropSelect extends GUIKit.CAbstractList {
 	
 		[attribute boolean normalBox true 'Three list box if false'];
+		[attribute boolean sortSelected true 'Sort box with selected according to original data source'];
 		
 		object dragdata;
 		
