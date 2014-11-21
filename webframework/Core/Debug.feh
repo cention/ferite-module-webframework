@@ -10,7 +10,7 @@ function alog( string message ) {
 }
 function log( string module, string message ) {
 	if( wantConsoleLogging ) {
-		object d = Date.date(Date.GMTnow());
+		object d = Date.date(Date.now());
 		Console.printlnErr("[${d.format('%H:%M:%S')}] [$module] $message");
 	}
 	if( wantServerLogging ) {
@@ -20,7 +20,7 @@ function log( string module, string message ) {
 	debug("[$module] $message");
 }
 function log_mark() {
-	string date = Date.date(Date.GMTnow()).format('%H:%M:%S');
+	string date = Date.date(Date.now()).format('%H:%M:%S');
 	
 	if( wantConsoleLogging ) {
 		Console.printlnErr("[$date] -------------------------------- MARK --------------------------------");

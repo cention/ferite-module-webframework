@@ -82,8 +82,11 @@ namespace modifies String {
 	 */
 	function formatDate( number date ) {
 		number localOffset = (Config.TimeZoneOffset * 60);
-		number localDate = date + localOffset + Date.localDate(date).tm_gmtoff; // Ideally this will be per user at somepoint.
+		number localDate = date + localOffset;
 		return Date.localDate(localDate).format(Config.DateFormat);
+	}
+	function formatDateTZ( number date, string zoneName ) {
+		return .tzLocalDate(date, zoneName).format(Config.DateFormat);
 	}
 	/**
 	 * @function formatDateTime
@@ -95,9 +98,36 @@ namespace modifies String {
 	 */
 	function formatDateTime( number date ) {
 		number localOffset = (Config.TimeZoneOffset * 60);
-		number localDate = date + localOffset + Date.localDate(date).tm_gmtoff; // Ideally this will be per user at somepoint.
+		number localDate = date + localOffset;
 		return Date.localDate(localDate).format(Config.DateFormat + ' %H:%M');
 	}
+	function formatDateTimeTZ( number date, string zoneName ) {
+		return .tzLocalDate(date, zoneName).format(Config.DateFormat + ' %H:%M');
+	}
+	/**
+	 * @function tzLocalDate
+	 * @declaration function tzLocalDate( number date )
+	 * @brief Convert a GMT timestamp Date object at specified TZ
+	 * @param number date The GMT timestamp
+	 * @return A Date object
+	 */
+	function tzLocalDate(number date, string zoneName) {
+		object dateAtTZ;
+		string oldZone = Sys.env.read("TZ");
+
+		if(zoneName.length() > 0 ){
+			Sys.env.write("TZ",zoneName);
+		}
+		dateAtTZ = Date.localDate(date);
+		if(oldZone.length() > 0){
+			Sys.env.write("TZ",oldZone);
+		}
+		else{
+			Sys.env.del("TZ");
+		}
+		return dateAtTZ;
+	}
+
 	/**
 	 * @function formatTime
 	 * @declaration function formatTime( number date )
@@ -107,8 +137,11 @@ namespace modifies String {
 	 */
 	function formatTime( number date ){
 		number localOffset = (Config.TimeZoneOffset * 60);
-		number localDate = date + localOffset + Date.localDate(date).tm_gmtoff; // Ideally this will be per user at somepoint.
+		number localDate = date + localOffset;
 		return Date.localDate(localDate).format('%H:%M');
+	}
+	function formatTimeTZ( number date, string zoneName ) {
+		return .tzLocalDate(date, zoneName).format('%H:%M');
 	}
 	/**
 	 * @function dateStringToTimestamp
