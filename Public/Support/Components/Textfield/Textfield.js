@@ -6,7 +6,7 @@ function ComponentTextfield( id ) {
 		self.attachKeyUpAction( self.node(), self.identifier() );
 	};
 	self.registerAction('keyup', function() {
-		self.setState('text-value', self._states['text-value'] = self.node().value);
+		self._states['text-value'] = self.node().value;
 	});
 	self.select = function() {
 		if( self.node() ) {
