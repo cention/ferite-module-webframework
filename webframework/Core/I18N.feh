@@ -122,22 +122,22 @@ namespace modifies String {
 		object d1 = Date.localParse(date + ' ' + time, Config.DateFormat + ' %T');
 		object d2 = Date.localDate(d1.time());
 		if( d1.tm_isdst == 0 and d2.tm_isdst == 0 )
-			return d2.time() - 3600;
+			return d2.time() - d2.tm_gmtoff;
 		else if( d1.tm_isdst == 0 and d2.tm_isdst == 1 )
-			return d2.time() - 7200 - 3600;
+			return d2.time() - d2.tm_gmtoff - d1.tm_gmtoff;
 		else if( d1.tm_isdst == 1 and d2.tm_isdst == 1 )
-			return d2.time() - 7200;
+			return d2.time() - d2.tm_gmtoff;
 		return d2.time();
 	}
 	function dateStringToTimestamp( string date ) {
 		object d1 = Date.localParse(date, Config.DateFormat);
 		object d2 = Date.localDate(d1.time());
 		if( d1.tm_isdst == 0 and d2.tm_isdst == 0 )
-			return d2.time() - 3600;
+			return d2.time() - d2.tm_gmtoff;
 		else if( d1.tm_isdst == 0 and d2.tm_isdst == 1 )
-			return d2.time() - 7200 - 3600;
+			return d2.time() - d2.tm_gmtoff - d1.tm_gmtoff;
 		else if( d1.tm_isdst == 1 and d2.tm_isdst == 1 )
-			return d2.time() - 7200;
+			return d2.time() - d2.tm_gmtoff;
 		return d2.time();
 	}
 	/**
