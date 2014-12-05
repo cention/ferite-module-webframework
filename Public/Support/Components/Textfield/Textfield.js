@@ -3,8 +3,12 @@ function ComponentTextfield( id ) {
 	
 	self.setDefaultState('text-value');
 	self.bind = function() {
+		self.attachChangeAction( self.node(), self.identifier() );
 		self.attachKeyUpAction( self.node(), self.identifier() );
 	};
+	self.registerAction('change', function() {
+		self.setState('text-value', self.node().value);
+	});
 	self.registerAction('keyup', function() {
 		self._states['text-value'] = self.node().value;
 	});
