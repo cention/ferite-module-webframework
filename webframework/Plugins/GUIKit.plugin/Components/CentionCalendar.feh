@@ -27,8 +27,7 @@ namespace modifies GUIKit {
 		}
 		function setDate( number value ) {
 			// This functions assumes that value is a GMT unix timestamp
-			number localDate = value + Date.timezone();
-			.date = Date.localDate(localDate).format(Config.DateFormat);
+			.date = Date.localDate(value).format(Config.DateFormat);
 			.touch();
 		}
 		function date() {
