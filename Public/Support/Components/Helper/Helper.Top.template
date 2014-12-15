@@ -1,5 +1,5 @@
 <div id="[ID]" class="HelperText">?</div>
-<div id="[ID].popup" class="HelperPopup" style="display:none">
+<div id="[ID].popup" class="HelperPopup" [Style:style="[] display:none"]>
 	[TextValue:<div>[]</div>]
 	<script type="text/javascript" charset="utf-8">
 		SetComponent('[ID]', new ComponentHelper('[ID]', '[target]'));
