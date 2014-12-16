@@ -17,8 +17,8 @@
 package feature
 
 import (
+	wf "c3/osm/webframework"
 	"log"
-	wf "osm/webframework"
 	"strings"
 )
 
