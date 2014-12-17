@@ -12,8 +12,8 @@
 // strings.
 //
 // Features can be queried via tags. Once loaded, features are cached.
-// Subsequent query of the feature value using State, Str, Bool and Int using
-// either uses the cached feature.
+// Subsequent query of the feature value using State, Str, Bool and Int
+// will use the cached feature.
 package feature
 
 import (
