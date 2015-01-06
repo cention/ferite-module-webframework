@@ -160,7 +160,7 @@ function MCAM() { // Multiple Channel AJAX Mechanism
 		var requesterEvent = {};
 		var requester = this.createRequestObject();
 		requesterEvent.requester = requester;
-		requester.open( parameters.length > 0 ? "POST":"GET", url );
+		requester.open( "POST", url );
 		requester.setRequestHeader( 'Content-Type','application/x-www-form-urlencoded' );
 		requester.onreadystatechange = function() { 
 			self.handleEvent(requesterEvent);
