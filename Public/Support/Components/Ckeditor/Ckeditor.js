@@ -49,28 +49,28 @@ function ComponentCkeditor( id ) {
 			'Verdana/Verdana, Geneva, sans-serif',
 		toolbar_Empty: [],
 		toolbar_SingleRow: [
-			[ 'Cention_SpellCheckLanguageSelector' ], 
-			[ 'Cention_SpellCheck' ]
+			[ 'SpellCheckerLanguage' ],
+			[ 'SpellChecker' ]
 		],
 		toolbar_OneRow: [
 			[ 'Bold', 'Italic', 'Underline', 'Strike' ],
 			[ 'NumberedList', 'BulletedList' ],
 			[ 'Indent', 'Outdent', 'Blockquote' ],
 			[ 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ],
-			[ 'Link', 'Cention_Image', 'HorizontalRule' ], [ 'PasteFromWord' ], [ 'Youtube' ],
+			[ 'Link', 'Image', 'HorizontalRule' ], [ 'PasteFromWord' ], [ 'Youtube' ],
 			[ 'Font' ], [ 'FontSize' ],
 			[ 'TextColor', 'BGColor' ],
-			[ 'Cention_SpellCheckLanguageSelector' ], [ 'Cention_SpellCheck' ], [ 'Resize' ]
+			[ 'SpellCheckerLanguage' ], [ 'SpellChecker' ], [ 'Resize' ]
 		],
 		toolbar_TwoRow: [
 			[ 'Bold', 'Italic', 'Underline', 'Strike' ],
 			[ 'NumberedList', 'BulletedList' ],
 			[ 'Indent', 'Outdent', 'Blockquote' ],
 			[ 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ], [ 'PasteFromWord' ],
-			[ 'Link', 'Cention_Image', 'HorizontalRule' ],
+			[ 'Link', 'Image', 'HorizontalRule' ],
 			[ 'Font' ], [ 'FontSize' ],'/',
 			[ 'TextColor', 'BGColor' ], ['Youtube'], 
-			[ 'Cention_SpellCheckLanguageSelector' ], [ 'Cention_SpellCheck' ], ['Resize']
+			[ 'SpellCheckerLanguage' ], [ 'SpellChecker' ], ['Resize']
 		],
 		toolbar: 'OneRow',
 		plugins:
