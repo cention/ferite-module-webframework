@@ -57,7 +57,7 @@ function ComponentCkeditor( id ) {
 			[ 'NumberedList', 'BulletedList' ],
 			[ 'Indent', 'Outdent', 'Blockquote' ],
 			[ 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ],
-			[ 'Link', 'Image', 'HorizontalRule' ], [ 'PasteFromWord' ], [ 'Youtube' ],
+			[ 'Link', 'Image', 'Youtube', 'HorizontalRule' ], [ 'PasteFromWord' ],
 			[ 'Font' ], [ 'FontSize' ],
 			[ 'TextColor', 'BGColor' ],
 			[ 'SpellCheckerLanguage' ], [ 'SpellChecker' ], [ 'Resize' ]
@@ -67,9 +67,9 @@ function ComponentCkeditor( id ) {
 			[ 'NumberedList', 'BulletedList' ],
 			[ 'Indent', 'Outdent', 'Blockquote' ],
 			[ 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ], [ 'PasteFromWord' ],
-			[ 'Link', 'Image', 'HorizontalRule' ],
+			[ 'Link', 'Image', 'Youtube', 'HorizontalRule' ],
 			[ 'Font' ], [ 'FontSize' ],'/',
-			[ 'TextColor', 'BGColor' ], ['Youtube'], 
+			[ 'TextColor', 'BGColor' ],
 			[ 'SpellCheckerLanguage' ], [ 'SpellChecker' ], ['Resize']
 		],
 		toolbar: 'OneRow',
