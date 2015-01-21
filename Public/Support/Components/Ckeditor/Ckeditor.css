@@ -1,0 +1,22 @@
+.cke_panel_grouptitle {
+	background-color: #acf0ff;
+	font-size: 12px;
+	padding: 5px;
+	font-weight: normal;
+}
+
+.cke_panel_list {
+	margin: 0;
+}
+
+.cke_panel_listItem a {
+ 	font-size: 12px;
+	padding: 5px;
+	border: 0;
+}
+
+.cke_panel_listItem a:hover,
+.cke_panel_listItem a:focus,
+.cke_panel_listItem a:active {
+	background-color: #79d9f7;
+}

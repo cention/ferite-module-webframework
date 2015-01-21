@@ -102,7 +102,11 @@ function ComponentCkeditor( id ) {
 			'pastefromword,' + 
 			'resize,' +
 			'youtube',
-		contentsCss: [WFServerURI + 'Resources/CSS/jquery.spellchecker.css', WFServerURI + 'Resources/Javascript/ckeditor/contents.css'],
+		contentsCss: [
+			WFServerURI + 'Resources/CSS/jquery.spellchecker.css',
+			WFServerURI + 'Resources/Javascript/ckeditor/contents.css',
+			WFServerURI + 'Support/Components/Ckeditor/Ckeditor.css',
+		],
 		spellCheckLanguages: []
 	};
 	
@@ -223,3 +227,5 @@ function ComponentCkeditor( id ) {
 	
 	return self;
 }
+
+CKEDITOR.addCss('body { margin-left: 5px; margin-right: 5px; margin-top: 3px; margin-bottom: 3px; }');
