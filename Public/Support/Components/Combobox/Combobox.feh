@@ -19,7 +19,9 @@ namespace modifies GUIKit {
 			.append( item, item );
 		}
 		function append( string id, string value ) {
-			._items[] = "{ id:'${id}', value:'${value}' }";
+			id = JSON.escape(id);
+			value = JSON.escape(value);
+			._items[] = "{ id:\"${id}\", value:\"${value}\" }";
 		}
 		function items {
 			return ._items;
