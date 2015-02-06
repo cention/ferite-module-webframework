@@ -125,7 +125,8 @@ applicationJavaScriptFiles = [
 	'Support/Components/QuickPreviewer/QuickPreviewer.js',
 	'Support/Components/CentionSimpleAttachmentList/CentionSimpleAttachmentList.js',
 	'Support/Components/CentionAnswerAttachmentList/CentionAnswerAttachmentList.js',
-	'Support/Components/OutboundTemplateEditor/OutboundTemplateEditor.js'
+	'Support/Components/OutboundTemplateEditor/OutboundTemplateEditor.js',
+	'Support/Components/Translation/Translation.js'
 ];
 
 Directory.build(outputPath);
