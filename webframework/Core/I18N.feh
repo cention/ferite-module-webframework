@@ -88,6 +88,9 @@ namespace modifies String {
 	function formatDateTZ( number date, string zoneName ) {
 		return .tzLocalDate(date, zoneName).format(Config.DateFormat);
 	}
+	function formatDateTZ( number date, string zoneName, string format ) {
+		return .tzLocalDate(date, zoneName).format(format);
+	}
 	/**
 	 * @function formatDateTime
 	 * @declaration function formatDateTime( number date )
@@ -126,6 +129,33 @@ namespace modifies String {
 			Sys.env.del("TZ");
 		}
 		return dateAtTZ;
+	}
+
+	/**
+	 * @function tzLocalDate
+	 * @declaration function gmtDateFromStringtz( string dateString, string timeZone )
+	 * @brief Convert a string with a date in format Config.DateFormat to a GMT timestamp in relation to the timeone
+	 * @param string dateString representing time in HOUR:MINUTE:SECOND format
+	 * @param string zoneName  name of the timezone where dateString is located
+	 * @return A GMT timestamp
+	 */
+	function gmtDateFromStringtz(string dateString, string zoneName){
+		number theGmtTime = 0;
+		object d1;
+		string oldZone = Sys.env.read("TZ");
+
+		if(zoneName.length() > 0 ){
+			Sys.env.write("TZ",zoneName);
+		}
+		d1 = Date.localParse(dateString, Config.DateFormat + ' %T');
+		theGmtTime = d1.time();
+		if(oldZone.length() > 0){
+			Sys.env.write("TZ",oldZone);
+		}
+		else{
+			Sys.env.del("TZ");
+		}
+		return theGmtTime;
 	}
 
 	/**
