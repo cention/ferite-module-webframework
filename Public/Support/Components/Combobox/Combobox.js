@@ -130,6 +130,10 @@ function ComponentCombobox( id ) {
 			// TODO: Do something here.
 		} else if( self.getState('autocomplete') == true ) {
 			var getCaretPosition = function( o ) {
+				if(document.createRange) /*Firefox, Chrome, Opera, Safari, IE 9+ */
+				{
+					return o.selectionStart;
+				}
 				if( o.createTextRange ) {
 					var r = document.selection.createRange().duplicate();
 					r.moveEnd('character', o.value.length);
@@ -137,7 +141,6 @@ function ComponentCombobox( id ) {
 						return o.value.length
 					return o.value.lastIndexOf(r.text)
 				}
-				return o.selectionStart;
 			};
 			self.node().onkeypress = function( keyEvent ) {
 				keyEvent = keyEvent || window.event;
