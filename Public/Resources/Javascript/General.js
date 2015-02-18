@@ -514,7 +514,10 @@ function CalendarPopup( id, start ) {
 				if($('DoneDate').value < daystart && $('DoneDate').value != 0){
 					$('DoneDateHuman').value = '';
 					$('DoneDate').value = daystart;
-					alert('Done Date can only be a future date');
+					if(WFI18NCatalog == 'sv')
+						alert('Klartdatum måste vara ett framtida datum');
+					else
+						alert('Done date must be a future date');
 				}
 		}
 	}
