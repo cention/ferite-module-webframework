@@ -109,11 +109,7 @@ function ComponentCkeditor( id ) {
 		],
 		spellCheckLanguages: []
 	};
-
-	self.setLanguage = function( language ) {
-		self.config.language = language;
-	}
-
+	
 	self.setFontSize = function( size ){
 		if( size ){
 			self.config.fontSize_defaultLabel = '' + size;

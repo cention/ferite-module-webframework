@@ -8,7 +8,6 @@
 	_('[ID]').setShowToolbar([showToolbar:true][!showToolbar:false]);
 	_('[ID]').setShowResize([ShowResize]);
 	_('[ID]').setSimpleToolbar([SimpleToolbar]);
-	_('[ID]').setLanguage('[Language]');
 	_('[ID]').setLanguages([Languages]);
 	_('[ID]').setState('text-value', "[JavascriptSafeTextValue]");
 	_('[ID]').setItemHeight([ItemHeight]);
