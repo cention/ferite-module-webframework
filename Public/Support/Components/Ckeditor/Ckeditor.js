@@ -105,7 +105,11 @@ function ComponentCkeditor( id ) {
 		contentsCss: [WFServerURI + 'Resources/CSS/jquery.spellchecker.css', WFServerURI + 'Resources/Javascript/ckeditor/contents.css'],
 		spellCheckLanguages: []
 	};
-	
+
+	self.setLanguage = function( language ) {
+		self.config.language = language;
+	}
+
 	self.setFontSize = function( size ){
 		if( size ){
 			self.config.fontSize_defaultLabel = ''+size;
