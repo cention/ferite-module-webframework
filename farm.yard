@@ -29,11 +29,16 @@
 			<fileset dir="Public/Resources/Templates/DTD" match="\.(ent|dtd)$" />
 			<file name="Public/Resources/Templates/xhtml.xsl" />
 		</list>
+
+		<list type="go">
+			<fileset dir="go" match="\.go$" recursive="true"/>
+		</list>
 	</collection>
 	
 	<phase id="install">
 		<copy source="webframework.module" target="$(FeriteModuleSourceDir)" maintainpath="true" />
 		<copy source="webframework.private" target="/cention/var/cache/webframework/Cache" />
 		<copy source="webframework.public" target="/cention/share/ferite/webframework" maintainpath="true" />
+		<copy source="webframework.go" target="/cention" maintainpath="true" />
 	</phase>
 </yard>

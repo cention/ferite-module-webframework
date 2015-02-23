@@ -184,23 +184,28 @@ namespace modifies String {
 	function dateStringToTimestamp( string date, string time ) {
 		object d1 = Date.localParse(date + ' ' + time, Config.DateFormat + ' %T');
 		object d2 = Date.localDate(d1.time());
-		if( d1.tm_isdst == 0 and d2.tm_isdst == 0 )
-			return d2.time() - 3600;
-		else if( d1.tm_isdst == 0 and d2.tm_isdst == 1 )
-			return d2.time() - 7200 - 3600;
-		else if( d1.tm_isdst == 1 and d2.tm_isdst == 1 )
-			return d2.time() - 7200;
+		/*
+		 * Note: Postgres already handles DST calculations based on tzdata if you pass it your
+		 *       time zone. Which means this calculation is a bug. Commenting this for now
+		 *       because I'm not sure if this affects anything else - Adly
+		 */
+		// if( d1.tm_isdst == 0 and d2.tm_isdst == 0 )
+		// 	return d2.time() - 3600;
+		// else if( d1.tm_isdst == 0 and d2.tm_isdst == 1 )
+		// 	return d2.time() - 7200 - 3600;
+		// else if( d1.tm_isdst == 1 and d2.tm_isdst == 1 )
+		// 	return d2.time() - 7200;
 		return d2.time();
 	}
 	function dateStringToTimestamp( string date ) {
 		object d1 = Date.localParse(date, Config.DateFormat);
 		object d2 = Date.localDate(d1.time());
-		if( d1.tm_isdst == 0 and d2.tm_isdst == 0 )
-			return d2.time() - 3600;
-		else if( d1.tm_isdst == 0 and d2.tm_isdst == 1 )
-			return d2.time() - 7200 - 3600;
-		else if( d1.tm_isdst == 1 and d2.tm_isdst == 1 )
-			return d2.time() - 7200;
+		// if( d1.tm_isdst == 0 and d2.tm_isdst == 0 )
+		// 	return d2.time() - 3600;
+		// else if( d1.tm_isdst == 0 and d2.tm_isdst == 1 )
+		// 	return d2.time() - 7200 - 3600;
+		// else if( d1.tm_isdst == 1 and d2.tm_isdst == 1 )
+		// 	return d2.time() - 7200;
 		return d2.time();
 	}
 	/**

@@ -506,6 +506,21 @@ function CalendarPopup( id, start ) {
 					 '<body onload="init();" style="margin:0px;">' + 
 						'<div style="text-align:center; margin-top:5px;" id="CalendarContainer"></div>' +
 					 '</body></html>');
+
+	w.onbeforeunload = function(){
+		if(id == 'DoneDate'){
+			var timestamp = Number(Math.floor(Date.now() / 1000));
+			var daystart = timestamp - (timestamp % 86400);
+				if($('DoneDate').value < daystart && $('DoneDate').value != 0){
+					$('DoneDateHuman').value = '';
+					$('DoneDate').value = daystart;
+					if(WFI18NCatalog == 'sv')
+						alert('Klartdatum måste vara ett framtida datum');
+					else
+						alert('Done date must be a future date');
+				}
+		}
+	}
 	w.document.close();
 }
 
