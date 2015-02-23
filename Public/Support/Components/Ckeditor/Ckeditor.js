@@ -112,15 +112,15 @@ function ComponentCkeditor( id ) {
 	
 	self.setFontSize = function( size ){
 		if( size ){
-			self.config.fontSize_defaultLabel = '' + size;
-			CKEDITOR.addCss('.cke_editable { font-size: '+ size +'; }');
+			self.config.fontSize_defaultLabel = ''+size;
+			CKEDITOR.addCss( '.cke_editable{ font-size: '+ size +'; }' );
 		}
 	};
 	
 	self.setFontFamily = function( family ){
 		if( family ){
-			self.config.font_defaultLabel = '' + family;
-			CKEDITOR.addCss('.cke_editable { font-family: '+ family +'; }');
+			self.config.font_defaultLabel = ''+family;
+			CKEDITOR.addCss( '.cke_editable{ font-family: '+ family +'; }' );
 		}
 	}
 
@@ -133,17 +133,16 @@ function ComponentCkeditor( id ) {
 		}
 	};
 	self.setShowResize = function( resize ) {
-		if( resize == true ) {
-			self.config.resize_enabled = true;
-		} else {
-			self.config.resize_enabled = false;
-		}
+	    if( resize == true )
+		self.config.resize_enabled = true;
+	    else
+		self.config.resize_enabled = false;	
 	};
 	self.setItemHeight = function( height ){
 		self.config.height = height;
 	};
 	self.showBasicToolbar = function() { };
-	self.showAdvancedToolbar = function() { };
+	self.showAdvancedToolbar = function() {};
 	self.setTwoRowToolbar = function( value ) {
 		if( value ) {
 			self.editorToolbar = 'TwoRow';
