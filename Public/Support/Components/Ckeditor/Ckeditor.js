@@ -11,7 +11,7 @@ function ComponentCkeditor( id ) {
 	
 	self.config = {
 		skin: 'kama',
-		enterMode: CKEDITOR.ENTER_BR,
+		enterMode: ( CKEDITOR.env.gecko ? CKEDITOR.ENTER_BR : CKEDITOR.ENTER_P),
 		shiftEnterMode: CKEDITOR.ENTER_P,
 		disableNativeSpellChecker: false,
 		browserContextMenuOnCtrl: true,
