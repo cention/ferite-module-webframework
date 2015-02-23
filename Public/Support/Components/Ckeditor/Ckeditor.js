@@ -10,7 +10,7 @@ function ComponentCkeditor( id ) {
 	self.haveUnsetData = false;
 	
 	self.config = {
-		skin: 'kama',
+		skin: 'cention',
 		enterMode: ( CKEDITOR.env.gecko ? CKEDITOR.ENTER_BR : CKEDITOR.ENTER_P),
 		shiftEnterMode: CKEDITOR.ENTER_P,
 		disableNativeSpellChecker: false,
