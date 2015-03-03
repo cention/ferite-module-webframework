@@ -8,7 +8,7 @@
 	_('[ID]').setShowToolbar([showToolbar:true][!showToolbar:false]);
 	_('[ID]').setShowResize([ShowResize]);
 	_('[ID]').setSimpleToolbar([SimpleToolbar]);
-	_('[ID]').setLanguage('[Language]');
+	_('[ID]').setLanguage('[language]');
 	_('[ID]').setLanguages([Languages]);
 	_('[ID]').setState('text-value', "[JavascriptSafeTextValue]");
 	_('[ID]').setItemHeight([ItemHeight]);
@@ -18,3 +18,37 @@
 	_('[ID]').setImages([Images]); /* This needs to come after activate() */
 </script>
 
+<!--
+Defining these style rules here isn't perfect. If multiple Ckeditor components are
+included on the same page then the rules will be defined multiple times.
+The reason these style rules are defined here is because the idea is that as little
+changes as possible should be made to Ckeditor so it should be as easy as possible
+to pull in updates to Ckeditor. Yes we could write our own skin for Ckeditor then
+there never would be any conflicts. However bugs are found within the skins too
+and by having our own skin we would be forced to find and solve those bugs ourselves.
+The reason the style rules are defined here and not in a CSS file is because
+these rules must be defined after all Ckeditor CSS files are included and it is hard
+to predict the order the CSS files are going to be loaded in. By defining the rules
+here it is guarenteed that they'll always be defined last.
+-->
+<style type="text/css">
+.cke_button__spellchecker_label {
+	display: inline;
+}
+.cke_panel {
+	border: 1px solid #999;
+	box-shadow: 0 0 5px #888;
+	border-radius: 3px;
+}
+.cke_chrome {
+	border: 0;
+	padding: 0;
+}
+.cke_button_off {
+	opacity: 1.0;
+}
+.cke_contents {
+	border: 1px solid #a5a5a5;
+	border-radius: 2px;
+}
+</style>
