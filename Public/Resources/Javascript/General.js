@@ -517,7 +517,7 @@ function CalendarPopup( id, start ) {
 					if(WFI18NCatalog == 'sv')
 						alert('Klartdatum måste vara ett framtida datum');
 					else
-						alert('Done date must be a future date');
+						alert('Due date must be a future date');
 				}
 		}
 	}
