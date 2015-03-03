@@ -10,8 +10,8 @@ function ComponentCkeditor( id ) {
 	self.haveUnsetData = false;
 	
 	self.config = {
-		skin: 'cention',
-		enterMode: ( CKEDITOR.env.gecko ? CKEDITOR.ENTER_BR : CKEDITOR.ENTER_P),
+		skin: 'kama',
+		enterMode: CKEDITOR.ENTER_BR,
 		shiftEnterMode: CKEDITOR.ENTER_P,
 		disableNativeSpellChecker: false,
 		browserContextMenuOnCtrl: true,
@@ -49,28 +49,28 @@ function ComponentCkeditor( id ) {
 			'Verdana/Verdana, Geneva, sans-serif',
 		toolbar_Empty: [],
 		toolbar_SingleRow: [
-			[ 'Cention_SpellCheckLanguageSelector' ], 
-			[ 'Cention_SpellCheck' ]
+			[ 'SpellCheckerLanguage' ],
+			[ 'SpellChecker' ]
 		],
 		toolbar_OneRow: [
 			[ 'Bold', 'Italic', 'Underline', 'Strike' ],
 			[ 'NumberedList', 'BulletedList' ],
 			[ 'Indent', 'Outdent', 'Blockquote' ],
 			[ 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ],
-			[ 'Link', 'Cention_Image', 'HorizontalRule' ], [ 'PasteFromWord' ], [ 'Youtube' ],
+			[ 'Link', 'Image', 'Youtube', 'HorizontalRule' ], [ 'PasteFromWord' ],
 			[ 'Font' ], [ 'FontSize' ],
 			[ 'TextColor', 'BGColor' ],
-			[ 'Cention_SpellCheckLanguageSelector' ], [ 'Cention_SpellCheck' ], [ 'Resize' ]
+			[ 'SpellCheckerLanguage' ], [ 'SpellChecker' ], [ 'Resize' ]
 		],
 		toolbar_TwoRow: [
 			[ 'Bold', 'Italic', 'Underline', 'Strike' ],
 			[ 'NumberedList', 'BulletedList' ],
 			[ 'Indent', 'Outdent', 'Blockquote' ],
 			[ 'JustifyLeft', 'JustifyCenter', 'JustifyRight' ], [ 'PasteFromWord' ],
-			[ 'Link', 'Cention_Image', 'HorizontalRule' ],
+			[ 'Link', 'Image', 'Youtube', 'HorizontalRule' ],
 			[ 'Font' ], [ 'FontSize' ],'/',
-			[ 'TextColor', 'BGColor' ], ['Youtube'], 
-			[ 'Cention_SpellCheckLanguageSelector' ], [ 'Cention_SpellCheck' ], ['Resize']
+			[ 'TextColor', 'BGColor' ],
+			[ 'SpellCheckerLanguage' ], [ 'SpellChecker' ], ['Resize']
 		],
 		toolbar: 'OneRow',
 		plugins:
@@ -102,7 +102,11 @@ function ComponentCkeditor( id ) {
 			'pastefromword,' + 
 			'resize,' +
 			'youtube',
-		contentsCss: [WFServerURI + 'Resources/CSS/jquery.spellchecker.css', WFServerURI + 'Resources/Javascript/ckeditor/contents.css'],
+		contentsCss: [
+			WFServerURI + 'Resources/CSS/jquery.spellchecker.css',
+			WFServerURI + 'Resources/Javascript/ckeditor/contents.css',
+			WFServerURI + 'Support/Components/Ckeditor/Ckeditor.css',
+		],
 		spellCheckLanguages: []
 	};
 
@@ -112,15 +116,15 @@ function ComponentCkeditor( id ) {
 
 	self.setFontSize = function( size ){
 		if( size ){
-			self.config.fontSize_defaultLabel = ''+size;
-			CKEDITOR.addCss( '.cke_editable{ font-size: '+ size +'; }' );
+			self.config.fontSize_defaultLabel = '' + size;
+			CKEDITOR.addCss('.cke_editable { font-size: '+ size +'; }');
 		}
 	};
 	
 	self.setFontFamily = function( family ){
 		if( family ){
-			self.config.font_defaultLabel = ''+family;
-			CKEDITOR.addCss( '.cke_editable{ font-family: '+ family +'; }' );
+			self.config.font_defaultLabel = '' + family;
+			CKEDITOR.addCss('.cke_editable { font-family: '+ family +'; }');
 		}
 	}
 
@@ -133,16 +137,17 @@ function ComponentCkeditor( id ) {
 		}
 	};
 	self.setShowResize = function( resize ) {
-	    if( resize == true )
-		self.config.resize_enabled = true;
-	    else
-		self.config.resize_enabled = false;	
+		if( resize == true ) {
+			self.config.resize_enabled = true;
+		} else {
+			self.config.resize_enabled = false;
+		}
 	};
 	self.setItemHeight = function( height ){
 		self.config.height = height;
 	};
 	self.showBasicToolbar = function() { };
-	self.showAdvancedToolbar = function() {};
+	self.showAdvancedToolbar = function() { };
 	self.setTwoRowToolbar = function( value ) {
 		if( value ) {
 			self.editorToolbar = 'TwoRow';
@@ -227,3 +232,5 @@ function ComponentCkeditor( id ) {
 	
 	return self;
 }
+
+CKEDITOR.addCss('body { margin-left: 5px; margin-right: 5px; margin-top: 3px; margin-bottom: 3px; }');
