@@ -512,11 +512,11 @@ function CalendarPopup( id, start ) {
 			var timestamp = Number(Math.floor(Date.now() / 1000));
 			var daystart = timestamp - (timestamp % 86400);
 			var alertstring = I("Due Date must be a future date");
-				if($('DoneDate').value < daystart && $('DoneDate').value != 0){
-					$('DoneDateHuman').value = '';
-					$('DoneDate').value = daystart;
-					alert(alertstring);
-				}
+			if($('DoneDate').value < daystart && $('DoneDate').value != 0){
+				$('DoneDateHuman').value = '';
+				$('DoneDate').value = daystart;
+				alert(alertstring);
+			}
 		}
 	}
 	w.document.close();
