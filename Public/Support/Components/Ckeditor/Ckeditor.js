@@ -13,6 +13,8 @@ function ComponentCkeditor( id ) {
 		skin: 'kama',
 		enterMode: CKEDITOR.ENTER_BR,
 		shiftEnterMode: CKEDITOR.ENTER_P,
+		forcePasteAsPlainText: false,
+		allowedContent: true,
 		disableNativeSpellChecker: false,
 		browserContextMenuOnCtrl: true,
 		colorButton_enableMore: false,
