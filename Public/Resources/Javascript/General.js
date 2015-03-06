@@ -511,14 +511,12 @@ function CalendarPopup( id, start ) {
 		if(id == 'DoneDate'){
 			var timestamp = Number(Math.floor(Date.now() / 1000));
 			var daystart = timestamp - (timestamp % 86400);
-				if($('DoneDate').value < daystart && $('DoneDate').value != 0){
-					$('DoneDateHuman').value = '';
-					$('DoneDate').value = daystart;
-					if(WFI18NCatalog == 'sv')
-						alert('Klartdatum måste vara ett framtida datum');
-					else
-						alert('Done date must be a future date');
-				}
+			var alertstring = I("Due Date must be a future date");
+			if($('DoneDate').value < daystart && $('DoneDate').value != 0){
+				$('DoneDateHuman').value = '';
+				$('DoneDate').value = daystart;
+				alert(alertstring);
+			}
 		}
 	}
 	w.document.close();

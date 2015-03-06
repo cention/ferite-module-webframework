@@ -3,7 +3,8 @@ namespace modifies GUIKit {
 	class BackgroundFileUploaderUploadedFile {
 		string path;
 		string name;
-		string type;
+		string majorType;
+		string minorType;
 		
 		constructor( string id, string uploadDirectoryPath ) {
 			string filePath = uploadDirectoryPath + '/' + id;
@@ -11,9 +12,25 @@ namespace modifies GUIKit {
 			object fileInfo = JSON.parse(File.open(fileInfoPath).toString());
 			.path = filePath;
 			.name = fileInfo.name;
+			._getMimeType();
 			File.remove(fileInfoPath);
 		}
-		
+
+		function _getMimeType() {
+			object process = Posix.openprocess("file --mime-type -b ${.path}", 'r');
+			if( process ) {
+				object regexp = new Regexp('([A-z]+)/([A-z]+)');
+				while( not process.eos() ) {
+					string line = process.readln();
+					object match = regexp.match(line);
+					if( match ) {
+						.majorType = match.capture(0);
+						.minorType = match.capture(1);
+					}
+				}
+			}
+		}
+
 		function moveTo( string newPath ) {
 			Sys.system("mv ${.path} ${newPath}");
 			.path = newPath;
