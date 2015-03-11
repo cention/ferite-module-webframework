@@ -236,3 +236,4 @@ function ComponentCkeditor( id ) {
 }
 
 CKEDITOR.addCss('body { margin-left: 5px; margin-right: 5px; margin-top: 3px; margin-bottom: 3px; }');
+CKEDITOR.addCss('p { margin-top: 0; }');
