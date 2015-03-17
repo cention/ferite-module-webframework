@@ -168,8 +168,40 @@ function ComponentCkeditor( id ) {
 			self.config.toolbar = self.editorToolbar;
 		}
 	};
+
+	self.bind = function() {
+		self.attachFocusAction();
+		self.attachBlurAction();
+	};
+
+	self.attachFocusAction = function() {
+		if( self.editor ) {
+			self.editor.on('focus', function() {
+				self.action('focus');
+			});
+		}
+	};
+	self.attachBlurAction = function() {
+		if( self.editor ) {
+			self.editor.on('blur', function() {
+				self.action('blur');
+			});
+		}
+	};
+
 	self.setReadOnly = function( value ) {};
 	self.setEnabled = function( value ) {};
+
+	self.focus = function() {
+		if( self.editor ) {
+			self.editor.focus();
+			return true;
+		}
+		return false;
+	};
+	self.blur = function() {
+		return false;
+	};
 	
 	self.empty = function() {
 		if( self.editor ) {
@@ -217,6 +249,13 @@ function ComponentCkeditor( id ) {
 	var previousActivate = self.activate;
 	self.activate = function() {
 		self.editor = CKEDITOR.replace(self.identifier(), self.config);
+
+		// Tobias 2015-03-17: The bind() function is called by SetComponent() however at the time
+		//                    This happens the editor isn't created which means no event handlers
+		//                    can be attached to it. The bind() function is therefore called one
+		//                    more time here.
+		self.bind();
+
 		self.editor.on('contentDom', function() {
 			self.editorIsReady = true;
 			if( self.haveUnsetData ) {
