@@ -1,7 +1,7 @@
 
 var helperCurrent = '';
 
-function ComponentHelper( id, target ) {
+function ComponentHelper( id, target, alternativeTarget ) {
 	var self = new Component(id);
 	var popup = $(id + '.popup');
 	var visible = false;
@@ -25,18 +25,23 @@ function ComponentHelper( id, target ) {
 					setWidth: false,
 					setHeight: false,
 					offsetLeft: self.node().offsetWidth + 10,
-					offsetTop: 0 - self.node().offsetHeight 
+					offsetTop: 0 - self.node().offsetHeight + document.viewport.getScrollOffsets().top
 				});
 			Element.show(popup);
 
 			if( self.highlight )
 				self.highlight.style.backgroundColor = '#e1ffe4';
-			if( $(target) ) {
-				try {
-					$(target).focus();
-				} catch( e ) {
+
+			$A([ target, alternativeTarget ]).each(function( t ) {
+				if( _(t ) ) {
+					_(t).focus();
+				} else if( $(t) ) {
+					try {
+						$(t).focus();
+					} catch( e ) {
+					}
 				}
-			}
+			});
 
 			helperCurrent = id;
 			visible = true;
@@ -47,8 +52,13 @@ function ComponentHelper( id, target ) {
 		helperCurrent = '';
 		if( self.highlight )
 			self.highlight.style.backgroundColor = '#FFF';
-		if( $(target) )
-			$(target).blur();
+		$A([ target, alternativeTarget ]).each(function( t ) {
+			if( _(t) ) {
+				_(t).blur();
+			} else if( $(t) ) {
+				$(t).blur();
+			}
+		});
 		Element.hide(popup);
 		visible = false;
 	};
@@ -64,15 +74,23 @@ function ComponentHelper( id, target ) {
 			self.show();
 		}
 	});
-	
-	if( $(target) ) {
-		$(target).onfocus = function(event) {
-			self.show();
-		};
-		$(target).onblur = function(event) {
-			self.hide();
-		};
-	}
-	
+	$A([ target, alternativeTarget ]).each(function( t ) {
+		if( _(t) ) {
+			_(t).registerAction('focus', function() {
+				self.show();
+			});
+			_(t).registerAction('blur', function() {
+				self.hide();
+			});
+		} else if( $(t) ) {
+			$(t).onfocus = function(event) {
+				self.show();
+			};
+			$(t).onblur = function(event) {
+				self.hide();
+			};
+		}
+	});
+
 	return self;
 }
