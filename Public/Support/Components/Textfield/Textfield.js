@@ -5,6 +5,8 @@ function ComponentTextfield( id ) {
 	self.bind = function() {
 		self.attachChangeAction( self.node(), self.identifier() );
 		self.attachKeyUpAction( self.node(), self.identifier() );
+		self.attachFocusAction( self.node(), self.identifier() );
+		self.attachBlurAction( self.node(), self.identifier() );
 	};
 	self.registerAction('change', function() {
 		self.setState('text-value', self.node().value);

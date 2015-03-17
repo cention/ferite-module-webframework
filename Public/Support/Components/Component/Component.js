@@ -101,6 +101,22 @@ function Component( identifier ) {
 			};
 		}
 	};
+	self.attachFocusAction = function( node, target ) {
+		if( node ) {
+			node.onfocus = function( e ) {
+				e = e || window.event;
+				return GetComponent(target).action('focus', e);
+			};
+		}
+	};
+	self.attachBlurAction = function( node, target ) {
+		if( node ) {
+			node.onblur = function( e ) {
+				e = e || window.event;
+				return GetComponent(target).action('blur', e);
+			};
+		}
+	};
 	self.disableSelection = function(element) {
 		element.onselectstart = function() {
 			return false;
