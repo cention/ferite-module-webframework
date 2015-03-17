@@ -3,6 +3,7 @@ namespace modifies GUIKit {
 	class CHelper extends GUIKit.AbstractContainerComponent {
 		[attribute string icon 'icon-help.png', ''];
 		[attribute string target '' ''];
+		[attribute string alternativeTarget '' ''];
 		
 		function handleChildren( array children, object renderEngine ) { }
 		

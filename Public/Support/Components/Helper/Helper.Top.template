@@ -2,6 +2,6 @@
 <div id="[ID].popup" class="HelperPopup" [Style:style="[] display:none"]>
 	[TextValue:<div>[]</div>]
 	<script type="text/javascript" charset="utf-8">
-		SetComponent('[ID]', new ComponentHelper('[ID]', '[target]'));
+		SetComponent('[ID]', new ComponentHelper('[ID]', '[target]', '[alternativeTarget]'));
 		_('[ID]').activate();
 	</script>
