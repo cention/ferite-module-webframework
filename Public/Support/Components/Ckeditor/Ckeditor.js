@@ -8,6 +8,7 @@ function ComponentCkeditor( id ) {
 	self.editorIsReady = false;
 	self.editorToolbar = 'OneRow';
 	self.haveUnsetData = false;
+	self.hideWhenReady = false;
 	
 	self.config = {
 		skin: 'kama',
@@ -202,6 +203,22 @@ function ComponentCkeditor( id ) {
 	self.blur = function() {
 		return false;
 	};
+	self.show = function() {
+		var node = $('cke_' + self.identifier());
+		if( node ) {
+			node.show();
+		}
+	};
+	self.hide = function() {
+		if( self.editorIsReady ) {
+			var node = $('cke_' + self.identifier());
+			if( node ) {
+				node.hide();
+			}
+		} else {
+			self.hideWhenReady = true;
+		}
+	};
 	
 	self.empty = function() {
 		if( self.editor ) {
@@ -262,6 +279,10 @@ function ComponentCkeditor( id ) {
 				self.editor.setData(self._states['text-value']);
 				self.editor.updateElement();
 				self.haveUnsetData = false;
+			}
+			if( self.hideWhenReady ) {
+				$('cke_' + self.identifier()).hide();
+				self.hideWhenReady = false;
 			}
 		});
 				
