@@ -231,9 +231,9 @@ function ComponentTable( id ) {
 			if( rowStyle.smallcaps ) styles += "font-variant:small-caps;";
 		}
 
-		Warningcount = ((columns.length * 50)/100);
+		Warningcount = ((columns.length * 40)/100);
 		Warningcount = Math.ceil( Warningcount );
-
+		
 		for( j = 0; j < columns.length; j++ ) {
 			var cancelClickEvent = '';
 			var column = columns[j];
