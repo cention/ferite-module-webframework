@@ -640,7 +640,7 @@ namespace modifies GUIKit {
 		}
 		function requiredJavascript
 			return [ /* 1st Party Titles */ 'Debug', 'General', 'Validator', 'Hotkey', 'MCAM', 
-					 /* 3rd Party Titles */ 'jquery', 'jquery-extensions', 'JSON2', 'prototype','jquery-ui',
+					 /* 3rd Party Titles */ 'jquery', 'jquery-extensions', 'JSON2', 'prototype','jquery-ui', 'JSXTransformer', 'react-with-addons',
 					 'scriptaculous/builder', 
 					 'scriptaculous/effects', 
 					 'scriptaculous/dragdrop', 
