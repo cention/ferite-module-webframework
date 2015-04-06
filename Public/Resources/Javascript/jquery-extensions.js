@@ -8,7 +8,18 @@
  * Modified by Lincoln Cooper to add Safari support and only call the callback once during initialization
  * for msie when no initial hash supplied.
  */
-
+jQuery.browser = {};
+(function () {
+    jQuery.browser.msie = false;
+    jQuery.browser.version = 0;
+    if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+        jQuery.browser.msie = true;
+        jQuery.browser.version = RegExp.$1;
+    }
+})();
+/** In jquery new version from 1.9 they have removed jQuery.browser but 
+*  as we still using old file so I create an object which will be act as like before
+**/
 jQuery.extend({
 	historyCurrentHash: undefined,
 	
@@ -19,6 +30,8 @@ jQuery.extend({
 		var current_hash = location.hash;
 		
 		jQuery.historyCurrentHash = current_hash;
+        console.log("", jQuery);
+
 		if ((jQuery.browser.msie) && (jQuery.browser.version < 8)) {
 			// To stop the callback firing twice during initilization if no hash present
 			if (jQuery.historyCurrentHash == '') {

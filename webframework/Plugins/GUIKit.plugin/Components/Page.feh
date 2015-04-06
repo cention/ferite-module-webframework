@@ -640,7 +640,7 @@ namespace modifies GUIKit {
 		}
 		function requiredJavascript
 			return [ /* 1st Party Titles */ 'Debug', 'General', 'Validator', 'Hotkey', 'MCAM', 
-					 /* 3rd Party Titles */ 'jquery', 'jquery-extensions', 'JSON2', 'prototype','jquery-ui', 'JSXTransformer', 'react-with-addons',
+					 /* 3rd Party Titles */ 'jquery', 'jquery-extensions', 'JSON2', 'prototype','jquery-ui',
 					 'scriptaculous/builder', 
 					 'scriptaculous/effects', 
 					 'scriptaculous/dragdrop', 
@@ -656,7 +656,10 @@ namespace modifies GUIKit {
 					 'rangy-cssclassapplier',
 					 'htmlparser',
 					 'soundmanager2-nodebug-jsmin',
-					 'Component/Component.js' ];
+					 'Component/Component.js',
+					 'react/react-with-addons',
+					 'react/JSXTransformer',
+					 'requirejs/require' ];
 		function requiredJavascriptExceptions 
 			return ['ckeditor/ckeditor'];
 
