@@ -639,10 +639,9 @@ namespace modifies GUIKit {
 				HTML.stylesheetHeader(uriForCSSResource('jquery-ui'));
 		}
 		function requiredJavascript
-			return [ /* 1st Party Titles */ 'Debug', 'General', 'Validator', 'Hotkey', 'MCAM', 
-					 /* 3rd Party Titles */ 
-                                         'jquery', 'jquery-extensions', 
-					 'JSON2', 'prototype','jquery-ui',
+
+			return [ /* 1st Party Titles */ 'Debug', 'General', 'Validator', 'Hotkey', 'MCAM', 'global-config', 
+				/* 3rd Party Titles */ 'jquery', 'jquery-extensions', 'JSON2', 'prototype','jquery-ui',
 					 'scriptaculous/builder', 
 					 'scriptaculous/effects', 
 					 'scriptaculous/dragdrop', 
@@ -660,7 +659,6 @@ namespace modifies GUIKit {
 					 'soundmanager2-nodebug-jsmin',
 					 'Component/Component.js',
 					 'react/react-with-addons',
-					 'react/JSXTransformer',
 					 'requirejs/require'];
 		function requiredJavascriptExceptions 
 			return ['ckeditor/ckeditor'];
