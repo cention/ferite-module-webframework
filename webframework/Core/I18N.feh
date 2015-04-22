@@ -195,6 +195,12 @@ namespace modifies String {
 		// 	return d2.time() - 7200 - 3600;
 		// else if( d1.tm_isdst == 1 and d2.tm_isdst == 1 )
 		// 	return d2.time() - 7200;
+		
+		// Not sure why the following works but it does
+		// (at least on servers in Sweden):
+		if( (d1.tm_isdst == 0 and d2.tm_isdst == 1) or (d1.tm_isdst == 1 and d2.tm_isdst == 0) ) // XOR
+			return d2.time() + 3600;
+		
 		return d2.time();
 	}
 	function dateStringToTimestamp( string date ) {
@@ -206,6 +212,12 @@ namespace modifies String {
 		// 	return d2.time() - 7200 - 3600;
 		// else if( d1.tm_isdst == 1 and d2.tm_isdst == 1 )
 		// 	return d2.time() - 7200;
+		
+		// Not sure why the following works but it does
+		// (at least on servers in Sweden):
+		if( (d1.tm_isdst == 0 and d2.tm_isdst == 1) or (d1.tm_isdst == 1 and d2.tm_isdst == 0) ) // XOR
+			return d2.time() + 3600;
+		
 		return d2.time();
 	}
 	/**
