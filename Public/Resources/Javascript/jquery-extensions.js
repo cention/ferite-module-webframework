@@ -30,7 +30,6 @@ jQuery.extend({
 		var current_hash = location.hash;
 		
 		jQuery.historyCurrentHash = current_hash;
-        console.log("", jQuery);
 
 		if ((jQuery.browser.msie) && (jQuery.browser.version < 8)) {
 			// To stop the callback firing twice during initilization if no hash present
