@@ -12,8 +12,8 @@ function ComponentCkeditor( id ) {
 	
 	self.config = {
 		skin: 'kama',
-		enterMode: CKEDITOR.ENTER_BR,
-		shiftEnterMode: CKEDITOR.ENTER_P,
+		enterMode: CKEDITOR.ENTER_DIV,
+		shiftEnterMode: CKEDITOR.ENTER_DIV,
 		forcePasteAsPlainText: false,
 		allowedContent: true,
 		disableNativeSpellChecker: false,
