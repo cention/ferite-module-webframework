@@ -35,7 +35,7 @@ function ComponentBackgroundFileUploader( id ) {
 		return form;
 	};
 
-	self.uploadFile = function() {
+	self.uploadFile = function(isIncreaseSize) {
 		var fileInput = byId(self.getState('file-input-id'));
 		var fileInputParent = fileInput.parentNode;
 		
@@ -44,12 +44,22 @@ function ComponentBackgroundFileUploader( id ) {
 		
 		self.action('startUpload', fileName);
 		
-		fileInput.name = 'FileUpload';
+		fileInput.name = 'FileUpload'; 
 		
 		var form = self.form();
 		/*var input = byId(self.identifier() + 'uieventcomponent');
 		input.value = self.getState('file-input-id'); */
 		form.appendChild(fileInput);
+		if (typeof isIncreaseSize !== 'undefined'){
+			form.appendChild((function(){
+				var input = document.createElement('input');
+				input.type = 'hidden';
+				input.id = id + 'IsIncreaseSize';
+				input.name = 'IsIncreaseSize';
+				input.value = isIncreaseSize;
+				return input;
+			})());
+		}
 		form.submit();
 		form.reset();
 		

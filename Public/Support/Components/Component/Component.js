@@ -145,7 +145,7 @@ function Component( identifier ) {
 		if( self._enabled ) {
 			handler = self._actions[action];
 			if( handler ) {
-				return handler.apply(self, Array.prototype.slice.apply(arguments, [1]));
+				return handler.apply(self, Array.prototype.slice.apply(arguments, [1]),Array.prototype.slice.apply(arguments, [2]));
 			}
 		}
 	};
