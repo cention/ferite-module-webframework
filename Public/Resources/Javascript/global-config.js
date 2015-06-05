@@ -4,5 +4,5 @@
 */
 var scriptSrcPath = "/Cention.app/Resources/ReactSrc/";
 var imageSrcPath = "/Cention.app/Resources/Images/";
-var webRoot = "/web/";
-var controllerPath = "/Cention/";
+var webRoot = "/Cention/web/";
+var controllerPath = "/";
