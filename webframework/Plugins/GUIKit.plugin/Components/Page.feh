@@ -659,7 +659,8 @@ namespace modifies GUIKit {
 					 'soundmanager2-nodebug-jsmin',
 					 'Component/Component.js',
 					 'react/react-with-addons',
-					 'requirejs/require'];
+					 'requirejs/require',
+					 'jquery.datetimepicker'];
 		function requiredJavascriptExceptions 
 			return ['ckeditor/ckeditor'];
 
