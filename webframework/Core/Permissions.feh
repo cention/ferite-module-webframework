@@ -151,7 +151,7 @@ namespace Permissions {
 	
 	function fetchUserObject( string ssid, string byCookie ) {
 		string username = '';
-		object user = Interface.User.byHashLogin( ssid );
+		object user = Interface.User.byHashLogin( (ssid ? ssid : "guest") );
 		if( not user ) {
 			user = Permissions.createApplicationUser('guest');
 		}
@@ -224,7 +224,7 @@ namespace Permissions {
 		string format = d.format('%a, %d-%b-%Y %H:%M:%S GMT');
 		string path = Config.Domain + application.topLevel;
 		if( not path ) path = "/";
-		request.setCookie("SSID=; path=$path");
+		request.setCookie("SSID=guest; path=$path");
     }
 	/**
 	 * @function usernameExists
