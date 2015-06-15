@@ -32,6 +32,7 @@ webframeworkJavaScriptFiles = [
 	'Resources/Javascript/scriptaculous/sound.js',
 	'Resources/Javascript/scriptaculous/multidrag.js',
 	'Resources/Javascript/scriptaculous/scriptaculous.js',
+	'Resources/Javascript/jquery.datetimepicker.js',
 	'Resources/Javascript/jquery.titlealert.js',
 	'Resources/Javascript/jquery.spellchecker.js',
 	'Resources/Javascript/jquery-ui.js',
