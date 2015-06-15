@@ -35,8 +35,8 @@ namespace modifies GUIKit {
 		
 		function columnHeaders {
 			array columnHeaders = [];
-			
-			._table.contents.each() using ( id ) {
+
+			._table.contents.eachWithIndex() using ( id, index ) {
 				object column = Cache.components[id];
 				string textValue = column.textValue();
 				string style = 'padding:4px;';
@@ -55,10 +55,11 @@ namespace modifies GUIKit {
 					'IgnoreClicks' => column.ignoreClicks(), 
 					'Sortable' => column.sortable(),
 					'Width' => column.size.width,
+					'ColumnSpan' => (index == 0 ? 2 : 1), /* The first column is assumed to be visible */
 					'Visible' => '' + column.visible()
 				];
 			};
-			
+
 			return columnHeaders;
 		}
 		
@@ -144,6 +145,7 @@ namespace modifies GUIKit {
 		[attribute boolean secondarySort false                'Whether the colunn is the secondary sort column'];
 		[attribute string  map ''                             'Column ID to data map'];
 		[attribute boolean disableWordWrap false              'Whether or not the column should support word-wrap'];
+		[attribute number  columnSpan 1                       'How many columns the column should span'];
 	}
 	
 	class CTable extends GUIKit.AbstractContainerComponent {

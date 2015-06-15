@@ -160,12 +160,21 @@ function ComponentTable( id ) {
 	self.updateHeaders = function() {
 		var columns = self.getState('columns');
 		var map = self.getState('columns.map');
+		var visible = [];
 		
 		var sortedColumn = self.getState('columns.sort');
 		var sortedColumnDirection = self.getState('columns.sort-direction');
-		
-		columns.each(function(column){
+
+		for( var i = 0; i < columns.length; i++ ) {
+			if( columns[i].visible ) {
+				visible.push(i);
+			}
+		}
+
+		for( var i = 0; i < columns.length; i++ ) {
+			var column = columns[i];
 			if( column.visible ) {
+				var classes = (sortedColumn == column.id ? 'active' : '');
 				var label = I(column.label);
 				if( sortedColumn == column.id && WFServerURI ) {
 					if( sortedColumnDirection == 'asc' ) {
@@ -174,15 +183,21 @@ function ComponentTable( id ) {
 						label += '<img src="' + WFServerURI + 'Resources/Images/sort_down.gif" style="vertical-align:middle" border="0" alt="">';
 					}
 				}
+				if( i == visible[0] /* first column */ ) {
+					classes += ' first';
+				} else if( i == visible[visible.length - 1] /* last column */ ) {
+					classes += ' last';
+				}
 				$(column.id).innerHTML = label;
 				$(column.id).style.display = '';
-				$(column.id).className = (sortedColumn == column.id ? 'active' : '');
+				$(column.id).className = classes;
 				$(column.id).style.paddingRight = (sortedColumn == column.id ? '0px' : (column.sortable ? '13px' : '4px'));
 				$(column.id).style.textAlign = column.align;
 			} else {
 				$(column.id).style.display = 'none';
 			}
-		});
+		}
+//		});
 	};
 	self.displayColumn = function( column_id ) {
 		var columns = self.getState('columns');
@@ -208,6 +223,7 @@ function ComponentTable( id ) {
 		var map = self.getState('columns.map');
 		var callbacks = self.getState('columns.callbacks');
 
+		var visible = [];
 		var html = '';
 		var id = row.id;
 		var rowStyle = {};
@@ -234,11 +250,23 @@ function ComponentTable( id ) {
 		Warningcount = ((columns.length * 40)/100);
 		Warningcount = Math.ceil( Warningcount );
 		
+		if( row.groupWith ) {
+			html += '<td style="border:0;">&nbsp;</td>';
+		}
+
+		for( i = 0; i < columns.length; i++ ) {
+			if( columns[i].visible ) {
+				visible.push(i);
+			}
+		}
+
 		for( j = 0; j < columns.length; j++ ) {
 			var cancelClickEvent = '';
 			var column = columns[j];
+			var cellClasses = classes;
 			var cellStyles = styles;
 			var item;
+			var colspan = 1;
 			
 			if( column.visible ) {
 				if( callbacks && callbacks[column.id] ) {
@@ -250,6 +278,19 @@ function ComponentTable( id ) {
 					}
 				}
 			
+				if( j == visible[0] /* first column */ ) {
+					cellClasses += ' first';
+					if( !row.groupWith ) {
+						colspan = 2;
+					}
+				} else if( j == visible[visible.length - 1] /* last column */ ) {
+					cellClasses += ' last';
+				}
+				if( row.groupWith ) {
+					cellClasses += ' grouped';
+					cellStyles += 'color:#a0a0a0;'
+				}
+
 				if( column.ignoreClicks ) {
 					cancelClickEvent = ' onclick="CancelEvent(event); return false"';
 					cellStyles += "cursor:default;";
@@ -269,7 +310,7 @@ function ComponentTable( id ) {
 				}
 			
 				html += 
-				'<td id="' + self.identifier() + '.row.' + id + '.' + map[column.id] + '" rowid="' + id + '"' + (classes ? ' class="' + classes + '" ' : '') + cancelClickEvent + cellStyles + '>' + 
+				'<td colspan="' + colspan + '"" id="' + self.identifier() + '.row.' + id + '.' + map[column.id] + '" rowid="' + id + '"' + (cellClasses ? ' class="' + cellClasses + '" ' : '') + cancelClickEvent + cellStyles + '>' +
 					(item != undefined ? item : '') + 
 				'</td>';
 			}

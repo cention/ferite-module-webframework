@@ -32,6 +32,7 @@ webframeworkJavaScriptFiles = [
 	'Resources/Javascript/scriptaculous/sound.js',
 	'Resources/Javascript/scriptaculous/multidrag.js',
 	'Resources/Javascript/scriptaculous/scriptaculous.js',
+	'Resources/Javascript/jquery.datetimepicker.js',
 	'Resources/Javascript/jquery.titlealert.js',
 	'Resources/Javascript/jquery.spellchecker.js',
 	'Resources/Javascript/jquery-ui.js',
@@ -77,7 +78,10 @@ webframeworkJavaScriptFiles = [
 	'Support/Components/ToggleLabel/ToggleLabel.js',
 	'Support/Components/ValueSlider/ValueSlider.js',
 	'Support/Components/WysiwygEditor/WysiwygEditor.js',
-	'Support/Components/BackgroundFileUploader/BackgroundFileUploader.js'
+	'Support/Components/BackgroundFileUploader/BackgroundFileUploader.js',
+	// React components
+	'Resources/ReactSrc/build/AcquiredErrands.js',
+	'Resources/ReactSrc/build/ErrandThread.js'
 ];
 
 applicationJavaScriptFiles = [

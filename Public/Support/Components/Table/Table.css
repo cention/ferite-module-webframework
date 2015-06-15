@@ -1,6 +1,5 @@
 
 table.wfTable {
-	border-width: 1px;
 	border-spacing: ;
 	border-style: outset;
 	border-color: #888;
@@ -9,13 +8,20 @@ table.wfTable {
 }
 
 table.wfTable th {
-	border-width: 1px;
 	padding: 4px;
+	border-width: 1px;
 	border-style: inset;
 	border-color: #0092ff;
+	border-top: 1px solid #888;
 	background-color: #80ceff;
 	font-weight: normal;
 	cursor: pointer;
+}
+table.wfTable th.first {
+	border-left: 1px solid #888;
+}
+table.wfTable th.last {
+	border-right: 1px solid #888;
 }
 table.wfTable th.active {
 	background-color: #fcff9c;
@@ -24,12 +30,25 @@ table.wfTable th.active {
 	color: #000;
 }
 table.wfTable td {
-	border-width: 1px;
 	padding: 4px;
+	border-width: 1px;
 	border-style: inset;
 	border-color: #CCC;
 	background-color: #FFF;
 	color: #000;
+}
+table.wfTable td.first {
+	border-left: 1px solid #888;
+}
+table.wfTable td.last {
+	border-right: 1px solid #888;
+}
+table.wfTable td.grouped {
+	font-style: italic;
+	color: #a0a0a0;
+}
+table.wfTable td.grouped img {
+	opacity: 0.6;
 }
 table.wfTable td.orange {
 	background-color:#FCAB46;
