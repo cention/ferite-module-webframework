@@ -45,7 +45,6 @@ webframeworkJavaScriptFiles = [
 //	'Resources/Javascript/rangy-serializer.js',
 	'Resources/Javascript/htmlparser.js',
 	'Resources/Javascript/soundmanager2-nodebug-jsmin.js',
-	'Resources/Javascript/jquery.datetimepicker.js',
 	// Components
 	'Support/Components/Component/Component.js',
 	'Support/Components/AbstractList/AbstractList.js',
