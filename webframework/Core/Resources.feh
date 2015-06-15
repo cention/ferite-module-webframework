@@ -33,6 +33,16 @@ function uriForCurrentPageActions() {
 	return uriForApplicationActionWithCommand(application.action, application.commands.join('/'));
 }
 /**
+ * @function uriForGoApplication
+ * @declaration function uriForGoApplication( string action )
+ * @brief Generate a url for the current application and a given action
+ * @param string action The action you wish to use, this should not have any slashes before or after the action.
+ * @return The generated url
+ */
+function uriForGoApplication( string action ) {
+	return Config.GoWebRoot + action;
+}
+/**
  * @function uriForApplicationAction
  * @declaration function uriForApplicationAction( string action )
  * @brief Generate a url for the current application and a given action
