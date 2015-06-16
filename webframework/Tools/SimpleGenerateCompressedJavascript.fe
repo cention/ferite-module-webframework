@@ -22,6 +22,7 @@ webframeworkJavaScriptFiles = [
 	'Resources/Javascript/jquery-extensions.js',
 	'Resources/Javascript/JSON2.js',
 	'Resources/Javascript/prototype.js',
+	'Resources/Javascript/soundmanager2-nodebug-jsmin.js',
 	//'Resources/Javascript/ckeditor/ckeditor.js',
 	'Resources/Javascript/ckeditor/config.js',
 	'Resources/Javascript/scriptaculous/builder.js',
@@ -44,7 +45,6 @@ webframeworkJavaScriptFiles = [
 	'Resources/Javascript/rangy-cssclassapplier.js',
 //	'Resources/Javascript/rangy-serializer.js',
 	'Resources/Javascript/htmlparser.js',
-	'Resources/Javascript/soundmanager2-nodebug-jsmin.js',
 	// Components
 	'Support/Components/Component/Component.js',
 	'Support/Components/AbstractList/AbstractList.js',
