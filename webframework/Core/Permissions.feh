@@ -195,12 +195,14 @@ namespace Permissions {
 	 */
     function validateUser( string username, string password ) {
 		object user = Interface.User.byLogin( username.toLower() );
-		user.setValue('ssid', .generateSSID());
-		user.save();
-		if( user and user.active and user.password == Permissions.encodePassword(password)) {
-			Permissions.setValidationCookies( user );
-			.currentUserObject = user;
-	        return .currentUserObject;
+		if( user ){
+			user.setValue('ssid', .generateSSID());
+			user.save();
+			if(user.active and user.password == Permissions.encodePassword(password)) {
+				Permissions.setValidationCookies( user );
+				.currentUserObject = user;
+				return .currentUserObject;
+			}
 		}
 		return null;
     }
