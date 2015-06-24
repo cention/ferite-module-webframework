@@ -51,7 +51,7 @@ namespace Permissions {
 			return true;
 		if( not user )
 			user = Permissions.fetchUserObject('guest');
-		if( user.active ) {
+		if( user and user.active ) {
 			anyZone = Interface.Application.specificZoneForUserResource( user.id, resource, zone );
 			if( anyZone ) 
 				return true;
