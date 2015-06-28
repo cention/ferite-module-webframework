@@ -126,7 +126,8 @@ namespace modifies GUIKit {
 						'ItemRender' => (itemRender ? itemRender : '&nbsp;'), 
 						'ItemRendersColumn' => _itemRendersColumn[j],
 						'IgnoreClicks' => (header.ignoreClicks() ? ' onclick="CancelEvent(event); return false"' : ''),
-						'Style' => style
+						'Style' => style,
+						'ColumnSpan' => (j == 0 ? 2 : 1)
 					];
 				};
 				rows[] = [ 'ID' => id, 'Columns' => rowColumns ];
