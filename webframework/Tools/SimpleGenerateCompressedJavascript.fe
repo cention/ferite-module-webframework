@@ -134,7 +134,7 @@ applicationJavaScriptFiles = [
 	'Support/Components/OutboundTemplateEditor/OutboundTemplateEditor.js',
 	'Support/Components/Translation/Translation.js',
 	// React components
-	'Resources/ReactSrc/build/AcquiredErrands.js',
+	'Resources/ReactSrc/build/OtherContacts.js',
 	'Resources/ReactSrc/build/ErrandThread.js'
 ];
 
