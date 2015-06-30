@@ -88,8 +88,7 @@ func States(featureTags []string, contexts []string) (map[string]*wf.FeatureAppl
 		if len(featureList) > 0 {
 			processList, err = wf.QueryFeatureApplication_fetchByFeaturesInContext(featureList, contextList)
 			if err != nil {
-				// FIXME don't panic
-				panic(err)
+				return nil, err
 			}
 		}
 	}
