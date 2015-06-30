@@ -22,44 +22,50 @@ import (
 	"strings"
 )
 
-var DefaultContexts []string
-var DefaultGlobalContext = ""
-var featureCache = make(map[string]*wf.FeatureApplication)
+type Feature struct {
+	defaultContexts      []string
+	defaultGlobalContext string
+	featureCache         map[string]*wf.FeatureApplication
+}
+
+func New() *Feature {
+	return &Feature{featureCache: map[string]*wf.FeatureApplication{}}
+}
 
 // ClearCache clears the cached features that were loaded from the object server.
-func ClearCache() {
-	featureCache = make(map[string]*wf.FeatureApplication)
+func (f *Feature) ClearCache() {
+	f.featureCache = make(map[string]*wf.FeatureApplication)
 }
 
 // Preload loads all the feature for the current default contexts.
-func Preload() {
-	States([]string{}, DefaultContexts)
+func (f *Feature) Preload() {
+	f.States([]string{}, f.defaultContexts)
 }
 
 // SetGlobalContext sets the default global context to the given context.
-func SetGlobalContext(ctx string) {
-	DefaultGlobalContext = ctx
+func (f *Feature) SetGlobalContext(ctx string) {
+	f.defaultGlobalContext = ctx
 }
 
 // SetDefaultContexts sets the default contexts to the given contexts.
-func SetDefaultContexts(ctxs []string) {
-	DefaultContexts = ctxs
+func (f *Feature) SetDefaultContexts(ctxs []string) {
+	f.defaultContexts = ctxs
 }
 
 // SetDefaultContext sets the default context to the given context string. More
 // than one context can be specified by separating them with semicolon.
-func SetDefaultContext(ctx string) {
-	SetDefaultContexts(strings.Split(ctx, ";"))
+func (f *Feature) SetDefaultContext(ctx string) {
+	f.SetDefaultContexts(strings.Split(ctx, ";"))
 }
 
 // DefaultContext returns the semicolon-separated default contexts.
-func DefaultContext() string {
-	return DefaultGlobalContext + ";" + wf.FeatureApplication_DEFAULT_CONTEXT
+func (f *Feature) DefaultContext() string {
+	return f.defaultGlobalContext + ";" + wf.FeatureApplication_DEFAULT_CONTEXT
 }
 
 // States implements the Go equivalent of webframework/Core/Features.feh's
 // state().
-func States(featureTags []string, contexts []string) (map[string]*wf.FeatureApplication, error) {
+func (f *Feature) States(featureTags []string, contexts []string) (map[string]*wf.FeatureApplication, error) {
 	// TODO rename processList to byPriorityDesc
 	var processList wf.FeatureApplicationSlice
 	var err error
@@ -67,9 +73,9 @@ func States(featureTags []string, contexts []string) (map[string]*wf.FeatureAppl
 	// TODO rename list to featureMap
 	list := map[string]*wf.FeatureApplication{}
 
-	contextList := []string{DefaultContext()}
+	contextList := []string{f.DefaultContext()}
 	for _, v := range contexts {
-		contextList = append(contextList, DefaultGlobalContext+`;`+v)
+		contextList = append(contextList, f.defaultGlobalContext+`;`+v)
 	}
 
 	if len(featureTags) == 0 {
@@ -79,7 +85,7 @@ func States(featureTags []string, contexts []string) (map[string]*wf.FeatureAppl
 		}
 	} else {
 		for _, tag := range featureTags {
-			if fa, exists := featureCache[tag]; exists {
+			if fa, exists := f.featureCache[tag]; exists {
 				list[tag] = fa
 			} else {
 				featureList = append(featureList, tag)
@@ -100,12 +106,12 @@ func States(featureTags []string, contexts []string) (map[string]*wf.FeatureAppl
 	}
 
 	if len(featureTags) == 0 {
-		featureCache = list
+		f.featureCache = list
 	} else {
 		for _, tag := range featureList {
 			//fmt.Printf("%8v => %v\n", tag, list[tag].Val())
 			if v, exists := list[tag]; exists {
-				featureCache[tag] = v
+				f.featureCache[tag] = v
 			}
 		}
 	}
@@ -113,8 +119,8 @@ func States(featureTags []string, contexts []string) (map[string]*wf.FeatureAppl
 	return list, nil
 }
 
-func stateForTagWithDefaultContexts(tag string) (*wf.FeatureApplication, error) {
-	m, err := States([]string{tag}, DefaultContexts)
+func (f *Feature) stateForTagWithDefaultContexts(tag string) (*wf.FeatureApplication, error) {
+	m, err := f.States([]string{tag}, f.defaultContexts)
 	if err != nil {
 		return nil, err
 	}
@@ -126,24 +132,17 @@ func stateForTagWithDefaultContexts(tag string) (*wf.FeatureApplication, error) 
 
 // State returns the (possibly cached) feature application state for the given
 // tag.
-func State(tag string) (*wf.FeatureApplication, error) {
-	if v, exists := featureCache[tag]; exists {
+func (f *Feature) State(tag string) (*wf.FeatureApplication, error) {
+	if v, exists := f.featureCache[tag]; exists {
 		return v, nil
 	}
-	fa, err := stateForTagWithDefaultContexts(tag)
-	if err != nil {
-		return nil, err
-	}
-	if fa != nil {
-		return fa, nil
-	}
-	return nil, nil
+	return f.stateForTagWithDefaultContexts(tag)
 }
 
 // Bool returns the boolean value of the feature application state for the
 // given tag.
-func Bool(tag string) bool {
-	fa, err := State(tag)
+func (f *Feature) Bool(tag string) bool {
+	fa, err := f.State(tag)
 	if err != nil {
 		log.Printf("feature.Bool(`%v`): %v", tag, err)
 	}
@@ -152,8 +151,8 @@ func Bool(tag string) bool {
 
 // Int returns the integer value of the feature application state for the given
 // tag.
-func Int(tag string) int {
-	fa, err := State(tag)
+func (f *Feature) Int(tag string) int {
+	fa, err := f.State(tag)
 	if err != nil {
 		log.Printf("feature.Int(`%v`): %v", tag, err)
 	}
@@ -165,8 +164,8 @@ func Int(tag string) int {
 
 // Str returns the string value of the feature application state for the given
 // tag.
-func Str(tag string) string {
-	fa, err := State(tag)
+func (f *Feature) Str(tag string) string {
+	fa, err := f.State(tag)
 	if err != nil {
 		log.Printf("feature.Str(`%v`): %v", tag, err)
 	}

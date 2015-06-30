@@ -1,24 +1,26 @@
 package feature
 
 import (
+	"c3/osm"
+	"c3/osm/webframework"
 	"encoding/json"
-	"osm"
-	"osm/webframework"
 	"testing"
 )
 
 func TestNonExistentString(t *testing.T) {
 	osm.SetFakeInvokeResult(`null`, nil)
-	got := Str("does-not-exist")
+	f := New()
+	got := f.Str("does-not-exist")
 	want := ""
 	if got != want {
-		t.Errorf("Str(`does-not-exist`) must return empty string\nwant: %v\n got: %v", want, got)
+		t.Errorf("f.Str(`does-not-exist`) must return empty string\nwant: %v\n got: %v", want, got)
 	}
 }
 
 func TestNonExistentBool(t *testing.T) {
 	osm.SetFakeInvokeResult(`null`, nil)
-	got := Bool("does-not-exist")
+	f := New()
+	got := f.Bool("does-not-exist")
 	want := false
 	if got != want {
 		t.Errorf("Bool(`does-not-exist`) must return false\nwant: %v\n got: %v", want, got)
@@ -27,7 +29,8 @@ func TestNonExistentBool(t *testing.T) {
 
 func TestNonExistentInt(t *testing.T) {
 	osm.SetFakeInvokeResult(`null`, nil)
-	got := Int("does-not-exist")
+	f := New()
+	got := f.Int("does-not-exist")
 	want := -1
 	if got != want {
 		t.Errorf("Int(`does-not-exist`) must return -1\nwant: %v\n got: %v", want, got)
@@ -44,7 +47,8 @@ func TestStates(t *testing.T) {
 	contexts := []string{
 		"context:1;default",
 	}
-	SetGlobalContext("context:1")
+	f := New()
+	f.SetGlobalContext("context:1")
 	fakeResponse := webframework.FeatureApplicationSlice{
 		&webframework.FeatureApplication{
 			FeatureTag: "a-string",
@@ -68,22 +72,22 @@ func TestStates(t *testing.T) {
 	buf, _ := json.Marshal(fakeResponse)
 	osm.SetFakeInvokeResult(string(buf), nil)
 
-	States(featureTags, contexts)
+	f.States(featureTags, contexts)
 
 	strWant := "Calibri"
-	strGot := Str("a-string")
+	strGot := f.Str("a-string")
 	if strGot != strWant {
 		t.Errorf("want: %v\n got: %v", strWant, strGot)
 	}
 
 	boolWant := true
-	boolGot := Bool("a-bool")
+	boolGot := f.Bool("a-bool")
 	if boolGot != boolWant {
 		t.Errorf("want: %v\n got: %v", boolWant, boolGot)
 	}
 
 	intWant := 42
-	intGot := Int("an-int")
+	intGot := f.Int("an-int")
 	if intGot != intWant {
 		t.Errorf("want: %v\n got: %v", intWant, intGot)
 	}
