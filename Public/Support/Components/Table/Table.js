@@ -280,7 +280,7 @@ function ComponentTable( id ) {
 			
 				if( j == visible[0] /* first column */ ) {
 					cellClasses += ' first';
-					if( !row.groupWith ) {
+					if( self.getState('group-rows') && !row.groupWith ) {
 						colspan = 2;
 					}
 				} else if( j == visible[visible.length - 1] /* last column */ ) {
