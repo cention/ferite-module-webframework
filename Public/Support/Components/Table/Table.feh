@@ -55,7 +55,7 @@ namespace modifies GUIKit {
 					'IgnoreClicks' => column.ignoreClicks(), 
 					'Sortable' => column.sortable(),
 					'Width' => column.size.width,
-					'ColumnSpan' => (index == 0 ? 2 : 1), /* The first column is assumed to be visible */
+					'ColumnSpan' => (._table.groupRows() and index == 0 ? 2 : 1), /* The first column is assumed to be visible */
 					'Visible' => '' + column.visible()
 				];
 			};
@@ -127,7 +127,7 @@ namespace modifies GUIKit {
 						'ItemRendersColumn' => _itemRendersColumn[j],
 						'IgnoreClicks' => (header.ignoreClicks() ? ' onclick="CancelEvent(event); return false"' : ''),
 						'Style' => style,
-						'ColumnSpan' => (j == 0 ? 2 : 1)
+						'ColumnSpan' => (._table.groupRows() and j == 0 ? 2 : 1)
 					];
 				};
 				rows[] = [ 'ID' => id, 'Columns' => rowColumns ];
@@ -155,6 +155,7 @@ namespace modifies GUIKit {
 		[attribute boolean sortable true 'Whether or not the table can be sorted'];
 		[attribute boolean autoSort false 'Whether the table should automatically note a sort change after data update'];
 		[attribute boolean showHeader true 'Whether the table should show the header'];
+		[attribute boolean groupRows false 'Whether the table should try to group rows'];
 		[attribute string  defaultForegroundColour '#000'      'The default foreground colour for a table row'];
 		[attribute string  defaultBackgroundColour '#FFF'      'The default foreground colour for a table row'];
 
