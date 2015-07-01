@@ -27,12 +27,28 @@ namespace I18N {
 		return .cleanString( key, true );
 	}
 	function cleanString( string key, boolean escapeQuote ) {
-		key = Regexp.replaceAll("[\t\n\r]", key, " ");
+		key = key.replace("\t", " ");
+		key = key.replace("\n", " ");
+		key = key.replace("\r", " ");
+
 		key = Regexp.replaceAll("([^\\\\])?\\\\'", key, "\\1'");
-		key = Regexp.replaceAll("\\\\", key, "\\\\\\");
-		if( escapeQuote ) 
-			key = Regexp.replaceAll("'", key, "\\'");
-		key = Regexp.replaceAll("[ \t\n]+", key, " ");
+
+		//HELP: This is the original regex:
+		//  key = Regexp.replaceAll("\\\\", key, "\\\\\\");
+		// and we're replacing it with this:
+		key = key.replace("\\", "\\\\\\");
+		// My question is why is the original code doing that? - Replacing 2
+		// backslashes with three? - nazri
+
+
+		if( escapeQuote ) {
+			key = key.replace("'", "\\'");
+		}
+
+		key = Regexp.replaceAll( " [ \t\n]+", key, " ");
+		key = Regexp.replaceAll("\t[ \t\n]+", key, " ");
+		key = Regexp.replaceAll("\n[ \t\n]+", key, " ");
+
 		return key.trim(" \r\n\t");
 	}
 }

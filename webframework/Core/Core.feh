@@ -199,8 +199,8 @@ namespace Core {
 }
 
 function EscapeHTML( string s ) {
-   s = Regexp.replaceAll( "&", s, "&amp;" );
-   s = Regexp.replaceAll( "<", s, "&lt;" );
-   s = Regexp.replaceAll( ">", s, "&gt;" );
+   s = s.replace("&", "&amp;" );
+   s = s.replace("<", "&lt;" );
+   s = s.replace(">", "&gt;" );
    return s;
 }
