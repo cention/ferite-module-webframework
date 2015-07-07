@@ -650,6 +650,7 @@ namespace modifies GUIKit {
 					 'scriptaculous/sound',
 					 'scriptaculous/multidrag',
 					 'scriptaculous/scriptaculous', 
+					 'socket.io-client/socket.io.js',
 					 'jquery.titlealert',
 					 'jquery.spellchecker',
 					 'rangy-core',
