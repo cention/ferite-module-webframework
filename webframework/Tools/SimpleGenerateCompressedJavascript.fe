@@ -38,6 +38,7 @@ webframeworkJavaScriptFiles = [
 	'Resources/Javascript/jquery.spellchecker.js',
 	'Resources/Javascript/jquery-ui.js',
 	'Resources/Javascript/react/react-with-addons.min.js',
+	'Resources/Javascript/socket.io-client/socket.io.js',
 	'Resources/Javascript/requirejs/require.js',
 //	'Resources/Javascript/scriptaculous/unittest.js',
 	'Resources/Javascript/rangy-core.js',
@@ -120,7 +121,6 @@ applicationJavaScriptFiles = [
 	'Resources/Javascript/3rdParty/Chart.js',
 	'Resources/Javascript/3rdParty/jquery.sparkline.js',
 	'Resources/Javascript/3rdParty/jquery.colorbox.js',
-	'Resources/Javascript/socket.io-client/socket.io.js',
 	// Components
 	'Support/Components/AnswerPageBox/AnswerPageBox.js',
 	'Support/Components/AnswerPageTextBox/AnswerPageTextBox.js',
@@ -133,7 +133,7 @@ applicationJavaScriptFiles = [
 	'Support/Components/CentionSimpleAttachmentList/CentionSimpleAttachmentList.js',
 	'Support/Components/CentionAnswerAttachmentList/CentionAnswerAttachmentList.js',
 	'Support/Components/OutboundTemplateEditor/OutboundTemplateEditor.js',
-	'Support/Components/Translation/Translation.js'
+	'Support/Components/Translation/Translation.js',
 	// React components
 	'Resources/ReactSrc/build/OtherContacts.js',
 	'Resources/ReactSrc/build/ErrandThread.js'
