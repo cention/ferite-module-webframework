@@ -120,6 +120,7 @@ applicationJavaScriptFiles = [
 	'Resources/Javascript/3rdParty/Chart.js',
 	'Resources/Javascript/3rdParty/jquery.sparkline.js',
 	'Resources/Javascript/3rdParty/jquery.colorbox.js',
+	'Resources/Javascript/socket.io.js',
 	// Components
 	'Support/Components/AnswerPageBox/AnswerPageBox.js',
 	'Support/Components/AnswerPageTextBox/AnswerPageTextBox.js',
