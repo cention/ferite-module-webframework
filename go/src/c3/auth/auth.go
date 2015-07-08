@@ -21,9 +21,7 @@ const (
 	HTTP_FORBIDDEN_ACCESS   = 403
 )
 
-var memcacheIsRunning bool
-
-var checkingMemcache = func () bool {
+func checkingMemcache() bool {
 	conn, err := net.Dial("tcp", "localhost:11211")
 	if err != nil {
 		log.Println("Memcache is not running! ", err)
@@ -33,71 +31,58 @@ var checkingMemcache = func () bool {
 	return true
 }
 
-var getFromMemcache = func (ssid string) (id int) {
-	id = -1;
-	if err := gobcache.GetFromMemcache("Session_"+ssid, &id); err != nil {
-		log.Println("[Set(Cookie)] Memcache key `Session` is empty!", err)
-	}
-	return
-}
-
-var saveInMemcache = func (ssid string, id int) {
-	if err := gobcache.SaveInMemcache("Session_"+ssid, id); err != nil {
-		log.Println("[`SaveInMemcache`] Error on saving:", err)
-	}
-}
-
-var userIdFromHash = func (ssid string) int {
-	wfUser, err := wf.QueryUser_byHashLogin(ssid)
-	if err == nil && wfUser != nil {
-		if wfUser.Active {
-			if memcacheIsRunning {
-				saveInMemcache("Session_"+ssid, wfUser.Id)
-			}
-			return wfUser.Id
-		}
-	}
-	return -1
-}
-
-var fetchUser = func (ssid string) *workflow.User {
-	var id int = -1
-	
-	if memcacheIsRunning {
-		id = getFromMemcache(ssid)
-	}
-	
-	if id == -1 {
-		id = userIdFromHash(ssid)
-	}
-	
-	if id != -1 {
-		return controllers.FetchUserObject(id)
-	}
-	return nil
-}
-
-func User (ctx *gin.Context) *workflow.User {
-	return ctx.Keys["loggedInUser"].(*workflow.User)
-}
-
-func Middleware () gin.HandlerFunc {
-	memcacheIsRunning = checkingMemcache()
+func Middleware () func (*gin.Context) {
+	memcacheIsRunning := checkingMemcache()
 
 	return func (ctx *gin.Context) {
-		var ssid string = ""
-	
+		var currUser *workflow.User
 		cookie, err := ctx.Request.Cookie("cention-suiteSSID")
-		if err == nil {
-			ssid = cookie.Value
+		if err != nil {
+			ctx.AbortWithStatus(HTTP_FORBIDDEN_ACCESS)
+			return
 		}
+		var id int = -1
+		ssid := cookie.Value
+		if memcacheIsRunning {
+			if err := gobcache.GetFromMemcache("Session_"+ssid, &id); err != nil {
+				log.Println("[Set(Cookie)] Memcache key `Session` is empty!", err)
+			}
+			if id != -1 {
+				currUser = controllers.FetchUserObject(id)
+			} else {
+				wfUser, err := wf.QueryUser_byHashLogin(ssid)
+				if err != nil {
+					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+				}
+				if wfUser != nil {
+					if wfUser.Active {
+						if err := gobcache.SaveInMemcache("Session_"+ssid, wfUser.Id); err != nil {
+							log.Println("[`SaveInMemcache`] Error on saving:", err)
+						}
+						currUser = controllers.FetchUserObject(wfUser.Id)
+					} else {
+						ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+					}
+				} else {
+					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+				}
+			}
 	
-		currUser := fetchUser(ssid)
-		
-		if currUser == nil {
-			ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+		} else {
+			wfUser, err := wf.QueryUser_byHashLogin(ssid)
+			if err != nil {
+				ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+			}
+			if wfUser != nil {
+				if wfUser.Active {
+					currUser = controllers.FetchUserObject(wfUser.Id)
+				} else {
+					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+				}
+			} else {
+				ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+			}
 		}
-		
 		ctx.Keys = make(map[string]interface{})
 		ctx.Keys["loggedInUser"] = currUser
 		ctx.Next()
