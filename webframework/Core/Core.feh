@@ -149,6 +149,9 @@ namespace Core {
 		allowedToStoreSession and Session.shutdown();
 		metrics.checkpoint("webframework done, good bye.");
 		JSON.RPC.connection and JSON.RPC.connection.close();
+		if (memcached.default_cache) {
+		  memcached.default_cache = null;
+		}
 	}
    
 	function DumpValues() {
