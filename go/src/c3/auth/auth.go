@@ -21,14 +21,14 @@ const (
 
 var ssid2idCache = syncmap.New()
 
-var getFromMemcache = func(ssid string) int {
+var getFromCache = func(ssid string) int {
 	if id, exist := ssid2idCache.Get(ssid); exist {
 		return id.(int)
 	}
 	return -1
 }
 
-var saveInMemcache = func(ssid string, id int) {
+var saveToCache = func(ssid string, id int) {
 	ssid2idCache.Put(ssid, id)
 }
 
@@ -36,7 +36,7 @@ var userIdFromHash = func(ssid string) int {
 	wfUser, err := wf.QueryUser_byHashLogin(ssid)
 	if err == nil && wfUser != nil {
 		if wfUser.Active {
-			saveInMemcache(ssid, wfUser.Id)
+			saveToCache(ssid, wfUser.Id)
 			return wfUser.Id
 		}
 	}
@@ -46,7 +46,7 @@ var userIdFromHash = func(ssid string) int {
 var fetchUser = func(ssid string) *workflow.User {
 	var id int = -1
 
-	id = getFromMemcache(ssid)
+	id = getFromCache(ssid)
 
 	if id == -1 {
 		id = userIdFromHash(ssid)
