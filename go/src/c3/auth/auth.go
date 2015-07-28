@@ -8,11 +8,9 @@ package auth
 import (
 	wf "c3/osm/webframework"
 	"c3/osm/workflow"
+	"c3/syncmap"
 	"c3/web/controllers"
-	"log"
-	"net"
 
-	"github.com/cention-mujibur-rahman/gobcache"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,39 +19,24 @@ const (
 	HTTP_FORBIDDEN_ACCESS   = 403
 )
 
-var memcacheIsRunning bool
+var ssid2idCache = syncmap.New()
 
-var checkingMemcache = func() bool {
-	conn, err := net.Dial("tcp", "localhost:11211")
-	if err != nil {
-		log.Println("Memcache is not running! ", err)
-		return false
+var getFromMemcache = func(ssid string) int {
+	if id, exist := ssid2idCache.Get(ssid); exist {
+		return id.(int)
 	}
-	defer conn.Close()
-	return true
-}
-
-var getFromMemcache = func(ssid string) (id int) {
-	id = -1
-	if err := gobcache.GetFromMemcache("Session_"+ssid, &id); err != nil {
-		log.Println("[Set(Cookie)] Memcache key `Session` is empty!", err)
-	}
-	return
+	return -1
 }
 
 var saveInMemcache = func(ssid string, id int) {
-	if err := gobcache.SaveInMemcache("Session_"+ssid, id); err != nil {
-		log.Println("[`SaveInMemcache`] Error on saving:", err)
-	}
+	ssid2idCache.Put(ssid, id)
 }
 
 var userIdFromHash = func(ssid string) int {
 	wfUser, err := wf.QueryUser_byHashLogin(ssid)
 	if err == nil && wfUser != nil {
 		if wfUser.Active {
-			if memcacheIsRunning {
-				saveInMemcache("Session_"+ssid, wfUser.Id)
-			}
+			saveInMemcache(ssid, wfUser.Id)
 			return wfUser.Id
 		}
 	}
@@ -63,9 +46,7 @@ var userIdFromHash = func(ssid string) int {
 var fetchUser = func(ssid string) *workflow.User {
 	var id int = -1
 
-	if memcacheIsRunning {
-		id = getFromMemcache(ssid)
-	}
+	id = getFromMemcache(ssid)
 
 	if id == -1 {
 		id = userIdFromHash(ssid)
@@ -82,8 +63,6 @@ func User(ctx *gin.Context) *workflow.User {
 }
 
 func Middleware() gin.HandlerFunc {
-	memcacheIsRunning = checkingMemcache()
-
 	return func(ctx *gin.Context) {
 		var ssid string = ""
 
