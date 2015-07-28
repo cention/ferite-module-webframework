@@ -10,6 +10,7 @@ import (
 	"c3/osm/workflow"
 	"c3/syncmap"
 	"c3/web/controllers"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,11 +35,17 @@ var saveToCache = func(ssid string, id int) {
 
 var userIdFromHash = func(ssid string) int {
 	wfUser, err := wf.QueryUser_byHashLogin(ssid)
-	if err == nil && wfUser != nil {
-		if wfUser.Active {
-			saveToCache(ssid, wfUser.Id)
-			return wfUser.Id
-		}
+	if err != nil {
+		log.Println(`auth.userIdFromHash():`, err)
+		return -1
+	}
+	if wfUser == nil {
+		// No user associated with ssid
+		return -1
+	}
+	if wfUser.Active {
+		saveToCache(ssid, wfUser.Id)
+		return wfUser.Id
 	}
 	return -1
 }
