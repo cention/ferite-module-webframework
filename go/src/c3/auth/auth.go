@@ -10,10 +10,11 @@ import (
 	"c3/osm/workflow"
 	"c3/web/controllers"
 	// "fmt"
+	"log"
+	"net"
+
 	"github.com/cention-mujibur-rahman/gobcache"
 	"github.com/gin-gonic/gin"
-	"net"
-	"log"
 )
 
 const (
@@ -31,10 +32,10 @@ func checkingMemcache() bool {
 	return true
 }
 
-func Middleware () func (*gin.Context) {
+func Middleware() func(*gin.Context) {
 	memcacheIsRunning := checkingMemcache()
 
-	return func (ctx *gin.Context) {
+	return func(ctx *gin.Context) {
 		var currUser *workflow.User
 		cookie, err := ctx.Request.Cookie("cention-suiteSSID")
 		if err != nil {
@@ -62,31 +63,30 @@ func Middleware () func (*gin.Context) {
 						currUser = controllers.FetchUserObject(wfUser.Id)
 					} else {
 						ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
-		}
+					}
 				} else {
 					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
-	}
-}
+				}
+			}
 
 		} else {
 			wfUser, err := wf.QueryUser_byHashLogin(ssid)
 			if err != nil {
 				ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
 			}
-	
+
 			if wfUser != nil {
 				if wfUser.Active {
 					currUser = controllers.FetchUserObject(wfUser.Id)
 				} else {
 					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
-	}
-	
+				}
+
 			} else {
 				ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
-	}
-}
+			}
+		}
 
-		
 		ctx.Keys = make(map[string]interface{})
 		ctx.Keys["loggedInUser"] = currUser
 		ctx.Next()
