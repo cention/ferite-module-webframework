@@ -650,7 +650,6 @@ namespace modifies GUIKit {
 					 'scriptaculous/sound',
 					 'scriptaculous/multidrag',
 					 'scriptaculous/scriptaculous', 
-					 'socket.io-client/socket.io.js',
 					 'jquery.titlealert',
 					 'jquery.spellchecker',
 					 'rangy-core',
@@ -660,6 +659,7 @@ namespace modifies GUIKit {
 					 'soundmanager2-nodebug-jsmin',
 					 'Component/Component.js',
 					 'react/react-with-addons',
+					 'socket.io-client/socket.io',
 					 'requirejs/require',
 					 'jquery.datetimepicker'];
 		function requiredJavascriptExceptions 
