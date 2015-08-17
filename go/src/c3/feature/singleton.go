@@ -1,31 +1,29 @@
 package feature
 
-import (
-	"sync"
-)
+import "sync"
 
 var onlyonce sync.Once
 var protect chan int
 var singleton *Feature
 
 func getSingleton() (r *Feature) {
-    onlyonce.Do(func() {
-    	singleton = New()
-    })
+	onlyonce.Do(func() {
+		singleton = New()
+	})
 	return singleton
 }
 
 // ClearCache clears the cached features that were loaded from the object server.
 func ClearCache() {
 	protect <- 1
-	defer func() {<-protect}()
+	defer func() { <-protect }()
 	getSingleton().ClearCache()
 }
 
 // SetGlobalContext sets the default global context to the given context.
 func SetGlobalContext(ctx string) {
 	protect <- 1
-	defer func() {<-protect}()
+	defer func() { <-protect }()
 	getSingleton().SetGlobalContext(ctx)
 }
 
@@ -33,7 +31,7 @@ func SetGlobalContext(ctx string) {
 // given tag.
 func Bool(tag string) bool {
 	protect <- 1
-	defer func() {<-protect}()
+	defer func() { <-protect }()
 	return getSingleton().Bool(tag)
 }
 
@@ -41,7 +39,7 @@ func Bool(tag string) bool {
 // tag.
 func Int(tag string) int {
 	protect <- 1
-	defer func() {<-protect}()
+	defer func() { <-protect }()
 	return getSingleton().Int(tag)
 }
 
@@ -49,10 +47,10 @@ func Int(tag string) int {
 // tag.
 func Str(tag string) string {
 	protect <- 1
-	defer func() {<-protect}()
+	defer func() { <-protect }()
 	return getSingleton().Str(tag)
 }
 
 func init() {
-	protect = make(chan int, 1)  // Allocate a buffer channel
+	protect = make(chan int, 1) // Allocate a buffer channel
 }
