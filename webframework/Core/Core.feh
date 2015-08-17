@@ -49,7 +49,7 @@ namespace modifies Config {
 		if( config.getVariables().keyExists('ObjectServerHost') ) {
 			Config._useObjectServer();
 			JSON.RPC.setDefaults( Config.ObjectServerHost, Config.ObjectServerPort, Config.ObjectServerURI );
-			JSON.RPC.connection = null;
+			JSON.RPC.connection = [];
 		}
 		else if( config.getVariables().keyExists('DBCDatabase') ) {
 			Config._useDatabaseServer();
@@ -148,7 +148,9 @@ namespace Core {
 		Interface.Shutdown();
 		allowedToStoreSession and Session.shutdown();
 		metrics.checkpoint("webframework done, good bye.");
-		JSON.RPC.connection and JSON.RPC.connection.close();
+		JSON.RPC.connection.each() using (conn) {
+			conn.close();
+		};
 		if (memcached.default_cache) {
 		  memcached.default_cache = null;
 		}
