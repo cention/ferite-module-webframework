@@ -43,21 +43,26 @@ func Middleware() func(*gin.Context) {
 			return
 		}
 		var id int = -1
+		var wfUser *wf.User
 		ssid := cookie.Value
 		if memcacheIsRunning {
-			if err := gobcache.GetFromMemcache("Session_"+ssid, &id); err != nil {
+			if err = gobcache.GetFromMemcache("Session_"+ssid, &id); err != nil {
 				log.Println("[Set(Cookie)] Memcache key `Session` is empty!", err)
 			}
 			if id != -1 {
 				currUser = controllers.FetchUserObject(id)
+				wfUser, err = wf.QueryUser_byHashLogin(ssid)
+				if err != nil {
+					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+				}
 			} else {
-				wfUser, err := wf.QueryUser_byHashLogin(ssid)
+				wfUser, err = wf.QueryUser_byHashLogin(ssid)
 				if err != nil {
 					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
 				}
 				if wfUser != nil {
 					if wfUser.Active {
-						if err := gobcache.SaveInMemcache("Session_"+ssid, wfUser.Id); err != nil {
+						if err = gobcache.SaveInMemcache("Session_"+ssid, wfUser.Id); err != nil {
 							log.Println("[`SaveInMemcache`] Error on saving:", err)
 						}
 						currUser = controllers.FetchUserObject(wfUser.Id)
@@ -70,7 +75,7 @@ func Middleware() func(*gin.Context) {
 			}
 
 		} else {
-			wfUser, err := wf.QueryUser_byHashLogin(ssid)
+			wfUser, err = wf.QueryUser_byHashLogin(ssid)
 			if err != nil {
 				ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
 			}
@@ -89,6 +94,10 @@ func Middleware() func(*gin.Context) {
 
 		ctx.Keys = make(map[string]interface{})
 		ctx.Keys["loggedInUser"] = currUser
+		if wfUser == nil {
+			log.Printf("auth.Middleware(): FIXME wfUser must not be nil.\n")
+		}
+		ctx.Keys["wfUser"] = wfUser
 		ctx.Next()
 	}
 }
