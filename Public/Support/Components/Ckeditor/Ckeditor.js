@@ -147,7 +147,9 @@ function ComponentCkeditor( id ) {
 		}
 	};
 	self.setItemHeight = function( height ){
-		self.config.height = height;
+		if( !isNaN(height) ) {
+			self.config.height = height;
+		}
 	};
 	self.showBasicToolbar = function() { };
 	self.showAdvancedToolbar = function() { };
