@@ -305,6 +305,34 @@ function ComponentCkeditor( id ) {
 		self.editor.on('contentDomUnload', function() {
 			self.editorIsReady = false;
 		});
+
+		self.editor.on('key', function( evt ) {
+			if( _('Hotkeys') ) {
+				if( CKEDITOR.env.webkit ||CKEDITOR.env.ie ) {
+					var newEvent = document.createEvent('Events');
+					newEvent.initEvent('keydown', true, true, window);
+					newEvent.view = window;
+					newEvent.altKey = evt.data.domEvent.$.altKey;
+					newEvent.ctrlKey = evt.data.domEvent.$.ctrlKey;
+					newEvent.shiftKey = evt.data.domEvent.$.shiftKey;
+					newEvent.metaKey = evt.data.domEvent.$.metaKey;
+					newEvent.keyCode = evt.data.domEvent.$.keyCode;
+					newEvent.charCode = evt.data.domEvent.$.charCode;
+					document.dispatchEvent(newEvent);
+				} else if( CKEDITOR.env.gecko ) {
+					var newEvent = document.createEvent('KeyboardEvent');
+					newEvent.initKeyEvent('keydown', true, true, window,
+						evt.data.domEvent.$.ctrlKey,
+						evt.data.domEvent.$.altKey,
+						evt.data.domEvent.$.shiftKey,
+						evt.data.domEvent.$.metaKey,
+						evt.data.domEvent.$.keyCode,
+						evt.data.domEvent.$.charCode);
+					document.dispatchEvent(newEvent);
+				}
+			}
+		});
+
 		previousActivate();
 	};
 	
