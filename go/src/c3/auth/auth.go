@@ -9,6 +9,7 @@ import (
 	wf "c3/osm/webframework"
 	"c3/osm/workflow"
 	"c3/web/controllers"
+	"strings"
 	// "fmt"
 	"log"
 	"net"
@@ -36,6 +37,10 @@ func Middleware() func(*gin.Context) {
 	memcacheIsRunning := checkingMemcache()
 
 	return func(ctx *gin.Context) {
+		if strings.HasPrefix(ctx.Request.RequestURI, "/debug/pprof/") {
+			ctx.Next()
+			return
+		}
 		var currUser *workflow.User
 		cookie, err := ctx.Request.Cookie("cention-suiteSSID")
 		if err != nil {
