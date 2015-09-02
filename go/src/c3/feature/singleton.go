@@ -27,7 +27,7 @@ func getSingleton() (r *Feature) {
 func ClearCache() {
 	protect <- 1
 	defer func() { <-protect }()
-	GetSingleton().ClearCache()
+	getSingleton().ClearCache()
 }
 
 // SetDefaultContext sets the default context to the given context string. More
@@ -42,7 +42,7 @@ func SetDefaultContext(ctx string) {
 func SetGlobalContext(ctx string) {
 	protect <- 1
 	defer func() { <-protect }()
-	GetSingleton().SetGlobalContext(ctx)
+	getSingleton().SetGlobalContext(ctx)
 }
 
 // Bool returns the boolean value of the feature application state for the
@@ -50,7 +50,7 @@ func SetGlobalContext(ctx string) {
 func Bool(tag string) bool {
 	protect <- 1
 	defer func() { <-protect }()
-	return GetSingleton().Bool(tag)
+	return getSingleton().Bool(tag)
 }
 
 // Int returns the integer value of the feature application state for the given
@@ -58,7 +58,7 @@ func Bool(tag string) bool {
 func Int(tag string) int {
 	protect <- 1
 	defer func() { <-protect }()
-	return GetSingleton().Int(tag)
+	return getSingleton().Int(tag)
 }
 
 // Str returns the string value of the feature application state for the given
@@ -66,7 +66,7 @@ func Int(tag string) int {
 func Str(tag string) string {
 	protect <- 1
 	defer func() { <-protect }()
-	return GetSingleton().Str(tag)
+	return getSingleton().Str(tag)
 }
 
 func init() {
