@@ -6,10 +6,16 @@ var onlyonce sync.Once
 var protect chan int
 var singleton *Feature
 
+// Use this function to get the interface Featurer which support both singleton
+// and also user declared feature object.
 func GetSingleton() Featurer {
 	return &globalFeature{}
 }
 
+// Never expose this func in order to directly access global Feature singleton
+// object. As it can break the thread safety of the singleton access. Use
+// the GetSingleton() to get interface Featurer which support both singleton
+// object and also user declared object.
 func getSingleton() (r *Feature) {
 	onlyonce.Do(func() {
 		singleton = New()
