@@ -6,6 +6,10 @@ var onlyonce sync.Once
 var protect chan int
 var singleton *Feature
 
+func GetSingleton() Featurer {
+	return &globalFeature{}
+}
+
 func getSingleton() (r *Feature) {
 	onlyonce.Do(func() {
 		singleton = New()
@@ -18,6 +22,14 @@ func ClearCache() {
 	protect <- 1
 	defer func() { <-protect }()
 	getSingleton().ClearCache()
+}
+
+// SetDefaultContext sets the default context to the given context string. More
+// than one context can be specified by separating them with semicolon.
+func SetDefaultContext(ctx string) {
+	protect <- 1
+	defer func() { <-protect }()
+	getSingleton().SetDefaultContext(ctx)
 }
 
 // SetGlobalContext sets the default global context to the given context.
@@ -53,4 +65,40 @@ func Str(tag string) string {
 
 func init() {
 	protect = make(chan int, 1) // Allocate a buffer channel
+}
+
+type Featurer interface {
+	ClearCache()
+	SetDefaultContext(ctx string)
+	SetGlobalContext(ctx string)
+	Bool(tag string) bool
+	Int(tag string) int
+	Str(tag string) string
+}
+
+type globalFeature struct {
+}
+
+func (g *globalFeature) ClearCache() {
+	ClearCache()
+}
+
+func (g *globalFeature) SetDefaultContext(ctx string) {
+	SetDefaultContext(ctx)
+}
+
+func (g *globalFeature) SetGlobalContext(ctx string) {
+	SetGlobalContext(ctx)
+}
+
+func (g *globalFeature) Bool(tag string) bool {
+	return Bool(tag)
+}
+
+func (g *globalFeature) Int(tag string) int {
+	return Int(tag)
+}
+
+func (g *globalFeature) Str(tag string) string {
+	return Str(tag)
 }
