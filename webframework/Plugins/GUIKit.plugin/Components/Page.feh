@@ -661,7 +661,12 @@ namespace modifies GUIKit {
 					 'react/react-with-addons',
 					 'socket.io-client/socket.io',
 					 'requirejs/require',
-					 'jquery.datetimepicker'];
+					 'jquery.datetimepicker',
+					 'jquery.flot',
+					 'jquery.flot-orderBars',
+					 'jquery.flot-resize',
+					 'jquery.flot-stack',
+					 'jquery.flot-time'];
 		function requiredJavascriptExceptions 
 			return ['ckeditor/ckeditor'];
 
