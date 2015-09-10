@@ -141,7 +141,8 @@ applicationJavaScriptFiles = [
 	'Support/Components/Translation/Translation.js',
 	// React components
 	'Resources/ReactSrc/build/OtherContacts.js',
-	'Resources/ReactSrc/build/ErrandThread.js'
+	'Resources/ReactSrc/build/ErrandThread.js',
+	'Resources/ReactSrc/build/Table.js'
 ];
 
 Directory.build(outputPath);
