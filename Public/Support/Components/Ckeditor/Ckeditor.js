@@ -222,7 +222,10 @@ function ComponentCkeditor( id ) {
 	
 	self.empty = function() {
 		if( self.editor ) {
-			if( self.editor.getData() )
+			var html = self.editor.getData();
+			var text = jQuery("<div/>").html(html).text();
+			text = jQuery.trim(text);
+			if( text )
 				return false;
 		}
 		return true;
