@@ -94,9 +94,6 @@ func Middleware() func(*gin.Context) {
 
 		ctx.Keys = make(map[string]interface{})
 		ctx.Keys["loggedInUser"] = currUser
-		if wfUser == nil {
-			log.Printf("auth.Middleware(): FIXME wfUser must not be nil.\n")
-		}
 		ctx.Keys["wfUser"] = wfUser
 		ctx.Next()
 	}
