@@ -118,8 +118,7 @@ function ComponentCkeditor( id ) {
 			'cention_image,' +
 			'pastefromword,' + 
 			'resize,' +
-			'youtube,' +
-			'pastebase64',
+			'youtube'
 		contentsCss: [
 			WFServerURI + 'Resources/CSS/jquery.spellchecker.css',
 			WFServerURI + 'Resources/Javascript/ckeditor/contents.css',
