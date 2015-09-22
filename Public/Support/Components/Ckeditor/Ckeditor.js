@@ -113,6 +113,7 @@ function ComponentCkeditor( id ) {
 			'toolbar,' +
 			'undo,' +
 			'wysiwygarea,' +
+			'cention_pasteimage,' +
 			'cention_spellcheck,' +
 			'cention_image,' +
 			'pastefromword,' + 
