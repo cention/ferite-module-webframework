@@ -1,14 +1,22 @@
 
 <span id="[ID]Wrapper">
-	<input type="text" name="[ID]" id="[ID]" class="[StyleClass]" style="[Style]" value="[Date]" [!Enabled:disabled="disabled"] />
+	<input type="text" name="[ID]" id="[ID]" class="[StyleClass]" style="[Style]" value="" [!Enabled:disabled="disabled"] />
 	[!Image:<input type="button" [.EventCode] value="[.TextValue]" class="[.StyleClass]" [!.Enabled:disabled="disabled"] />]
 	[Image:<img src="[.Image]" class="[.StyleClass]" [.Enabled:[.EventCode] style="cursor:pointer;"] alt="[.TextValue]" />]
 </span>
 
 <script type="text/javascript" charset="utf-8">
 
-	jQuery('#[ID]').datetimepicker({
+	var today = new Date(); 
+	var dd = today.getDate(); 
+	var mm = today.getMonth()+1; //January is 0! 
+	var yyyy = today.getFullYear(); 
+	if(dd<10) { dd='0'+dd } 
+	if(mm<10) { mm='0'+mm } 
+	today = yyyy+'/'+mm+'/'+dd; 
 
+	jQuery('#[ID]').datetimepicker({
+		value:today,
 		timepicker:false,
 		format:'Y/m/d',
 		closeOnDateSelect:true,
