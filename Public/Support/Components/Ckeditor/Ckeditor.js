@@ -105,7 +105,7 @@ function ComponentCkeditor( id ) {
 		contentsCss: [
 			WFServerURI + 'Resources/CSS/jquery.spellchecker.css',
 			WFServerURI + 'Resources/Javascript/ckeditor/contents.css',
-			WFServerURI + 'Support/Components/Ckeditor/Ckeditor.css',
+			WFServerURI + 'Support/Components/Ckeditor/Ckeditor.css'
 		],
 		spellCheckLanguages: []
 	};
