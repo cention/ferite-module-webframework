@@ -94,10 +94,14 @@ namespace Permissions {
 	function fetchUserObject() {
 		if( .currentUserObject == null ) {
 			array cookies = request.cookies();
-			if(	Array.keyExists(cookies, "SSID" ) ) 
+			if(	Array.keyExists(cookies, "SSID" ) )
+				//TODO: Mujibur: have to remove later 
+			  	// and  Array.keyExists(cookies,"${application.realName}WFPassword") and 
+			  	// cookies["${application.realName}WFUserID"] != "INVALIDUSER") 
 			{
 				.currentUserObject = .fetchUserObject( cookies["SSID"], '' );
 				if( .currentUserObject ){
+				// and .currentUserObject.password == cookies["${application.realName}WFPassword"] ) {
 					.userObjectCache['' + .currentUserObject.id] = .currentUserObject;
 				} else {
 					Permissions.invalidateUser();
@@ -170,7 +174,10 @@ namespace Permissions {
 		string format = d.format('%a, %d-%b-%Y %H:%M:%S GMT');
 		string path = Config.Domain + application.topLevel;
 		if( not path ) path = "/";
-		request.setCookie("SSID=${user.ssid}; path=$path");
+		//TODO: Mujibur: have to remove later
+        //request.setCookie( "${application.realName}WFUserID=${user.id}; path=$path" );
+        //request.setCookie( "${application.realName}WFPassword=${user.password}; path=$path" );
+        request.setCookie("SSID=${user.ssid}; path=$path");
 	}
 
 	/**
@@ -224,7 +231,10 @@ namespace Permissions {
 		string format = d.format('%a, %d-%b-%Y %H:%M:%S GMT');
 		string path = Config.Domain + application.topLevel;
 		if( not path ) path = "/";
-		request.setCookie("SSID=; path=$path");
+		//TODO: Mujibur: have to remove later
+        //request.setCookie( "${application.realName}WFUserID=; expires=$format; path=$path" );
+        //request.setCookie( "${application.realName}WFPassword=; expires=$format; path=$path" );
+        request.setCookie("SSID=; path=$path");
     }
 	/**
 	 * @function usernameExists
