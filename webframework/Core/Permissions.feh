@@ -85,9 +85,6 @@ namespace Permissions {
 		return I('Guest');
 	}
 	
-	function getAppSSID() {
-		return application.realName + "SSID";
-	}
 	/**
 	 * @function fetchUserObject
 	 * @declaration function fetchUserObject()
@@ -95,12 +92,11 @@ namespace Permissions {
 	 * @return The current user object, null otherwise
 	 */
 	function fetchUserObject() {
-		if( .currentUserObject == null ) {
+		if( application.realName == 'cention-suite' && .currentUserObject == null ) {
 			array cookies = request.cookies();
-			string ssid = .getAppSSID();
-			if(	Array.keyExists(cookies, ssid ))
+			if(	Array.keyExists(cookies, "SSID" ))
 			{
-				.currentUserObject = .fetchUserObject( cookies[ssid], '' );
+				.currentUserObject = .fetchUserObject( cookies["SSID"], '' );
 				if( .currentUserObject ){
 					.userObjectCache['' + .currentUserObject.id] = .currentUserObject;
 				} else {
@@ -174,7 +170,7 @@ namespace Permissions {
 		string format = d.format('%a, %d-%b-%Y %H:%M:%S GMT');
 		string path = Config.Domain + application.topLevel;
 		if( not path ) path = "/";
-		request.setCookie(.getAppSSID() + "=${user.ssid}; path=$path");
+		request.setCookie("SSID=${user.ssid}; path=$path");
 	}
 
 	/**
@@ -230,7 +226,7 @@ namespace Permissions {
 		string format = d.format('%a, %d-%b-%Y %H:%M:%S GMT');
 		string path = Config.Domain + application.topLevel;
 		if( not path ) path = "/";
-		request.setCookie( .getAppSSID() + "=guest; path=$path");
+		request.setCookie("SSID=guest; path=$path");
 	}
 	/**
 	 * @function usernameExists
