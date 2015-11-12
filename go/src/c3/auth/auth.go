@@ -27,11 +27,20 @@ import (
 const (
 	HTTP_UNAUTHORIZE_ACCESS = 401
 	HTTP_FORBIDDEN_ACCESS   = 403
+	HTTP_MOVED_PERMANENTLY  = 301
 )
 
-var hashKey = securecookie.GenerateRandomKey(64)
-var blockKey = securecookie.GenerateRandomKey(32)
-var s = securecookie.New(hashKey, blockKey)
+var (
+	hashKey                        = securecookie.GenerateRandomKey(64)
+	blockKey                       = securecookie.GenerateRandomKey(32)
+	sc                             = securecookie.New(hashKey, blockKey)
+	ERROR_USER_PASS_MISMATCH       = errors.New("Username or Password doesnt match!")
+	ERROR_CACHE_MISSED             = errors.New("Cache missed somehow!")
+	ERROR_ON_SECURECOOKIE_HASHKEY  = errors.New("HashKey doesn't match with secureCookie")
+	ERROR_COOKIE_NOT_FOUND         = errors.New("Cookie: cention-suiteSSID=? not found")
+	ERROR_WF_USER_NULL             = errors.New("webframework user is null")
+	ERROR_ON_MULTIPLE_LOGIN_COOKIE = errors.New("User logged in from multiple place")
+)
 
 func checkingMemcache() bool {
 	conn, err := net.Dial("tcp", "localhost:11211")
@@ -45,13 +54,11 @@ func checkingMemcache() bool {
 func getCookieHashKey(ctx *gin.Context) (string, error) {
 	cookie, err := ctx.Request.Cookie("cention-suiteSSID")
 	if err != nil {
-		//Keep log for debugging
-		//log.Println("Cookie is empty: ", err)
+		log.Println("getCookieHashKey(): Cookie is empty - ", err)
 		return "", err
 	}
 	if cookie != nil && cookie.Value == "" && cookie.Value == "guest" {
-		err = errors.New("Cache missed somehow!")
-		return "", err
+		return "", ERROR_CACHE_MISSED
 	}
 	return cookie.Value, nil
 }
@@ -63,28 +70,64 @@ func decodeCookie(ctx *gin.Context) (bool, string, error) {
 	}
 	if cookie != "" && cookie != "guest" {
 		value := make(map[string]string)
-		if err = s.Decode("cention-suiteSSID", cookie, &value); err == nil {
+		if err = sc.Decode("cention-suiteSSID", cookie, &value); err == nil {
 			log.Println("Cookie[`cention-suiteSSID`]", value["username"])
 			return true, value["username"], nil
+		} else {
+			//Somehow cookie got malformed so need to invalidate
+			log.Println("decodeCookie(): Error to decode ", err)
+			InvalidateCookie(ctx)
+			return false, "", err
 		}
 	} else {
 		return false, "", err
 	}
-	err = errors.New("Cookie: cention-suiteSSID=? not found")
-	return false, "", err
+	return false, "", ERROR_COOKIE_NOT_FOUND
+}
+func validateByOnlyCookie(ssid string) (*wf.User, error) {
+	wu, err := wf.QueryUser_byHashLogin(ssid)
+	if err != nil {
+		log.Println("validateByOnlyCookie(): Error on loading - wf.QueryUser_byLogin", err)
+		return nil, err
+	}
+	if wu != nil {
+		if wu.Active {
+			return wu, nil
+		}
+	}
+	return nil, ERROR_ON_SECURECOOKIE_HASHKEY
+
+}
+func InvalidateCookie(ctx *gin.Context) {
+	ctx.Writer.Header().Add("Set-Cookie", "cention-suiteSSID=guest; Path=/;MaxAge=-1")
 }
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
-	memcacheIsRunning := checkingMemcache()
-	if ok, username, err := decodeCookie(ctx); err == nil && ok {
-		log.Printf("-- User `%s` has login now", username)
-		return nil
+	user := ctx.Request.FormValue("username")
+	pass := ctx.Request.FormValue("password")
+	mu := &sync.Mutex{}
+	if ok, cookieUser, err := decodeCookie(ctx); err == nil && ok {
+		ssid, _ := getCookieHashKey(ctx)
+		cu, err := validateByOnlyCookie(ssid)
+		if err != nil {
+			log.Println("Error on CheckOrCreateAuthCookie() - validateByOnlyCookie(): ", err)
+			return err
+		}
+		if cu != nil {
+			log.Printf("CentionAuth: User `%s` has logedin now", cookieUser)
+			return nil
+		} else {
+			log.Println("Error on CheckOrCreateAuthCookie() - validateByOnlyCookie(): ", err)
+			InvalidateCookie(ctx)
+			return ERROR_ON_MULTIPLE_LOGIN_COOKIE
+		}
+	} else if user == "" && pass == "" {
+		//log.Println("Error on empty user/pass")
+		return ERROR_USER_PASS_MISMATCH
 	} else {
-		mu := &sync.Mutex{}
-		user := ctx.Request.FormValue("username")
-		pass := ctx.Request.FormValue("password")
 		expires := time.Now().Add(time.Minute * 135)
 		wfUser, err := validateUser(user, pass)
 		if err != nil {
+			log.Println("Error on CheckOrCreateAuthCookie() - validateUser: ", err)
 			return err
 		}
 		if wfUser != nil {
@@ -92,36 +135,51 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 				"username": user,
 			}
 			mu.Lock()
-			if encoded, err := s.Encode("cention-suiteSSID", value); err == nil {
+			if encoded, err := sc.Encode("cention-suiteSSID", value); err == nil {
 				wfUser.SetSsid(encoded)
 				if err := wfUser.Save(); err != nil {
-					log.Println("Error on saving webframework User: ", err)
+					log.Println("CheckOrCreateAuthCookie(): Error on saving webframework User: ", err)
 				}
 				//Saving the cookie to memcache
-				if memcacheIsRunning {
+				if checkingMemcache() {
 					if err = gobcache.SaveInMemcache("Session_"+encoded, wfUser.Id); err != nil {
 						log.Println("[`SaveInMemcache`] Error on saving:", err)
 					}
 				}
-				log.Printf("User `%s` just now Logged In", wfUser.Username)
+				log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
 				cookie := fmt.Sprintf("cention-suiteSSID=%s; Path=/;expires=%s", encoded, expires)
 				ctx.Writer.Header().Add("Set-Cookie", cookie)
-				mu.Unlock()
+				defer mu.Unlock()
 				return nil
 			} else {
-				log.Println("Error", err)
+				log.Println("CheckOrCreateAuthCookie(): Error on wrong cookie - ", err)
 				return err
 			}
 		}
-		err = errors.New("Username or Password doesnt match!")
+		return ERROR_USER_PASS_MISMATCH
+	}
+}
+func CheckAuthCookie(ctx *gin.Context) error {
+	ssid, err := getCookieHashKey(ctx)
+	if err != nil {
+		log.Println("Error on CheckAuthCookie() - getCookieHashKey(): ", err)
 		return err
 	}
+	cu, err := validateByOnlyCookie(ssid)
+	if err != nil {
+		return err
+	}
+	if cu == nil {
+		log.Println("Error on CheckAuthCookie() - Webframework user nil: ")
+		return ERROR_ON_MULTIPLE_LOGIN_COOKIE
+	}
+	return nil
 }
 func validateUser(user, pass string) (*wf.User, error) {
 	if user != "" && pass != "" {
 		wu, err := wf.QueryUser_byLogin(user)
 		if err != nil {
-			log.Println("Error on loading: wf.QueryUser_byLogin", err)
+			log.Println("validateUser() - Error on loading: wf.QueryUser_byLogin", err)
 			return nil, err
 		}
 		if wu != nil {
@@ -137,14 +195,13 @@ func validateUser(user, pass string) (*wf.User, error) {
 		msg = "!! Provided empty Username or Password."
 	}
 	log.Println(msg)
-	err := errors.New("Username or password wrong")
-	return nil, err
+	return nil, ERROR_USER_PASS_MISMATCH
 }
 func encodePassword(p string) string {
 	ep := sha256.New()
 	_, err := ep.Write([]byte(p))
 	if err != nil {
-		log.Println("Error on Sha256: ", err)
+		log.Println("encodePassword() - Error on Sha256: ", err)
 	}
 	return base64.StdEncoding.EncodeToString(ep.Sum(nil))
 }
@@ -152,7 +209,7 @@ func validateUserByCookie(secureCookieUser string, ctx *gin.Context) (*wf.User, 
 	if cookie, err := getCookieHashKey(ctx); err == nil {
 		wu, err := wf.QueryUser_byHashLogin(cookie)
 		if err != nil {
-			log.Println("Error on loading: wf.QueryUser_byLogin", err)
+			log.Println("validateUserByCookie() - Error on loading: wf.QueryUser_byLogin", err)
 			return nil, err
 		}
 		if wu != nil {
@@ -160,26 +217,23 @@ func validateUserByCookie(secureCookieUser string, ctx *gin.Context) (*wf.User, 
 				return wu, nil
 			}
 		}
-		err = errors.New("HashKey doesn't match with secureCookie")
-		return nil, err
+		return nil, ERROR_ON_SECURECOOKIE_HASHKEY
 	}
-	err := errors.New("webframework user is null")
-	return nil, err
+	return nil, ERROR_WF_USER_NULL
 }
 func destroyAuthCookie(ctx *gin.Context) error {
-	memcacheIsRunning := checkingMemcache()
 	if ok, username, err := decodeCookie(ctx); err == nil && ok {
 		wfUser, err := validateUserByCookie(username, ctx)
 		if err != nil {
-			log.Println("Error on validateUserByCookie: ", err)
+			log.Println("destroyAuthCookie() - Error on validateUserByCookie: ", err)
 		}
 		if wfUser != nil && wfUser.Active {
 			wfUser.SetSsid("")
 			if err := wfUser.Save(); err != nil {
-				log.Println("Error on saving webframework User: ", err)
+				log.Println("destroyAuthCookie() - Error on saving webframework User: ", err)
 			}
 			ssid, _ := getCookieHashKey(ctx) //Error ignored!
-			if memcacheIsRunning {
+			if checkingMemcache() {
 				gobcache.DeleteFromMemcache("Session_" + ssid)
 			}
 			log.Printf("User `%s` just now Logged Out", wfUser.Username)
@@ -187,31 +241,29 @@ func destroyAuthCookie(ctx *gin.Context) error {
 		}
 		return nil
 	} else {
-		//Nothing to do!!
+		log.Println("destroyAuthCookie() - Error to decode ", err)
 		return err
 	}
 }
 func Logout(ctx *gin.Context) error {
 	return destroyAuthCookie(ctx)
 }
-func Middleware() func(*gin.Context) {
-	memcacheIsRunning := checkingMemcache()
-
+func Middleware(pathPrefix string) func(*gin.Context) {
 	return func(ctx *gin.Context) {
 		if strings.HasPrefix(ctx.Request.RequestURI, "/debug/pprof/") {
 			ctx.Next()
 			return
 		}
 		var currUser *workflow.User
-		cookie, err := ctx.Request.Cookie("cention-suiteSSID")
+		ssid, err := getCookieHashKey(ctx)
 		if err != nil {
+			log.Println("Middleware() - getCookieHashKey(): Error ", err)
 			ctx.AbortWithStatus(HTTP_FORBIDDEN_ACCESS)
-			return
+			ctx.Redirect(HTTP_MOVED_PERMANENTLY, pathPrefix+"login")
 		}
 		var id int = -1
 		var wfUser *wf.User
-		ssid := cookie.Value
-		if memcacheIsRunning {
+		if checkingMemcache() {
 			if err = gobcache.GetFromMemcache("Session_"+ssid, &id); err != nil {
 				log.Println("[Set(Cookie)] Memcache key `Session` is empty!", err)
 			}
@@ -219,12 +271,16 @@ func Middleware() func(*gin.Context) {
 				currUser = controllers.FetchUserObject(id)
 				wfUser, err = wf.QueryUser_byHashLogin(ssid)
 				if err != nil {
+					log.Println("Middleware() - QueryUser_byHashLogin(): Cookie not found in Memcache: ", err)
 					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+					ctx.Redirect(HTTP_MOVED_PERMANENTLY, pathPrefix+"login")
 				}
 			} else {
 				wfUser, err = wf.QueryUser_byHashLogin(ssid)
 				if err != nil {
+					log.Println("Middleware() - QueryUser_byHashLogin(): Cookie not matched in database: ", err)
 					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+					ctx.Redirect(HTTP_MOVED_PERMANENTLY, pathPrefix+"login")
 				}
 				if wfUser != nil {
 					if wfUser.Active {
@@ -233,28 +289,38 @@ func Middleware() func(*gin.Context) {
 						}
 						currUser = controllers.FetchUserObject(wfUser.Id)
 					} else {
+						log.Println("Middleware() - Creating session - Webframework user is not active, User Id: ", wfUser.Id)
 						ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+						ctx.Redirect(HTTP_MOVED_PERMANENTLY, pathPrefix+"login")
 					}
 				} else {
+					log.Println("Middleware() - Creating session - Webframework user is nil ")
 					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+					ctx.Redirect(HTTP_MOVED_PERMANENTLY, pathPrefix+"login")
 				}
 			}
-
 		} else {
 			wfUser, err = wf.QueryUser_byHashLogin(ssid)
 			if err != nil {
+				log.Println("Middleware() - QueryUser_byHashLogin(): ", err)
 				ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+				ctx.Redirect(HTTP_MOVED_PERMANENTLY, pathPrefix+"login")
 			}
 
 			if wfUser != nil {
 				if wfUser.Active {
 					currUser = controllers.FetchUserObject(wfUser.Id)
 				} else {
+					log.Println("Middleware() - Webframework user is not active, User Id: ", wfUser.Id)
 					ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+					ctx.Redirect(HTTP_MOVED_PERMANENTLY, pathPrefix+"login")
 				}
 
 			} else {
+				log.Println("Middleware() - Webframework user is nil")
+				/*Resolve from Headers were already written. Wanted to override status code 301 with 200*/
 				ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
+				ctx.Redirect(HTTP_MOVED_PERMANENTLY, pathPrefix+"login")
 			}
 		}
 
