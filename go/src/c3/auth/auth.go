@@ -7,10 +7,9 @@ package auth
 
 import (
 	wf "c3/osm/webframework"
-	"c3/osm/workflow"
 	"c3/web/controllers"
 	"log"
-	"net"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -22,6 +21,36 @@ const (
 	HTTP_FORBIDDEN_ACCESS   = 403
 )
 
+func GetWebframeworkUserFromRequest(r *http.Request) *wf.User {
+	userIdCookie, err := r.Cookie("cention-suiteWFUserID")
+	if err != nil {
+		return nil
+	}
+	userId, err := strconv.Atoi(userIdCookie.Value)
+	if err != nil {
+		log.Printf("cention-suiteWFUserID: %v\n", err)
+		return nil
+	}
+
+	passwordCookie, err := r.Cookie("cention-suiteWFPassword")
+	if err != nil {
+		return nil
+	}
+	password := passwordCookie.Value
+
+	wfUser, err := wf.LoadUser(userId)
+	if err != nil {
+		log.Printf("webframework.LoadUser(%d): %v\n", userId, err)
+		return nil
+	}
+
+	if !wfUser.Active || wfUser.Password != password {
+		return nil
+	}
+
+	return wfUser
+}
+
 func Middleware() func(*gin.Context) {
 	return func(ctx *gin.Context) {
 		if strings.HasPrefix(ctx.Request.RequestURI, "/debug/pprof/") {
@@ -29,46 +58,13 @@ func Middleware() func(*gin.Context) {
 			return
 		}
 
-		var userId int = -1
-		var password string
-		var wfUser *wf.User
-		var currUser *workflow.User
-
-		userIdCookie, err := ctx.Request.Cookie("cention-suiteWFUserID")
-		if err != nil {
-			ctx.AbortWithStatus(HTTP_FORBIDDEN_ACCESS)
-			return
-		}
-		userId, err = strconv.Atoi(userIdCookie.Value)
-		if err != nil {
-			ctx.AbortWithStatus(HTTP_FORBIDDEN_ACCESS)
-			return
-		}
-
-		passwordCookie, err := ctx.Request.Cookie("cention-suiteWFPassword")
-		if err != nil {
-			ctx.AbortWithStatus(HTTP_FORBIDDEN_ACCESS)
-			return
-		}
-		password = passwordCookie.Value
-
-		wfUser, err = wf.LoadUser(userId)
-		if err != nil {
+		wfUser := GetWebframeworkUserFromRequest(ctx.Request)
+		if wfUser == nil {
 			ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
 			return
 		}
 
-		if wfUser != nil {
-			if wfUser.Active && wfUser.Password == password {
-				currUser = controllers.FetchUserObject(wfUser.Id)
-			} else {
-				ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
-				return
-			}
-		} else {
-			ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
-			return
-		}
+		currUser := controllers.FetchUserObject(wfUser.Id)
 
 		ctx.Keys = make(map[string]interface{})
 		ctx.Keys["loggedInUser"] = currUser
