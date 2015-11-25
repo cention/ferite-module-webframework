@@ -2,9 +2,9 @@
  * @namespace Permissions
  * @brief     The webframework permissions layer
  */
-
 namespace Permissions {
 	array resourcePermissionCache;
+	object sessiond;
 	/**
 	 * @function userAllowedForResource
 	 * @declaration function userAllowedForResource( object user, string resource )
@@ -104,7 +104,9 @@ namespace Permissions {
 				if( .currentUserObject ){
 					.userObjectCache['' + .currentUserObject.id] = .currentUserObject;
 				} else {
-					Permissions.invalidateUser();
+					//Permissions.invalidateUser();
+					//Mujibur: Need to investigate, is there any reason to invalidate?
+					.currentUserObject = .fetchUserObject( cookies[ssid], '' );
 				}
 			}
 		}
@@ -153,14 +155,33 @@ namespace Permissions {
 		return .userObjectCache["username:$username"];
 	}
 	
+	function getSession(string ssid) {
+		array session = [ 'id' => 0, 'timestamp' => 0, 'loggedin' => false ];
+		monitor {
+			string s = .sessiond.get("Session_" + ssid);
+			array a = s.toArray("/");
+			if( session.size() != 3 ) {
+				Console.printlnErr("session ${ssid} do not have 3 chunks? ${s}");
+			} else {
+				session['id'] = a[0].toNumber();
+				session['timestamp'] = a[1].toNumber();
+				session['loggedin'] = a[2].toBoolean();
+			}
+		} handle (e) {
+			Console.printlnErr("error getSession(${ssid}): ${e.str}");
+		}
+		return session;
+	}
+
 	function fetchUserObject( string ssid, string byCookie ) {
-		string username = '';
-		object user = Interface.User.byHashLogin( (ssid ? ssid : "guest") );
-		if( not user ) {
+		object user;
+		array session = .getSession(ssid);
+		if(session['id'] == 0 || session['loggedin'] == false) {
 			user = Permissions.createApplicationUser('guest');
+		} else {
+			user = Interface.User.load(session['id']);
 		}
 		.userObjectCache["username:${user.username}"] = user;
-		
 		return .userObjectCache["username:${user.username}"];
 	}
 	/**
@@ -170,11 +191,26 @@ namespace Permissions {
 	 * @param object user The user object to set the validation cookies for
 	 */
 	function setValidationCookies( object user ) {
+		//No need to set cookie over here!!
+		Console.printlnErr("Should we update memcache!!!??");
+	}
+
+	function setSession(string ssid, number uid) {
+		monitor{
+			number ts = Date.now();
+			string sessionValue = "${uid}/${ts}/true";
+			.sessiond.set("Session_"+ssid, sessionValue);
+		} handle(e){
+			Console.printlnErr("error setSession(${ssid}): ${e.str}");
+		}
+	}
+
+	function setAutoLoginCookie( string ssid) {
 		object d = Date.date(Date.now() + (135 * 60));
 		string format = d.format('%a, %d-%b-%Y %H:%M:%S GMT');
 		string path = Config.Domain + application.topLevel;
 		if( not path ) path = "/";
-		request.setCookie(.getAppSSID() + "=${user.ssid}; path=$path");
+		request.setCookie(.getAppSSID() + "=${ssid}; path=$path");
 	}
 
 	/**
@@ -198,10 +234,11 @@ namespace Permissions {
 	 * @return The user object or null if validation failed.
 	 */
     function validateUser( string username, string password ) {
+		//Here its also needed to check from sessiond
 		object user = Interface.User.byLogin( username.toLower() );
 		if( user ){
-			user.setValue('ssid', .generateSSID());
-			user.save();
+			//user.setValue('ssid', .generateSSID());
+			//user.save();
 			if(user.active and user.password == Permissions.encodePassword(password)) {
 				Permissions.setValidationCookies( user );
 				.currentUserObject = user;
@@ -226,11 +263,12 @@ namespace Permissions {
 	 * @brief Make the validation cookies invalid effectively causing the system to "log the user out"
 	 */
 	function invalidateUser() {
-		object d = Date.date(Date.now() - (300 * 60));
+		/*object d = Date.date(Date.now() - (300 * 60));
 		string format = d.format('%a, %d-%b-%Y %H:%M:%S GMT');
 		string path = Config.Domain + application.topLevel;
 		if( not path ) path = "/";
-		request.setCookie( .getAppSSID() + "=guest; path=$path");
+		request.setCookie( .getAppSSID() + "=guest; path=$path");*/
+		//Invalidate user no more needed from ferite
 	}
 	/**
 	 * @function usernameExists
@@ -349,3 +387,4 @@ namespace Permissions {
 /**
  * @end
  */
+ Permissions.sessiond = new memcached.Cache('localhost', 11311);
