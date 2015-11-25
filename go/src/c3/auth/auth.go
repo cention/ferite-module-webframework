@@ -20,8 +20,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cention-mujibur-rahman/gobcache"
 	"github.com/gin-gonic/gin"
-	"github.com/gobcache"
 	"github.com/gorilla/securecookie"
 )
 
@@ -41,7 +41,7 @@ var (
 	ERROR_ON_SECURECOOKIE_HASHKEY = errors.New("HashKey doesn't match with secureCookie")
 	ERROR_COOKIE_NOT_FOUND        = errors.New("Cookie: cention-suiteSSID=? not found")
 	ERROR_WF_USER_NULL            = errors.New("webframework user is null")
-	ERROR_MEMCACHE_FAILED         = errors.New("Memcache not running")
+	ERROR_MEMCACHE_FAILED         = errors.New("Sessiond not running")
 )
 
 type AuthCookieManager struct {
@@ -51,13 +51,16 @@ type AuthCookieManager struct {
 }
 
 func checkingMemcache() bool {
-	conn, err := net.Dial("tcp", "localhost:11211")
+	conn, err := net.Dial("tcp", "localhost:11311")
 	if err != nil {
-		log.Println("Memcache is not running! ", err)
+		log.Println("Sessiond Server is not running! ", err)
 		return false
 	}
 	defer conn.Close()
 	return true
+}
+func init() {
+	gobcache.SetHostAndPort("localhost:11311")
 }
 func getCookieHashKey(ctx *gin.Context) (string, error) {
 	cookie, err := ctx.Request.Cookie("cention-suiteSSID")
@@ -105,7 +108,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		acm := new(AuthCookieManager)
 		if checkingMemcache() {
 			if err := gobcache.GetFromMemcache("Session_"+ssid, &acm); err != nil {
-				log.Println("[GetFromMemcache] key `Session` is empty!")
+				log.Println("[GetFromMemcache] key :000 `Session` is empty!")
 				return err
 			}
 			if acm.LoggedIn && acm.UserId != 0 {
