@@ -6,8 +6,6 @@ package auth
  */
 
 import (
-	"c3/ferite"
-	"c3/ferite/serialize"
 	wf "c3/osm/webframework"
 	"c3/web/controllers"
 	"crypto/sha256"
@@ -17,6 +15,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -81,16 +80,53 @@ func decodeCookie(ctx *gin.Context) (string, error) {
 	}
 	if cookie != "" && cookie != "guest" {
 		return cookie, nil
-		//TODO Mujibur: Do we need to verify the cookie? Not sure? Why?
-		// Because if somehow webserver restarted the securecookie got vanish from memory
-		// So its tried to create new. :)
-		//		value := make(map[string]interface{})
-		//		if err = sc.Decode("cention-suiteSSID", cookie, &value); err == nil {
-		//			log.Printf("Cookie[`cention-suiteSSID`: %v] and params %v", cookie, value)
-		//			return nil
-		//		}
 	}
 	return "", ERROR_COOKIE_NOT_FOUND
+}
+
+func getCurrentSession(v []byte) (int, int, bool, error) {
+	sv := string(v)
+	sValue := strings.Split(sv, "/")
+	if len(sValue) != 3 {
+		return 0, 0, false, ERROR_CACHE_MISSED
+	}
+	uid, err := strconv.Atoi(sValue[0])
+	if err != nil {
+		log.Printf("Error on Uid conversion: %v", err)
+		return 0, 0, false, err
+	}
+	ts, err := strconv.Atoi(sValue[1])
+	if err != nil {
+		log.Printf("Error on timestampLastLogin conversion: %v", err)
+		return 0, 0, false, err
+	}
+	currentlyLoggedIn, err := strconv.ParseBool(sValue[2])
+	if err != nil {
+		log.Printf("Error on currentlyLoggedIn conversion: %v", err)
+		return 0, 0, false, err
+	}
+	return uid, ts, currentlyLoggedIn, nil
+}
+
+func fetchFromCache(key string) error {
+	skey := "Session_" + key
+	sItems, err := gobcache.GetRawFromMemcache(skey)
+	if err != nil {
+		log.Println("[GetRawFromMemcache] key `Session` is empty!")
+		return err
+	}
+	if sItems != nil {
+		uid, timestamp, currentlyLogedin, err := getCurrentSession(sItems.Value)
+		if err != nil {
+			return err
+		}
+		//Mujibur: timestamp, thinking how to use it?
+		_ = timestamp
+		if uid != 0 && currentlyLogedin {
+			return nil
+		}
+	}
+	return ERROR_CACHE_MISSED
 }
 
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
@@ -105,19 +141,15 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	user := ctx.Request.FormValue("username")
 	pass := ctx.Request.FormValue("password")
 	if user == "" && pass == "" {
-		acm := new(AuthCookieManager)
 		if checkingMemcache() {
-			if err := gobcache.GetFromMemcache("Session_"+ssid, &acm); err != nil {
-				log.Println("[GetFromMemcache] key :000 `Session` is empty!")
+			if err = fetchFromCache(ssid); err != nil {
 				return err
 			}
-			if acm.LoggedIn && acm.UserId != 0 {
-				return nil
-			}
+			return nil
 		}
 		return ERROR_USER_PASS_EMPTY
 	} else {
-		log.Println("!!-- Seiting cookie informations to memcache. First time login.")
+		log.Println("!!-- Setting cookie informations to memcache. First time login.")
 		wfUser, err := validateUser(user, pass)
 		if err != nil {
 			log.Println("Error on CheckOrCreateAuthCookie() - validateUser: ", err)
@@ -125,13 +157,9 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		}
 		if wfUser != nil {
 			lastLoginTime := time.Now().Unix()
-			acm := new(AuthCookieManager)
-			acm.UserId = wfUser.Id
-			acm.LoggedIn = true
-			acm.LastLoginTime = lastLoginTime
 			if checkingMemcache() {
-				if err = gobcache.SaveInMemcache("Session_"+ssid, acm); err != nil {
-					log.Println("[`SaveInMemcache`] Error on saving:", err)
+				sValue := fmt.Sprintf("%v/%v/%v", wfUser.Id, lastLoginTime, true)
+				if err = saveToSessiondCache(ssid, sValue); err != nil {
 					return err
 				}
 				log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
@@ -142,6 +170,15 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		}
 	}
 	return ERROR_WF_USER_NULL
+}
+
+func saveToSessiondCache(key, value string) error {
+	sKey := "Session_" + key
+	if err := gobcache.SetRawToMemcache(sKey, value); err != nil {
+		log.Println("[`SetRawToMemcache`] Error on saving:", err)
+		return err
+	}
+	return nil
 }
 
 func validateUser(user, pass string) (*wf.User, error) {
@@ -185,29 +222,6 @@ func CheckAuthCookie(ctx *gin.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	//	acm := &AuthCookieManager{
-	//		UserId:   2,
-	//		LoggedIn: true,
-	//	}
-	//	s, err := serialize.ToNative("SSID", acm)
-	//	tests := struct {
-	//		name string
-	//		list interface{}
-	//		want string
-	//	}{
-	//		name: "integer number",
-	//		list: 42,
-	//	}
-	ss := ferite.NewArray(2, 559922377, true)
-	s, err := serialize.ToNative("SSID", ss)
-	if err != nil {
-		log.Println("Error:", err)
-	}
-	log.Println("FFSession_" + cookie)
-	err = gobcache.SetRawToMemcache("FFSession_"+cookie, interface{}(s))
-	if err != nil {
-		log.Println("Errorw:", err)
-	}
 	ok, err := validateByBrowserCookie(cookie)
 	if err != nil {
 		return false, err
@@ -218,81 +232,56 @@ func CheckAuthCookie(ctx *gin.Context) (bool, error) {
 	return true, nil
 }
 
-func validateByBrowserCookie(ssid string) (bool, error) {
-	acm := new(AuthCookieManager)
-	if checkingMemcache() {
-		if err := gobcache.GetFromMemcache("Session_"+ssid, &acm); err != nil {
-			log.Println("[GetFromMemcache] key `Session` is empty!")
-			return false, err
-		}
-		if acm.LoggedIn && acm.UserId != 0 {
-			log.Println("Time after", acm.LastLoginTime)
-			if err := updateTimeStampToMemcacheSSID(ssid, acm.UserId, true); err != nil {
-				log.Printf("Error on validateByBrowserCookie(): %v", err)
-				return false, err
-			}
-			log.Println("Time after")
-			log.Printf("CentionAuth: Cookie has vrified with this info: %v", acm)
-			return true, nil
-		}
-		log.Printf("CentionAuth redirect to login: Cookie info: %v", acm)
-		return false, nil
+func fetchFromCacheWithValue(key string) (int, int, bool, error) {
+	skey := "Session_" + key
+	sItems, err := gobcache.GetRawFromMemcache(skey)
+	if err != nil {
+		log.Println("[GetRawFromMemcache] key `Session` is empty!")
+		return 0, 0, false, err
 	}
-	return false, ERROR_MEMCACHE_FAILED
-	/*
-		//TODO Mujibur: I wrote and kept intentionally for future :P
-		// Please dont argue with that. because wanting to get rif of from database while logging in and session checks
-		wfv, err := wf.QueryVoucher_byHashLogin(ssid)
+	if sItems != nil {
+		uid, timestamp, currentlyLogedin, err := getCurrentSession(sItems.Value)
 		if err != nil {
-			log.Println("validateByOnlyCookie(): Error on loading - wf.QueryVoucher_byHashLogin", err)
-			return false, err
+			return 0, 0, false, err
 		}
-		if wfv != nil {
-			if wfv.Loggedin && wfv.Active {
-				return true, nil
-			}
+		if uid != 0 && currentlyLogedin {
+			return uid, timestamp, currentlyLogedin, nil
 		}
-		//Because wfv null is not an error.
-		return false, nil
-	*/
+	}
+	return 0, 0, false, ERROR_CACHE_MISSED
 }
 
-//Not used now.
-//Kept that for future if anyhow is needed
-func validateUserByCookie(secureCookieUser string, ctx *gin.Context) (*wf.User, error) {
-	if cookie, err := getCookieHashKey(ctx); err == nil {
-		wu, err := wf.QueryUser_byHashLogin(cookie)
+func validateByBrowserCookie(ssid string) (bool, error) {
+	if checkingMemcache() {
+		uid, _, currentlyLogedin, err := fetchFromCacheWithValue(ssid)
 		if err != nil {
-			log.Println("validateUserByCookie() - Error on loading: wf.QueryUser_byLogin", err)
-			return nil, err
+			return false, err
 		}
-		if wu != nil {
-			if wu.Username == secureCookieUser { //Need to make sure the cookie hash and secureCookie name is same
-				return wu, nil
-			}
+		if err := updateTimeStampToCache(ssid, uid, currentlyLogedin); err != nil {
+			log.Printf("Error on validateByBrowserCookie(): %v", err)
+			return false, err
 		}
-		return nil, ERROR_ON_SECURECOOKIE_HASHKEY
+		log.Printf("CentionAuth: Cookie has vrified with this info: %v", uid)
+		return true, nil
 	}
-	return nil, ERROR_WF_USER_NULL
+	return false, ERROR_MEMCACHE_FAILED
 }
+
 func destroyAuthCookie(ctx *gin.Context) error {
 	ssid, err := decodeCookie(ctx)
 	if err != nil {
 		return err
 	}
 	if checkingMemcache() {
-		acm := new(AuthCookieManager)
-		if err = gobcache.GetFromMemcache("Session_"+ssid, &acm); err != nil {
-			log.Println("[GetFromMemcache] key `Session` is empty!")
+		uid, _, _, err := fetchFromCacheWithValue(ssid)
+		if err != nil {
 			return err
 		}
-		if acm.LoggedIn && acm.UserId != 0 {
-			if err = updateTimeStampToMemcacheSSID(ssid, acm.UserId, false); err != nil {
-				log.Printf("Error on destroyAuthCookie(): %v", err)
-				return err
-			}
-			return nil
+		if err := updateTimeStampToCache(ssid, uid, false); err != nil {
+			log.Printf("Error on validateByBrowserCookie(): %v", err)
+			return err
 		}
+		return nil
 	}
 	return ERROR_MEMCACHE_FAILED
 }
@@ -316,46 +305,33 @@ func GetWebframeworkUserFromRequest(r *http.Request) int {
 	if ssid == "" {
 		return 0
 	}
-	acm := new(AuthCookieManager)
 	if checkingMemcache() {
-		if err := gobcache.GetFromMemcache("Session_"+ssid, &acm); err != nil {
-			log.Println("[GetFromMemcache] key `Session` is empty!")
+		uid, _, currentlyLogedin, err := fetchFromCacheWithValue(ssid)
+		if err != nil {
+			log.Println("Error on fetchFromCacheWithValue(): ", err)
 			return 0
 		}
-		log.Printf("Acm: %v", acm)
-		if !acm.LoggedIn {
+		if !currentlyLogedin {
 			return 0
 		}
 		//Update timestamp for every request
-		if err := updateTimeStampToMemcacheSSID(ssid, acm.UserId, true); err != nil {
+		if err := updateTimeStampToCache(ssid, uid, currentlyLogedin); err != nil {
 			log.Printf("Error on %v", err)
 			return 0
 		}
-		return acm.UserId
+		return uid
 	}
 	return 0
 }
 
-func updateTimeStampToMemcacheSSID(ssid string, uid int, loginStatus bool) error {
-	acm1 := new(AuthCookieManager)
-	acm := new(AuthCookieManager)
+func updateTimeStampToCache(ssid string, uid int, loginStatus bool) error {
 	lastTimeGetRequest := time.Now().Unix()
-	acm.LastLoginTime = lastTimeGetRequest
-	acm.UserId = uid
-	acm.LoggedIn = loginStatus
-	log.Println("Time after:", acm.LastLoginTime)
-	if err := gobcache.SaveInMemcache("Session_"+ssid, acm); err != nil {
-		log.Println("[`SaveInMemcache`] Error on saving:", err)
+	svalue := fmt.Sprintf("%v/%v/%v", uid, lastTimeGetRequest, loginStatus)
+	if err := saveToSessiondCache(ssid, svalue); err != nil {
 		return err
 	}
-	if err := gobcache.GetFromMemcache("Session_"+ssid, &acm1); err != nil {
-		log.Println("[`SaveInMemcache`] Error on saving:", err)
-		return err
-	}
-	log.Println("HHHHHHH:", acm1)
 	return nil
 }
-
 func Middleware() func(*gin.Context) {
 	return func(ctx *gin.Context) {
 		if strings.HasPrefix(ctx.Request.RequestURI, "/debug/pprof/") {
