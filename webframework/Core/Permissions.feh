@@ -2,9 +2,9 @@
  * @namespace Permissions
  * @brief     The webframework permissions layer
  */
-
 namespace Permissions {
 	array resourcePermissionCache;
+	object sessiond;
 	/**
 	 * @function userAllowedForResource
 	 * @declaration function userAllowedForResource( object user, string resource )
@@ -103,7 +103,9 @@ namespace Permissions {
 				if( .currentUserObject and .currentUserObject.password == cookies["${application.realName}WFPassword"] ) {
 					.userObjectCache['' + .currentUserObject.id] = .currentUserObject;
 				} else {
-					Permissions.invalidateUser();
+					//Permissions.invalidateUser();
+					//Mujibur: Need to investigate, is there any reason to invalidate?
+					.currentUserObject = .fetchUserObject( cookies[ssid], '' );
 				}
 			}
 		}
@@ -150,6 +152,35 @@ namespace Permissions {
 		} 
 		return .userObjectCache["username:$username"];
 	}
+	function getSession(string ssid) {
+		array session = [ 'id' => 0, 'timestamp' => 0, 'loggedin' => false ];
+		monitor {
+			string s = .sessiond.get("Session_" + ssid);
+			array a = s.toArray("/");
+			if( session.size() != 3 ) {
+				Console.printlnErr("session ${ssid} do not have 3 chunks? ${s}");
+			} else {
+				session['id'] = a[0].toNumber();
+				session['timestamp'] = a[1].toNumber();
+				session['loggedin'] = a[2].toBoolean();
+			}
+		} handle (e) {
+			Console.printlnErr("error getSession(${ssid}): ${e.str}");
+		}
+		return session;
+	}
+
+	function fetchUserObject( string ssid, string byCookie ) {
+		object user;
+		array session = .getSession(ssid);
+		if(session['id'] == 0 || session['loggedin'] == false) {
+			user = Permissions.createApplicationUser('guest');
+		} else {
+			user = Interface.User.load(session['id']);
+		}
+		.userObjectCache["username:${user.username}"] = user;
+		return .userObjectCache["username:${user.username}"];
+	}
 	/**
 	 * @function setValidationCookies
 	 * @declaration function setValidationCookies( object user )
@@ -157,12 +188,26 @@ namespace Permissions {
 	 * @param object user The user object to set the validation cookies for
 	 */
 	function setValidationCookies( object user ) {
+		//No need to set cookie over here!!
+		Console.printlnErr("Should we update memcache!!!??");
+	}
+
+	function setSession(string ssid, number uid) {
+		monitor{
+			number ts = Date.now();
+			string sessionValue = "${uid}/${ts}/true";
+			.sessiond.set("Session_"+ssid, sessionValue);
+		} handle(e){
+			Console.printlnErr("error setSession(${ssid}): ${e.str}");
+		}
+	}
+
+	function setAutoLoginCookie( string ssid) {
 		object d = Date.date(Date.now() + (135 * 60));
 		string format = d.format('%a, %d-%b-%Y %H:%M:%S GMT');
 		string path = Config.Domain + application.topLevel;
 		if( not path ) path = "/";
-        request.setCookie( "${application.realName}WFUserID=${user.id}; path=$path" );
-        request.setCookie( "${application.realName}WFPassword=${user.password}; path=$path" );
+		request.setCookie(.getAppSSID() + "=${ssid}; path=$path");
 	}
 	/**
 	 * @function validateUser
@@ -174,10 +219,12 @@ namespace Permissions {
 	 */
     function validateUser( string username, string password ) {
 		object user = Interface.User.byLogin( username.toLower() );
-		if( user and user.active and user.password == Permissions.encodePassword(password)) {
-			Permissions.setValidationCookies( user );
-			.currentUserObject = user;
-	        return .currentUserObject;
+		if( user ){
+			if(user.active and user.password == Permissions.encodePassword(password)) {
+				Permissions.setValidationCookies( user );
+				.currentUserObject = user;
+				return .currentUserObject;
+			}
 		}
 		return null;
     }
@@ -196,14 +243,9 @@ namespace Permissions {
 	 * @declaration function invalidateUser()
 	 * @brief Make the validation cookies invalid effectively causing the system to "log the user out"
 	 */
-    function invalidateUser() {
-		object d = Date.date(Date.now() - (300 * 60));
-		string format = d.format('%a, %d-%b-%Y %H:%M:%S GMT');
-		string path = Config.Domain + application.topLevel;
-		if( not path ) path = "/";
-        request.setCookie( "${application.realName}WFUserID=; expires=$format; path=$path" );
-        request.setCookie( "${application.realName}WFPassword=; expires=$format; path=$path" );
-    }
+	function invalidateUser() {
+		//Invalidate user no more needed from ferite
+	}
 	/**
 	 * @function usernameExists
 	 * @declaration function usernameExists( string name )
@@ -321,3 +363,4 @@ namespace Permissions {
 /**
  * @end
  */
+ Permissions.sessiond = new memcached.Cache('localhost', 11311);
