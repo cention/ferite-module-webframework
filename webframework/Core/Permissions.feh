@@ -51,23 +51,23 @@ namespace Permissions {
 			return true;
 		if( not user )
 			user = Permissions.fetchUserObject('guest');
-		if( user.active ) {
+		if( user and user.active ) {
 			anyZone = Interface.Application.specificZoneForUserResource( user.id, resource, zone );
 			if( anyZone ) 
 				return true;
 		}
 		return false;
-    }
-    object currentUserObject;
-    /**
-     * @function currentUserID
-     * @declaration function currentUserID()
-     * @brief Fetch the current user ID
-     * @return The current user ID or 0 otherwise
-     */
+	}
+	object currentUserObject;
+	/**
+	 * @function currentUserID
+	 * @declaration function currentUserID()
+	 * @brief Fetch the current user ID
+	 * @return The current user ID or 0 otherwise
+	 */
 	function currentUserID() {
 		object o = Permissions.fetchUserObject();
-		if( o ) 
+		if( o )
 			return o.id;
 		return 0;
 	}
@@ -85,6 +85,9 @@ namespace Permissions {
 		return I('Guest');
 	}
 	
+	function getAppSSID() {
+		return application.realName + "SSID";
+	}
 	/**
 	 * @function fetchUserObject
 	 * @declaration function fetchUserObject()
@@ -94,13 +97,11 @@ namespace Permissions {
 	function fetchUserObject() {
 		if( .currentUserObject == null ) {
 			array cookies = request.cookies();
-			if( 
-				Array.keyExists(cookies,"${application.realName}WFUserID") and  
-			    Array.keyExists(cookies,"${application.realName}WFPassword") and 
-				cookies["${application.realName}WFUserID"] != "INVALIDUSER" 
-			) {
-				.currentUserObject = .fetchUserObject( String.toNumber(cookies["${application.realName}WFUserID"]) );
-				if( .currentUserObject and .currentUserObject.password == cookies["${application.realName}WFPassword"] ) {
+			string ssid = .getAppSSID();
+			if(	Array.keyExists(cookies, ssid ))
+			{
+				.currentUserObject = .fetchUserObject( cookies[ssid], '' );
+				if( .currentUserObject ){
 					.userObjectCache['' + .currentUserObject.id] = .currentUserObject;
 				} else {
 					//Permissions.invalidateUser();
@@ -111,8 +112,9 @@ namespace Permissions {
 		}
 		if( not .currentUserObject )
 			.currentUserObject = .fetchUserObject('guest');
-        return .currentUserObject;
-    }
+
+		return .currentUserObject;
+	}
 	array userObjectCache;
 	/**
 	 * @function fetchUserObject
@@ -152,6 +154,7 @@ namespace Permissions {
 		} 
 		return .userObjectCache["username:$username"];
 	}
+
 	function getSession(string ssid) {
 		array session = [ 'id' => 0, 'timestamp' => 0, 'loggedin' => false ];
 		monitor {
@@ -209,6 +212,19 @@ namespace Permissions {
 		if( not path ) path = "/";
 		request.setCookie(.getAppSSID() + "=${ssid}; path=$path");
 	}
+
+	/**
+	 * @function generateSSID
+	 * @declaration function generateSSID()
+	 * @brief Will generate a Session ID and then will return to the function call to save to users table
+	 * return hash key
+	 */
+	function generateSSID(){
+		string random = '' + Math.randomNumber(0,4294967296) + Date.now();
+			string ns = MHash.hashString(random, MHash.MD5).base64encode().toUpper();
+			string ssid = MHash.hmacString(ns, random, MHash.SHA1).base64encode();
+		return ssid;
+	} 
 	/**
 	 * @function validateUser
 	 * @declaration function validateUser( string username, string password )
@@ -218,6 +234,7 @@ namespace Permissions {
 	 * @return The user object or null if validation failed.
 	 */
     function validateUser( string username, string password ) {
+		//Here its also needed to check from sessiond
 		object user = Interface.User.byLogin( username.toLower() );
 		if( user ){
 			if(user.active and user.password == Permissions.encodePassword(password)) {
@@ -227,7 +244,7 @@ namespace Permissions {
 			}
 		}
 		return null;
-    }
+	}
 	/**
 	 * @function encodePassword
 	 * @declaration function encodePassword( string password )
@@ -362,5 +379,5 @@ namespace Permissions {
 }
 /**
  * @end
- */
- Permissions.sessiond = new memcached.Cache('localhost', 11311);
+*/
+Permissions.sessiond = new memcached.Cache('localhost', 11311);
