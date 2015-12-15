@@ -208,10 +208,18 @@ function MCAM() { // Multiple Channel AJAX Mechanism
 		return div;
 	};
 	this.fireReplaceRequestWithCallback = function( request, callback, target, new_parameters, failureCallback ) {
-		var url = this.getTargetURL() + '/-/MCAM/' + request;
+		var targetUrl, url;
 		var self = this;
 		var parameters = '';
 		var i = 0;
+
+		if (new_parameters.TARGET_URL) {
+			targetUrl = new_parameters.TARGET_URL;
+			delete new_parameters["TARGET_URL"];
+		} else {
+			targetUrl = this.getTargetURL();
+		}
+		url = targetUrl + '/-/MCAM/' + request;
 
 		/* Old lists */
 		for( i = 0; i < this.dirtyList.length; i++ ) {
@@ -230,7 +238,7 @@ function MCAM() { // Multiple Channel AJAX Mechanism
 		for( key in new_parameters ) {
 			parameters += '&' + key + "=" + encodeURIComponent(new_parameters[key]);
 		}
-		
+
 		this.toggleLoading(true);
 		
 		var requesterEvent = {};
