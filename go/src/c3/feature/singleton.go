@@ -1,6 +1,11 @@
 package feature
 
-import "sync"
+import (
+	"sync"
+
+	// cention
+	wf "c3/osm/webframework"
+)
 
 var onlyonce sync.Once
 var protect chan int
@@ -30,6 +35,18 @@ func ClearCache() {
 	getSingleton().ClearCache()
 }
 
+func Preload() {
+	protect <- 1
+	defer func() { <-protect }()
+	getSingleton().Preload()
+}
+
+func SetDefaultContexts(ctxs []string) {
+	protect <- 1
+	defer func() { <-protect }()
+	getSingleton().SetDefaultContexts(ctxs)
+}
+
 // SetDefaultContext sets the default context to the given context string. More
 // than one context can be specified by separating them with semicolon.
 func SetDefaultContext(ctx string) {
@@ -43,6 +60,24 @@ func SetGlobalContext(ctx string) {
 	protect <- 1
 	defer func() { <-protect }()
 	getSingleton().SetGlobalContext(ctx)
+}
+
+func DefaultContext() string {
+	protect <- 1
+	defer func() { <-protect }()
+	return getSingleton().DefaultContext()
+}
+
+func States(featureTags, contexts []string) (map[string]*wf.FeatureApplication, error) {
+	protect <- 1
+	defer func() { <-protect }()
+	return getSingleton().States(featureTags, contexts)
+}
+
+func State(tag string) (*wf.FeatureApplication, error) {
+	protect <- 1
+	defer func() { <-protect }()
+	return getSingleton().State(tag)
 }
 
 // Bool returns the boolean value of the feature application state for the
@@ -75,36 +110,60 @@ func init() {
 
 type Featurer interface {
 	ClearCache()
-	SetDefaultContext(ctx string)
-	SetGlobalContext(ctx string)
-	Bool(tag string) bool
-	Int(tag string) int
-	Str(tag string) string
+	Preload()
+	SetDefaultContexts([]string)
+	SetDefaultContext(string)
+	SetGlobalContext(string)
+	DefaultContext() string
+	States([]string, []string) (map[string]*wf.FeatureApplication, error)
+	State(string) (*wf.FeatureApplication, error)
+	Bool(string) bool
+	Int(string) int
+	Str(string) string
 }
 
-type globalFeature struct {
-}
+type globalFeature struct{}
 
-func (g *globalFeature) ClearCache() {
+func (g globalFeature) ClearCache() {
 	ClearCache()
 }
 
-func (g *globalFeature) SetDefaultContext(ctx string) {
+func (g globalFeature) Preload() {
+	Preload()
+}
+
+func (g globalFeature) SetDefaultContexts(ctxs []string) {
+	SetDefaultContexts(ctxs)
+}
+
+func (g globalFeature) SetDefaultContext(ctx string) {
 	SetDefaultContext(ctx)
 }
 
-func (g *globalFeature) SetGlobalContext(ctx string) {
+func (g globalFeature) SetGlobalContext(ctx string) {
 	SetGlobalContext(ctx)
 }
 
-func (g *globalFeature) Bool(tag string) bool {
+func (g globalFeature) DefaultContext() string {
+	return DefaultContext()
+}
+
+func (g globalFeature) States(featureTags, contexts []string) (map[string]*wf.FeatureApplication, error) {
+	return States(featureTags, contexts)
+}
+
+func (g globalFeature) State(tag string) (*wf.FeatureApplication, error) {
+	return State(tag)
+}
+
+func (g globalFeature) Bool(tag string) bool {
 	return Bool(tag)
 }
 
-func (g *globalFeature) Int(tag string) int {
+func (g globalFeature) Int(tag string) int {
 	return Int(tag)
 }
 
-func (g *globalFeature) Str(tag string) string {
+func (g globalFeature) Str(tag string) string {
 	return Str(tag)
 }
