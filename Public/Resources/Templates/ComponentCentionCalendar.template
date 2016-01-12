@@ -7,13 +7,18 @@
 
 <script type="text/javascript" charset="utf-8">
 
-	var [ID]_today = new Date();
-	var [ID]_dd = [ID]_today.getDate();
-	var [ID]_mm = [ID]_today.getMonth() + 1; // January is 0!
-	var [ID]_yyyy = [ID]_today.getFullYear();
-	if( [ID]_dd < 10 ) [ID]_dd = '0' + [ID]_dd;
-	if( [ID]_mm < 10 ) [ID]_mm = '0' + [ID]_mm;
-	[ID]_today = [ID]_yyyy + '/' + [ID]_mm + '/' + [ID]_dd;
+[Date:
+	var [<ID]_today = '[]';
+]
+[!Date:
+	var [<ID]_today = new Date();
+	var [<ID]_dd = [<ID]_today.getDate();
+	var [<ID]_mm = [<ID]_today.getMonth() + 1; // January is 0!
+	var [<ID]_yyyy = [<ID]_today.getFullYear();
+	if( [<ID]_dd < 10 ) [<ID]_dd = '0' + [<ID]_dd;
+	if( [<ID]_mm < 10 ) [<ID]_mm = '0' + [<ID]_mm;
+	[<ID]_today = [<ID]_yyyy + '/' + [<ID]_mm + '/' + [<ID]_dd;
+]
 
 	jQuery('#[ID]').datetimepicker({
 		value:[ID]_today,
