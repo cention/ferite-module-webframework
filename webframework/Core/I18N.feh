@@ -123,6 +123,12 @@ namespace modifies String {
 	function formatDateTimeTZ( number date, string zoneName ) {
 		return .tzLocalDate(date, zoneName).format(Config.DateFormat + ' %H:%M');
 	}
+	function formatDateTimeWithTimeZone( number date, string zoneName, string timeformat ) {
+		if (timeformat) {
+			return .tzLocalDate(date, zoneName).format(Config.DateFormat + ' ' + timeformat);
+		}
+		return .tzLocalDate(date, zoneName).format(Config.DateFormat);
+	}
 	/**
 	 * @function tzLocalDate
 	 * @declaration function tzLocalDate( number date )
