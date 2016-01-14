@@ -1,7 +1,7 @@
 
 .wfMultiplePopupList {
 	position: absolute;
-	z-index: 7;
+	z-index: 42;
 	background-color: white;
 	border: 1px solid #999;
 	padding: 0px;
