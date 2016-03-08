@@ -41,7 +41,10 @@ var (
 	ERROR_COOKIE_NOT_FOUND        = errors.New("Cookie: cention-suiteSSID=? not found")
 	ERROR_WF_USER_NULL            = errors.New("webframework user is null")
 	ERROR_MEMCACHE_FAILED         = errors.New("Sessiond not running")
-	HostnPort                     = "localhost:11311"
+)
+
+var (
+	sessiond = gobcache.NewCache("localhost:11311")
 )
 
 type AuthCookieManager struct {
@@ -109,7 +112,7 @@ func getCurrentSession(v []byte) (int, int, bool, error) {
 
 func fetchFromCache(key string) error {
 	skey := "Session_" + key
-	sItems, err := gobcache.GetRawFromMemcache(skey, HostnPort)
+	sItems, err := sessiond.GetRawFromMemcache(skey)
 	if err != nil {
 		log.Println("[GetRawFromMemcache] key `Session` is empty!")
 		return err
@@ -173,7 +176,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 
 func saveToSessiondCache(key, value string) error {
 	sKey := "Session_" + key
-	if err := gobcache.SetRawToMemcache(sKey, value, HostnPort); err != nil {
+	if err := sessiond.SetRawToMemcache(sKey, value); err != nil {
 		log.Println("[`SetRawToMemcache`] Error on saving:", err)
 		return err
 	}
@@ -233,7 +236,7 @@ func CheckAuthCookie(ctx *gin.Context) (bool, error) {
 
 func fetchFromCacheWithValue(key string) (int, int, bool, error) {
 	skey := "Session_" + key
-	sItems, err := gobcache.GetRawFromMemcache(skey, HostnPort)
+	sItems, err := sessiond.GetRawFromMemcache(skey)
 	if err != nil {
 		log.Println("[GetRawFromMemcache] key `Session` is empty!")
 		return 0, 0, false, err
