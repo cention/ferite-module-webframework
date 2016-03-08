@@ -41,6 +41,7 @@ var (
 	ERROR_COOKIE_NOT_FOUND        = errors.New("Cookie: cention-suiteSSID=? not found")
 	ERROR_WF_USER_NULL            = errors.New("webframework user is null")
 	ERROR_MEMCACHE_FAILED         = errors.New("Sessiond not running")
+	HostnPort                     = "localhost:11311"
 )
 
 type AuthCookieManager struct {
@@ -58,9 +59,7 @@ func checkingMemcache() bool {
 	defer conn.Close()
 	return true
 }
-func init() {
-	gobcache.SetHostAndPort("localhost:11311")
-}
+
 func getCookieHashKey(ctx *gin.Context) (string, error) {
 	cookie, err := ctx.Request.Cookie("cention-suiteSSID")
 	if err != nil {
@@ -110,7 +109,7 @@ func getCurrentSession(v []byte) (int, int, bool, error) {
 
 func fetchFromCache(key string) error {
 	skey := "Session_" + key
-	sItems, err := gobcache.GetRawFromMemcache(skey)
+	sItems, err := gobcache.GetRawFromMemcache(skey, HostnPort)
 	if err != nil {
 		log.Println("[GetRawFromMemcache] key `Session` is empty!")
 		return err
@@ -174,7 +173,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 
 func saveToSessiondCache(key, value string) error {
 	sKey := "Session_" + key
-	if err := gobcache.SetRawToMemcache(sKey, value); err != nil {
+	if err := gobcache.SetRawToMemcache(sKey, value, HostnPort); err != nil {
 		log.Println("[`SetRawToMemcache`] Error on saving:", err)
 		return err
 	}
@@ -234,7 +233,7 @@ func CheckAuthCookie(ctx *gin.Context) (bool, error) {
 
 func fetchFromCacheWithValue(key string) (int, int, bool, error) {
 	skey := "Session_" + key
-	sItems, err := gobcache.GetRawFromMemcache(skey)
+	sItems, err := gobcache.GetRawFromMemcache(skey, HostnPort)
 	if err != nil {
 		log.Println("[GetRawFromMemcache] key `Session` is empty!")
 		return 0, 0, false, err
@@ -261,7 +260,7 @@ func validateByBrowserCookie(ssid string) (bool, error) {
 			log.Printf("Error on validateByBrowserCookie(): %v", err)
 			return false, err
 		}
-		log.Printf("CentionAuth: Cookie has vrified with this info: %v", uid)
+		log.Printf("CentionAuth: Cookie has verified with this info: %v", uid)
 		return true, nil
 	}
 	return false, ERROR_MEMCACHE_FAILED
