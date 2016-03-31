@@ -164,6 +164,9 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 				if err = saveToSessiondCache(ssid, sValue); err != nil {
 					return err
 				}
+				if err = saveUserIdToCache(wfUser.Id, ssid); err != nil {
+					return err
+				}
 				log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
 				return nil
 			} else {
@@ -172,6 +175,15 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		}
 	}
 	return ERROR_WF_USER_NULL
+}
+
+func saveUserIdToCache(key int, value string) error {
+	sKey := fmt.Sprintf("user/%d", key)
+	if err := sessiond.SetRawToMemcache(sKey, value); err != nil {
+		log.Println("[`SetRawToMemcache`] Error on saving:", err)
+		return err
+	}
+	return nil
 }
 
 func saveToSessiondCache(key, value string) error {
