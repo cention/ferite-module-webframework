@@ -660,6 +660,7 @@ namespace modifies GUIKit {
 					 'Component/Component.js',
 					 'react/react-with-addons',
 					 'socket.io-client/socket.io',
+					 'sockwrap',
 					 'requirejs/require',
 					 'jquery.datetimepicker',
 					 'jquery.flot',
