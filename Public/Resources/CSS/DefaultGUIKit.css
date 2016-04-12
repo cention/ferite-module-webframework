@@ -151,7 +151,7 @@
 	height:19;
 	text-align:center;
 	margin-top:0;
-	background-color:#fffFFF
+	background-color:#fffFFF;
 	border:0px;	
 }
 .wfC3 {
@@ -202,23 +202,24 @@
 .wfTabViewActiveTabLeft {
 	margin: 0px;
 	padding:0px;
-	width:15px;height:22px;
-	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[ServerImages]/ActiveTabLeft.png', sizingMethod='crop');
+	width:15px;
+	height:22px;
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='[ServerImages]/ActiveTabLeft.png', sizingMethod='crop'); /* IE6 & IE7 */
 }
 div.wfTabViewActiveTabLeft img {
 	background-image: url('../Images/Components/TabView/ActiveTabLeft.png');
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	opacity:0;
 }
 
 .wfTabViewActiveTabRight {
 	margin: 0px;
 	padding:0px;
 	width:15px;height:22px;
-	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/ActiveTabRight.png', sizingMethod='crop');
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/ActiveTabRight.png', sizingMethod='crop'); /* IE6 & IE7 */
 }
 div.wfTabViewActiveTabRight img {
 	background-image: url('../Images/Components/TabView/ActiveTabRight.png');
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	opacity:0;
 }
 
 .wfTabViewActiveTabFarLeft {
@@ -244,46 +245,50 @@ div.wfTabViewActiveTabRight img {
 	background-color:#E5E5D1;
 	margin: 0px;
 	padding:0px;
-	width:15px;height:22px;
-	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/InactiveTabLeft.png', sizingMethod='crop');
+	width:15px;
+	height:22px;
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/InactiveTabLeft.png', sizingMethod='crop'); /* IE6 & IE7 */
 }
 div.wfTabViewInactiveTabLeft img {
 	background-image: url('../Images/Components/TabView/InactiveTabLeft.png');
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	opacity:0;
 }
 
 .wfTabViewInactiveTabRight {
 	background-color:#E5E5D1;
 	margin: 0px;
 	padding:0px;
-	width:15px;height:22px;
-	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/InactiveTabRight.png', sizingMethod='crop');
+	width:15px;
+	height:22px;
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/InactiveTabRight.png', sizingMethod='crop'); /* IE6 & IE7 */
 }
 div.wfTabViewInactiveTabRight img {
 	background-image: url('../Images/Components/TabView/InactiveTabRight.png');
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	opacity:0;
 }
 
 .wfTabViewInactiveTabFarLeft {
 	margin: 0px;
 	padding:0px;
-	width:15px;height:22px;
-	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/InactiveTabFarLeft.png', sizingMethod='crop');
+	width:15px;
+	height:22px;
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/InactiveTabFarLeft.png', sizingMethod='crop'); /* IE6 & IE7 */
 }
 div.wfTabViewInactiveTabFarLeft img {
 	background-image: url('../Images/Components/TabView/InactiveTabFarLeft.png');
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	opacity:0;
 }
 
 .wfTabViewInactiveTabFarRight {
 	margin: 0px;
 	padding:0px;
-	width:15px;height:22px;
-	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/InactiveTabFarRight.png', sizingMethod='crop');
+	width:15px;
+	height:22px;
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/InactiveTabFarRight.png', sizingMethod='crop'); /* IE6 & IE7 */
 }
 div.wfTabViewInactiveTabFarRight img {
 	background-image: url('../Images/Components/TabView/InactiveTabFarRight.png');
-	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+	opacity:0;
 }
 .wfTabViewSpacer {
 	background-color:#E5E5D1;
