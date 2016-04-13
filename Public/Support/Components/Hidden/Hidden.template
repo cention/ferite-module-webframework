@@ -2,6 +2,6 @@
 <input type="hidden" name="[ID]" value="" id="FormValue_[ID]" />
 <script type="text/javascript" charset="utf-8">
 	SetComponent('[ID]', ComponentHidden('[ID]'));
-	_('[ID]').setState('text-value', '[TextValue]');
+	_('[ID]').setState('text-value', "[TextValue]");
 	_('[ID]').activate();
 </script>
