@@ -7,6 +7,7 @@ package auth
 
 import (
 	wf "c3/osm/webframework"
+	"c3/osm/workflow"
 	"c3/web/controllers"
 	"crypto/sha256"
 	"encoding/base64"
@@ -118,12 +119,10 @@ func fetchFromCache(key string) error {
 		return err
 	}
 	if sItems != nil {
-		uid, timestamp, currentlyLogedin, err := getCurrentSession(sItems.Value)
+		uid, _, currentlyLogedin, err := getCurrentSession(sItems.Value)
 		if err != nil {
 			return err
 		}
-		//Mujibur: timestamp, thinking how to use it?
-		_ = timestamp
 		if uid != 0 && currentlyLogedin {
 			return nil
 		}
@@ -167,6 +166,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 				if err = saveUserIdToCache(wfUser.Id, ssid); err != nil {
 					return err
 				}
+				updateUserCurrentLoginIn(wfUser.Id)
 				log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
 				return nil
 			} else {
@@ -176,7 +176,28 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	}
 	return ERROR_WF_USER_NULL
 }
-
+func updateUserCurrentLoginIn(wfUId int) {
+	user, err := workflow.QueryUser_byWebframeworkUser(wfUId)
+	if err != nil {
+		log.Println("Error QueryUser_byWebframeworkUser: ", err)
+	}
+	user.SetTimestampLastLogin(time.Now().Unix())
+	user.SetCurrentlyLoggedIn(true)
+	if err := user.Save(); err != nil {
+		log.Println("Error on Save: ", err)
+	}
+}
+func updateUserCurrentLoginOut(wfUId int) {
+	user, err := workflow.QueryUser_byWebframeworkUser(wfUId)
+	if err != nil {
+		log.Println("Error QueryUser_byWebframeworkUser: ", err)
+	}
+	user.SetTimestampLastLogout(time.Now().Unix())
+	user.SetCurrentlyLoggedIn(false)
+	if err := user.Save(); err != nil {
+		log.Println("Error on Save: ", err)
+	}
+}
 func saveUserIdToCache(key int, value string) error {
 	sKey := fmt.Sprintf("user/%d", key)
 	if err := sessiond.SetRawToMemcache(sKey, value); err != nil {
@@ -258,6 +279,9 @@ func fetchFromCacheWithValue(key string) (int, int, bool, error) {
 		if err != nil {
 			return 0, 0, false, err
 		}
+		if uid != 0 && !currentlyLogedin {
+			return uid, timestamp, !currentlyLogedin, nil
+		}
 		if uid != 0 && currentlyLogedin {
 			return uid, timestamp, currentlyLogedin, nil
 		}
@@ -295,6 +319,7 @@ func destroyAuthCookie(ctx *gin.Context) error {
 			log.Printf("Error on validateByBrowserCookie(): %v", err)
 			return err
 		}
+		updateUserCurrentLoginOut(uid)
 		return nil
 	}
 	return ERROR_MEMCACHE_FAILED
