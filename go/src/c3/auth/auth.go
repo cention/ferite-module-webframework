@@ -197,6 +197,7 @@ func updateUserCurrentLoginOut(wfUId int) {
 	if err := user.Save(); err != nil {
 		log.Println("Error on Save: ", err)
 	}
+	log.Printf("- User %d logout", user.Id)
 }
 func saveUserIdToCache(key int, value string) error {
 	sKey := fmt.Sprintf("user/%d", key)
@@ -279,9 +280,6 @@ func fetchFromCacheWithValue(key string) (int, int, bool, error) {
 		if err != nil {
 			return 0, 0, false, err
 		}
-		if uid != 0 && !currentlyLogedin {
-			return uid, timestamp, !currentlyLogedin, nil
-		}
 		if uid != 0 && currentlyLogedin {
 			return uid, timestamp, currentlyLogedin, nil
 		}
@@ -293,6 +291,10 @@ func validateByBrowserCookie(ssid string) (bool, error) {
 	if checkingMemcache() {
 		uid, _, currentlyLogedin, err := fetchFromCacheWithValue(ssid)
 		if err != nil {
+			return false, err
+		}
+		if !currentlyLogedin {
+			log.Println("Cookie exist but user logged out by backend script")
 			return false, err
 		}
 		if err := updateTimeStampToCache(ssid, uid, currentlyLogedin); err != nil {
@@ -347,8 +349,11 @@ func GetWebframeworkUserFromRequest(r *http.Request) int {
 	if checkingMemcache() {
 		uid, _, currentlyLogedin, err := fetchFromCacheWithValue(ssid)
 		if err != nil {
-			log.Println("Error on fetchFromCacheWithValue(): ", err)
-			return 0
+			if !currentlyLogedin {
+				return 0
+			} else {
+				log.Println("Error: ", err)
+			}
 		}
 		if !currentlyLogedin {
 			return 0
