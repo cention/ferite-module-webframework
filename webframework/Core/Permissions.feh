@@ -173,6 +173,18 @@ namespace Permissions {
 		return session;
 	}
 
+	function getSessionByUserId(number userId) {
+		string ssid;
+		array session;
+		monitor {
+			ssid = .sessiond.get("user/" + userId);
+			session = .getSession(ssid);
+		} handle (e) {
+				Console.printlnErr("error getSession(${ssid}): ${e.str}");
+		}
+		return session;
+	}
+
 	function fetchUserObject( string ssid, string byCookie ) {
 		object user;
 		array session = .getSession(ssid);
@@ -204,6 +216,7 @@ namespace Permissions {
 			Console.printlnErr("error setSession(${ssid}): ${e.str}");
 		}
 	}
+
 
 	function setAutoLoginCookie( string ssid) {
 		object d = Date.date(Date.now() + (135 * 60));
