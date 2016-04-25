@@ -12,6 +12,7 @@ namespace modifies GUIKit {
 		}
 		string date = '';
 		string image;
+		string language = 'en';
 		function handleFormValue( string value ) {
 			.date = value;
 		}
@@ -39,11 +40,15 @@ namespace modifies GUIKit {
 		function setImage( string value ) {
 			.image = value;
 		}
+		function setLanguage( string value ) {
+			.language = value;
+		}
 		function render() {
 			if( .visible() ) {
 				array values = .generateTemplateAttributes('wfCalendar');
 				number timestamp = Date.parse(.date, Config.DateFormat).time();
 				values['ID'] = .id;
+				values['Language'] = .language;
 				values['Date'] = (.date != '' ? .date : I('Not Set'));
 				values['EventCodeRaw'] = "CalendarPopup('${.id}', ${timestamp});";
 				values['EventCode'] = 

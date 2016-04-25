@@ -3,10 +3,10 @@
 	<input type="text" name="[ID]" id="[ID]" class="[StyleClass]" style="[Style]" value="" [!Enabled:disabled="disabled"] />
 	[!Image:<input type="button" [.EventCode] value="[.TextValue]" class="[.StyleClass]" [!.Enabled:disabled="disabled"] />]
 	[Image:<img src="[.Image]" class="[.StyleClass]" [.Enabled:[.EventCode] style="cursor:pointer;"] alt="[.TextValue]" />]
+	<input id="[ID]_lang" type="hidden" value="[Language]" />
 </span>
 
 <script type="text/javascript" charset="utf-8">
-
 [Date:
 	var [<ID]_today = '[]';
 ]
@@ -19,12 +19,15 @@
 	if( [<ID]_mm < 10 ) [<ID]_mm = '0' + [<ID]_mm;
 	[<ID]_today = [<ID]_yyyy + '/' + [<ID]_mm + '/' + [<ID]_dd;
 ]
-
+[Language:
+	var [<ID]_lang = jQuery('#[<ID]_lang').val();
+]
 	jQuery('#[ID]').datetimepicker({
 		value:[ID]_today,
 		timepicker:false,
 		format:'Y/m/d',
 		closeOnDateSelect:true,
+		lang:[ID]_lang,
 		onChangeDateTime:function(dp,$input){
 
 			var hmdate = $input.val();
