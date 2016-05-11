@@ -106,11 +106,17 @@ namespace modifies GUIKit {
 						.dragdata.append();
 					}
 					.setItems();
-					values['Items'] = .source.items(.id, values);
+					values['Items'] = .source.items(.id, values).process() using ( item ) {
+						return item.replace("'", "\\'");
+					};
 					.setSelectedItems();
-					values['Selected'] = .source.items(.id, values);
+					values['Selected'] = .source.items(.id, values).process() using ( item ) {
+						return item.replace("'", "\\'");
+					};
 					.setExtraSelectedItems();
-					values['extraSelected'] = .source.items(.id, values);
+					values['extraSelected'] = .source.items(.id, values).process() using ( item ) {
+						return item.replace("'", "\\'");
+					};
 					values['LeftArrow'] = uriForImageResource('arrow_left.gif');
 					values['RightArrow'] = uriForImageResource('arrow_right.gif');
 				}
