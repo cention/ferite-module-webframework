@@ -292,12 +292,14 @@ function ComponentCkeditor( id ) {
 		//                    more time here.
 		self.bind();
 
-		self.editor.on('contentDom', function() {
+		self.editor.on('instanceReady', function() {
 			self.editorIsReady = true;
 			if( self.haveUnsetData ) {
-				self.editor.setData(self._states['text-value']);
-				self.editor.updateElement();
-				self.haveUnsetData = false;
+				setTimeout(function() {
+					self.editor.setData(self._states['text-value']);
+					self.editor.updateElement();
+					self.haveUnsetData = false;
+				}, 0 /* This is not a typo. Workaround for bug in IE when setting data to quickly */);
 			}
 			if( self.hideWhenReady ) {
 				$('cke_' + self.identifier()).hide();
