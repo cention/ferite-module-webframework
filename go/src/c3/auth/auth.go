@@ -65,15 +65,20 @@ func checkingMemcache() bool {
 }
 
 func getCookieHashKey(ctx *gin.Context) (string, error) {
+	var err error
 	cookie, err := ctx.Request.Cookie("cention-suiteSSID")
 	if err != nil {
 		log.Println("getCookieHashKey(): Cookie is empty - ", err)
 		return "", err
 	}
-	if cookie != nil && cookie.Value == "" && cookie.Value == "guest" {
-		return "", ERROR_CACHE_MISSED
+	if cookie == nil {
+		return "", err
 	}
-	return cookie.Value, nil
+	if cookie.Value == "" || cookie.Value == "guest" {
+		return "", ERROR_CACHE_MISSED
+	} else {
+		return cookie.Value, nil
+	}
 }
 
 func decodeCookie(ctx *gin.Context) (string, error) {
