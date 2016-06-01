@@ -72,13 +72,12 @@ func getCookieHashKey(ctx *gin.Context) (string, error) {
 		return "", err
 	}
 	if cookie == nil {
-		return "", err
+		return "", ERROR_CACHE_MISSED
 	}
 	if cookie.Value == "" || cookie.Value == "guest" {
 		return "", ERROR_CACHE_MISSED
-	} else {
-		return cookie.Value, nil
 	}
+	return cookie.Value, nil
 }
 
 func decodeCookie(ctx *gin.Context) (string, error) {
