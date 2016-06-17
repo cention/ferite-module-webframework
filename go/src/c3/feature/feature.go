@@ -22,6 +22,24 @@ import (
 	"strings"
 )
 
+type Boolean interface {
+	Bool(string) bool
+}
+
+type Number interface {
+	Int(string) bool
+}
+
+type String interface {
+	Str(string) bool
+}
+
+type All interface {
+	Bool(string) bool
+	Int(string) bool
+	Str(string) bool
+}
+
 type Feature struct {
 	defaultContexts      []string
 	defaultGlobalContext string
