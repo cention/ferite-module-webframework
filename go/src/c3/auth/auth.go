@@ -190,6 +190,7 @@ func updateUserCurrentLoginIn(wfUId int) {
 	if err := user.Save(); err != nil {
 		log.Println("Error on Save: ", err)
 	}
+	updateUserStatusInHistory(user, "Login")
 }
 func updateUserCurrentLoginOut(wfUId int) {
 	user, err := workflow.QueryUser_byWebframeworkUser(wfUId)
@@ -201,7 +202,35 @@ func updateUserCurrentLoginOut(wfUId int) {
 	if err := user.Save(); err != nil {
 		log.Println("Error on Save: ", err)
 	}
+	updateUserStatusInHistory(user, "Logout")
 	log.Printf("- User %d logout", user.Id)
+}
+func updateUserStatusInHistory(user *workflow.User, status string) {
+	newstat := workflow.NewUserStatusTrack()
+	currstat, _ := workflow.QueryUserStatus_byName(status)
+	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserID(user.Id)
+	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOn(user.Id)
+	timeLapsed := 0
+
+	if user.AcceptChat {
+		if chatstat != nil {
+			timeLapsed = int(time.Now().Unix() - chatstat.TimestampCreate)
+			if timeLapsed <= 24*60*60 && timeLapsed > 0 {
+				chatstat.SetTimeSpent(timeLapsed)
+				chatstat.Save()
+			}
+		}
+	}
+	if prestat != nil {
+		prestat.SetTimeSpent(int(time.Now().Unix() - prestat.TimestampCreate))
+		prestat.Save()
+	}
+	if newstat != nil {
+		newstat.SetUser(user)
+		newstat.SetStatus(currstat)
+		newstat.SetSystemGroup(user.SystemGroup)
+		newstat.SetTimestampCreate(time.Now().Unix())
+	}
 }
 func saveUserIdToCache(key int, value string) error {
 	sKey := fmt.Sprintf("user/%d", key)
