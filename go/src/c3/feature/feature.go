@@ -65,9 +65,17 @@ func (f *Feature) SetGlobalContext(ctx string) {
 	f.defaultGlobalContext = ctx
 }
 
+func (f *Feature) GetGlobalContext() string {
+	return f.defaultGlobalContext
+}
+
 // SetDefaultContexts sets the default contexts to the given contexts.
 func (f *Feature) SetDefaultContexts(ctxs []string) {
 	f.defaultContexts = ctxs
+}
+
+func (f *Feature) GetDefaultContexts() []string {
+	return f.defaultContexts
 }
 
 // SetDefaultContext sets the default context to the given context string. More
