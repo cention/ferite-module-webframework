@@ -1,6 +1,7 @@
-;var SockWrap = function(io) {
+;var SockWrap = function(io, forcedLongPolling) {
 	var cs = {};
 	cs.io = io;
+	cs.forcedLongPolling = forcedLongPolling;
 	cs.encode = function(str) {
 		return encodeURIComponent(str);
 	};
