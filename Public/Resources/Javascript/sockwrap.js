@@ -10,12 +10,13 @@
 	};
 	cs.on = function(what, callback) {
 		cs.io.on(what, function(data) {
-			callback(data);
+			callback.apply(null, arguments);
 		});
 	};
 	cs.onString = function(what, callback) {
 		cs.io.on(what, function(data) {
-			callback(cs.decode(data));
+			arguments[0] = cs.decode(data)
+			callback.apply(null, arguments);
 		});
 	};
 	cs.onJson = function(what, callback) {
@@ -31,7 +32,8 @@
 			} catch (e) {
 				console.log("ERROR SockWrap.decode(): error parsing json `" + decoded + " `: " + e);
 			}
-			callback(json);
+			arguments[0] = json;
+			callback.apply(null, arguments);
 		});
 	};
 	cs.emit = function(what, data) {
