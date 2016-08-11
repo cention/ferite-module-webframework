@@ -143,7 +143,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		}
 		return nil
 	}
-	user := ctx.Request.FormValue("username")
+	user := strings.TrimSpace(ctx.Request.FormValue("username"))
 	pass := ctx.Request.FormValue("password")
 	if user == "" && pass == "" {
 		if checkingMemcache() {
