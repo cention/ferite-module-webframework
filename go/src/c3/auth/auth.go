@@ -221,16 +221,19 @@ func updateUserStatusInHistory(user *workflow.User, status string) {
 			}
 		}
 	}
-	if status == "Logout" && prestat != nil {
-		prestat.SetTimeSpent(int(time.Now().Unix() - prestat.TimestampCreate))
-		prestat.Save()
-	}
-	if newstat != nil {
-		newstat.SetUser(user)
-		newstat.SetStatus(currstat)
-		newstat.SetSystemGroup(user.SystemGroup)
-		newstat.SetTimestampCreate(time.Now().Unix())
-		newstat.Save()
+	if prestat != nil {
+		if newstat != nil && currstat != nil && prestat.Status != currstat {
+			newstat.SetUser(user)
+			newstat.SetStatus(currstat)
+			newstat.SetSystemGroup(user.SystemGroup)
+			newstat.SetTimestampCreate(time.Now().Unix())
+			newstat.SetLastUpdatedTimestamp(time.Now().Unix())
+			newstat.Save()
+		} else {
+			prestat.SetTimeSpent(int(time.Now().Unix() - prestat.TimestampCreate))
+			prestat.SetLastUpdatedTimestamp(time.Now().Unix())
+			prestat.Save()
+		}
 	}
 }
 func saveUserIdToCache(key int, value string) error {
