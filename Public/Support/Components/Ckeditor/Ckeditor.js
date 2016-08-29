@@ -292,7 +292,7 @@ function ComponentCkeditor( id ) {
 		//                    more time here.
 		self.bind();
 
-		self.editor.on('instanceReady', function() {
+		self.editor.on('contentDom', function() {
 			self.editorIsReady = true;
 			if( self.haveUnsetData ) {
 				setTimeout(function() {
