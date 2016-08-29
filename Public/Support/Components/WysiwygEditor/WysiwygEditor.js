@@ -198,12 +198,13 @@ var WysiwygEditor = {
 					});
 				var elementViewPortOffsetTop = parseInt(list.style.top.slice(0, list.style.top.length - 2));
 				var elementHeight = Element.getHeight(list);
-				if( elementViewPortOffsetTop + elementHeight - Element.cumulativeScrollOffset(list)[1] > document.viewport.getHeight() ) {
+				var elementCumulativeScrollOffset = Element.cumulativeScrollOffset(list)[1];
+				if( elementViewPortOffsetTop + elementHeight - elementCumulativeScrollOffset > document.viewport.getHeight() ) {
 					Element.clonePosition(list, container, {
 							setWidth: false,
 							setHeight: false,
 							offsetLeft: 2,
-							offsetTop: -(elementHeight + 2)
+							offsetTop: -(elementHeight + 2) + elementCumulativeScrollOffset
 						});
 				}
 				Element.show(list);
