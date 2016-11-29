@@ -813,15 +813,8 @@
 
   SpellChecker.prototype.onIgnoreForever = function(e, word, element) {
     e.preventDefault();
-    return this.webservice.makeRequest({
-      data: {
-        action: 'learn_word',
-        word: this.incorrectWord
-      },
-      success: function(){
-       this.replaceWord(this.incorrectWord, this.incorrectWord);
-      }.bind(this)
-    },this);
+    mcam.fireCallbackRequest('spell_check_learn_word', null, { word: this.incorrectWord, language: this.language });
+    this.replaceWord(this.incorrectWord, this.incorrectWord);
    };
 
   SpellChecker.prototype.onIncorrectWordSelect = function(e, word, element, incorrectWords) {
