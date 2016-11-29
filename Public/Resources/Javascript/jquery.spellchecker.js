@@ -581,7 +581,9 @@
     if (!incorrectWords.length) {
       return;
     }
-
+    //Based on patch suggested at https://github.com/badsyntax/jquery-spellchecker/issues/48
+    // add newlines at block level elements, for cross-node matching later
+    element.html(element.html().replace(/\n?(<((\/(div|p|td|th|li|dt|dd))|br\/?)>)/gi, '\n$1'));
     this.incorrectWords = incorrectWords;
     incorrectWords = $.map(incorrectWords, function(word) {
       return RegExp.escape(word);
