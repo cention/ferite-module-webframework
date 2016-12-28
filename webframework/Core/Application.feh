@@ -192,8 +192,15 @@ class Application {
 		.registeredPages[page] = true;
 
 		.registerAction( page, closure ( commands, parameters ) {
+			if( .unregisteredPages[page] == true ){
+				Application.performAction(application.topLevel + "ng/admin#agents/edit");
+			}
 			return GUIKit.Page.load( page, commands, parameters );
 		} );
+	}
+	array unregisteredPages;
+	function unRegisterAgentAccess(string page){
+		.unregisteredPages[page] = true;
 	}
 	function invokeActualAction( void handler ) {
 		if( handler isa object ) 
@@ -216,7 +223,6 @@ class Application {
 		.commands = commands;
 		.parameters = parameters;
 		.pushedActionData = Session.valueForAction(action);
-		
 		if( handler ) {
 			object user;
 			

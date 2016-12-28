@@ -192,7 +192,6 @@ namespace Permissions {
 	 */
 	function setValidationCookies( object user ) {
 		//No need to set cookie over here!!
-		Console.printlnErr("Should we update memcache!!!??");
 	}
 
 	function setSession(string ssid, number uid) {
