@@ -423,8 +423,7 @@ func Middleware() func(*gin.Context) {
 			return
 		}
 		currUser := controllers.FetchUserObject(wfUserId)
-		ctx.Keys = make(map[string]interface{})
-		ctx.Keys["loggedInUser"] = currUser
+		ctx.Set("loggedInUser", currUser)
 		ctx.Next()
 	}
 }
