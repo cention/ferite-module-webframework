@@ -911,10 +911,15 @@ function RegisterTranslation( k, v ) {
 	TranslationDictionary[k] = v;
 }
 function I(k) {
-	if( TranslationDictionary[k] ) {
-		return TranslationDictionary[k];
+	var translated = TranslationDictionary[k];
+	if( translated ) {
+		return translated;
 	}
 	return k;
+}
+
+function L(k) {
+	return I(k);
 }
 
 function wfStringExpand( format ) {
