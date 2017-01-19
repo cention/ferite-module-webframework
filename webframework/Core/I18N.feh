@@ -265,7 +265,7 @@ namespace modifies String {
 			if( I18N.catalog.keyExists(key) )
 				return I18N.catalog[key];
 		}
-		return toTranslate;
+		return key;
 	}
 
 	function L(string toTranslate) {
