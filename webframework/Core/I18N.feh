@@ -260,9 +260,8 @@ namespace modifies String {
 	 * @param string toTranslate The string to translate
 	 * @return The translated string, or the original string if no translation exists.
 	 */
-	function I( string toTranslate ) {
-		if( I18N.catalog and toTranslate ) {
-			string key = I18N.cleanString(toTranslate, false);
+	function I( string key ) {
+		if( I18N.catalog and key ) {
 			if( I18N.catalog.keyExists(key) )
 				return I18N.catalog[key];
 		}
