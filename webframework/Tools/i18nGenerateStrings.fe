@@ -31,6 +31,9 @@ object templateMatch = new Regexp( '(.*)\.(template|html)$' );
 
 string applicationName = File.name(argv[0]) - ".app";
 
+Console.println("i18nGenerateStrings.fe has been retired. Please use 'make gettext' in c3-beta instead");
+Sys.exit(1);
+
 application = new Application( applicationName );
 // Server pages
 Directory.open('${Config.PublicPath}/Pages') using ( item ) {
