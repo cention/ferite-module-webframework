@@ -12,6 +12,9 @@ string applicationName = argv[0];
 string language = argv[1];
 string translationFile = "$applicationName/Resources/Strings/$language/translation.strings.fe";
 
+Console.println("i18nDiff.fe has been retired. Please use 'make gettext-update' in c3-beta instead");
+Sys.exit(1);
+
 master = include("$applicationName/Resources/Strings/Master.strings.fe");
 
 monitor { 
