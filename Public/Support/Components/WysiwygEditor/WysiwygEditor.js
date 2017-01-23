@@ -2311,10 +2311,7 @@ function WysiwygEditorSpellCheckSetup( editor ) {
 					if( captured_this.words[item.word] && !captured_this.words[item.word].ignore ) {
 						for( j = 0; j < captured_this.words[item.word].nodes.length; j++ ) {
 							var node = captured_this.words[item.word].nodes[j];
-							node.style.backgroundColor = 'red';
-							if( item.suggestions.length > 0 ) {
-								node.style.backgroundColor = 'yellow';
-							}
+							node.className = 'spellchecker-word-highlight';
 							captured_this.words[item.word].suggestions = item.suggestions;
 						}
 					}
@@ -2373,7 +2370,7 @@ function WysiwygEditorSpellCheckSetup( editor ) {
 				var nodesLength = this.words[word].nodes.length;
 				for( i = 0; i < nodesLength; i++ ) {
 					var node = this.words[word].nodes[i];
-					node.style.backgroundColor = '';
+					node.className = '';
 				}
 			}
 		},
