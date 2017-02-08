@@ -172,6 +172,8 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 				}
 				updateUserCurrentLoginIn(wfUser.Id)
 				log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
+				cu := controllers.FetchUserObject(wfUser.Id)
+				ctx.Set("loggedInUser", cu)
 				return nil
 			} else {
 				return ERROR_MEMCACHE_FAILED
@@ -422,8 +424,10 @@ func Middleware() func(*gin.Context) {
 			ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
 			return
 		}
-		currUser := controllers.FetchUserObject(wfUserId)
-		ctx.Set("loggedInUser", currUser)
+		if _, exist := ctx.Get("loggedInUser"); !exist {
+			currUser := controllers.FetchUserObject(wfUserId)
+			ctx.Set("loggedInUser", currUser)
+		}
 		ctx.Next()
 	}
 }
