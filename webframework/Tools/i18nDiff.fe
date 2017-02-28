@@ -30,7 +30,7 @@ master.keys().each() using ( key ) {
 
 translation.keys().each() using ( key ) {
 	if( not master.keyExists(key) ) {
-		Console.println( "- Keeping '$key' from translation [even though it might have been deleted]");
+		translation.del(key);
 	}
 };
 
