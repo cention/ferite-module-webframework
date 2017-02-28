@@ -12,9 +12,6 @@ string applicationName = argv[0];
 string language = argv[1];
 string translationFile = "$applicationName/Resources/Strings/$language/translation.strings.fe";
 
-Console.println("i18nDiff.fe has been retired. Please use 'make gettext-update' in c3-beta instead");
-Sys.exit(1);
-
 master = include("$applicationName/Resources/Strings/Master.strings.fe");
 
 monitor { 
@@ -33,7 +30,7 @@ master.keys().each() using ( key ) {
 
 translation.keys().each() using ( key ) {
 	if( not master.keyExists(key) ) {
-		Console.println( "- Keeping '$key' from translation [even though it might have been deleted]");
+		translation.del(key);
 	}
 };
 
