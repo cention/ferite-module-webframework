@@ -262,8 +262,12 @@ namespace modifies String {
 	 */
 	function I( string key ) {
 		if( I18N.catalog and key ) {
-			if( I18N.catalog.keyExists(key) )
-				return I18N.catalog[key];
+			if( I18N.catalog.keyExists(key) ) {
+				string text = I18N.catalog[key];
+				if (text) {
+					return text;
+				}
+			}
 		}
 		return key;
 	}
