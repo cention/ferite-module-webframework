@@ -1,5 +1,13 @@
 ;var SockWrap = function(io, forcedLongPolling) {
-	var cs = {};
+	var cs = {}
+	, ack = function(what, args) {
+		var cb;
+		if (args.length == 0) return;
+		cb = args[args.length-1];
+		if (typeof cb !== 'function') return;
+		cb(what);
+	}
+	;
 	cs.io = io;
 	cs.forcedLongPolling = forcedLongPolling;
 	cs.encode = function(str) {
@@ -9,14 +17,16 @@
 		return decodeURIComponent(str);
 	};
 	cs.on = function(what, callback) {
-		cs.io.on(what, function(data) {
+		cs.io.on(what, function() {
 			callback.apply(null, arguments);
+			ack('plain', arguments)
 		});
 	};
 	cs.onString = function(what, callback) {
 		cs.io.on(what, function(data) {
 			arguments[0] = cs.decode(data)
 			callback.apply(null, arguments);
+			ack('onString', arguments)
 		});
 	};
 	cs.onJson = function(what, callback) {
@@ -34,6 +44,7 @@
 			}
 			arguments[0] = json;
 			callback.apply(null, arguments);
+			ack('onJson', arguments)
 		});
 	};
 	cs.emit = function(what, data) {
