@@ -29,6 +29,8 @@ const (
 	HTTP_UNAUTHORIZE_ACCESS = 401
 	HTTP_FORBIDDEN_ACCESS   = 403
 	HTTP_FOUND              = 302
+	DayEpoch                = 86400
+	CookieExpireAt          = DayEpoch * 30
 )
 
 var (
@@ -253,7 +255,8 @@ func createNewAuthCookie(ctx *gin.Context) error {
 		ctx.Writer.Header().Add("Set-Cookie", cookie)
 		return err
 	}
-	cookie := fmt.Sprintf("cention-suiteSSID=%s; Path=/", encoded)
+	expiration := time.Now().Add(CookieExpireAt * time.Second).Format(time.RFC1123)
+	cookie := fmt.Sprintf("cention-suiteSSID=%s; Path=/;Expires=%v;Max-Age=%d;HttpOnly", encoded, expiration, CookieExpireAt)
 	ctx.Writer.Header().Add("Set-Cookie", cookie)
 	return nil
 }
