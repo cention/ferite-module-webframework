@@ -136,6 +136,69 @@ func fetchFromCache(key string) error {
 	return ERROR_CACHE_MISSED
 }
 
+func AutoCreateAuthCookie(ctx *gin.Context, errStrId, userExtId,
+	itemId string) bool {
+	ssid, err := decodeCookie(ctx)
+	if err != nil {
+		err := createNewAuthCookie(ctx)
+		if err != nil {
+			return false
+		}
+	}
+	errandId, err := strconv.Atoi(errStrId)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	errandExtId, err := strconv.Atoi(itemId)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	errand, err := workflow.LoadErrand(errandId)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	if errand.ExternalID == 0 || errand.ExternalID != errandExtId {
+		log.Printf("Errand %d extId [%d] does not match itme Id %d",
+			errand.Id, errand.ExternalID, errandExtId)
+		return false
+	}
+	sysGroup, err :=
+		workflow.QuerySystemGroup_minimalByAreaID(errand.TargetArea.Id)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	wfUser, err := workflow.QueryUser_byExternalID(sysGroup.Id, userExtId)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	if wfUser != nil {
+		lastLoginTime := time.Now().Unix()
+		if checkingMemcache() {
+			sValue := fmt.Sprintf("%v/%v/%v", wfUser.Id, lastLoginTime, true)
+			if err = saveToSessiondCache(ssid, sValue); err != nil {
+				log.Println(err)
+				return false
+			}
+			if err = saveUserIdToCache(wfUser.Id, ssid); err != nil {
+				log.Println(err)
+				return false
+			}
+			updateUserCurrentLoginIn(wfUser.Id)
+			log.Printf("CentionAuth: User `%s` auto logged In", wfUser.Username)
+			cu := controllers.FetchUserObject(wfUser.Id)
+			ctx.Set("loggedInUser", cu)
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	ssid, err := decodeCookie(ctx)
 	if err != nil {
