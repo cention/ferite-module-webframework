@@ -138,12 +138,10 @@ func fetchFromCache(key string) error {
 
 func AutoCreateAuthCookie(ctx *gin.Context, errStrId, userExtId,
 	itemId string) bool {
-	ssid, err := decodeCookie(ctx)
+	ssid, err := createNewAuthCookie(ctx)
 	if err != nil {
-		err := createNewAuthCookie(ctx)
-		if err != nil {
-			return false
-		}
+		log.Println(err)
+		return false
 	}
 	errandId, err := strconv.Atoi(errStrId)
 	if err != nil {
@@ -171,38 +169,45 @@ func AutoCreateAuthCookie(ctx *gin.Context, errStrId, userExtId,
 		log.Println(err)
 		return false
 	}
-	wfUser, err := workflow.QueryUser_byExternalID(sysGroup.Id, userExtId)
+	user, err := workflow.QueryUser_byExternalID(sysGroup.Id, userExtId)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
-	if wfUser != nil {
+	if user != nil {
 		lastLoginTime := time.Now().Unix()
 		if checkingMemcache() {
-			sValue := fmt.Sprintf("%v/%v/%v", wfUser.Id, lastLoginTime, true)
+			sValue := fmt.Sprintf("%v/%v/%v", user.WebframeworkUserID,
+				lastLoginTime, true)
 			if err = saveToSessiondCache(ssid, sValue); err != nil {
 				log.Println(err)
 				return false
 			}
-			if err = saveUserIdToCache(wfUser.Id, ssid); err != nil {
+			if err = saveUserIdToCache(user.WebframeworkUserID,
+				ssid); err != nil {
 				log.Println(err)
 				return false
 			}
-			updateUserCurrentLoginIn(wfUser.Id)
-			log.Printf("CentionAuth: User `%s` auto logged In", wfUser.Username)
-			cu := controllers.FetchUserObject(wfUser.Id)
+			updateUserCurrentLoginIn(user.WebframeworkUserID)
+			log.Printf("CentionAuth: User `%s` auto logged In", user.Username)
+			cu := controllers.FetchUserObject(user.WebframeworkUserID)
 			ctx.Set("loggedInUser", cu)
+			ctx.Next()
+			return true
 		} else {
 			return false
 		}
+	} else {
+		log.Printf("Unable to locate userExtId %s sysGroup %d", userExtId,
+			sysGroup.Id)
 	}
-	return true
+	return false
 }
 
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	ssid, err := decodeCookie(ctx)
 	if err != nil {
-		err := createNewAuthCookie(ctx)
+		_, err := createNewAuthCookie(ctx)
 		if err != nil {
 			return err
 		}
@@ -338,7 +343,7 @@ func encodePassword(p string) string {
 	}
 	return base64.StdEncoding.EncodeToString(ep.Sum(nil))
 }
-func createNewAuthCookie(ctx *gin.Context) error {
+func createNewAuthCookie(ctx *gin.Context) (string, error) {
 	value := map[string]interface{}{
 		"cookie-set-date": time.Now().Unix(),
 	}
@@ -347,12 +352,12 @@ func createNewAuthCookie(ctx *gin.Context) error {
 		log.Printf("createNewAuthCookie(): Error %v, creating `guest` cookie", err)
 		cookie := fmt.Sprintf("cention-suiteSSID=%s; Path=/", "guest")
 		ctx.Writer.Header().Add("Set-Cookie", cookie)
-		return err
+		return "", err
 	}
 	expiration := time.Now().Add(CookieExpireAt * time.Second).Format(time.RFC1123)
 	cookie := fmt.Sprintf("cention-suiteSSID=%s; Path=/;Expires=%v;Max-Age=%d;HttpOnly", encoded, expiration, CookieExpireAt)
 	ctx.Writer.Header().Add("Set-Cookie", cookie)
-	return nil
+	return encoded, nil
 }
 func CheckAuthCookie(ctx *gin.Context) (bool, error) {
 	cookie, err := decodeCookie(ctx)
