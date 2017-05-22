@@ -136,72 +136,30 @@ func fetchFromCache(key string) error {
 	return ERROR_CACHE_MISSED
 }
 
-func AutoCreateAuthCookie(ctx *gin.Context, errStrId, userExtId,
-	itemId string) bool {
+func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
 	ssid, err := createNewAuthCookie(ctx)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	errandId, err := strconv.Atoi(errStrId)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	errandExtId, err := strconv.Atoi(itemId)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	errand, err := workflow.LoadErrand(errandId)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	if errand.ExternalID == 0 || errand.ExternalID != errandExtId {
-		log.Printf("Errand %d extId [%d] does not match itme Id %d",
-			errand.Id, errand.ExternalID, errandExtId)
-		return false
-	}
-	sysGroup, err :=
-		workflow.QuerySystemGroup_minimalByAreaID(errand.TargetArea.Id)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	user, err := workflow.QueryUser_byExternalID(sysGroup.Id, userExtId)
-	if err != nil {
-		log.Println(err)
-		return false
-	}
-	if user != nil {
-		lastLoginTime := time.Now().Unix()
-		if checkingMemcache() {
-			sValue := fmt.Sprintf("%v/%v/%v", user.WebframeworkUserID,
-				lastLoginTime, true)
-			if err = saveToSessiondCache(ssid, sValue); err != nil {
-				log.Println(err)
-				return false
-			}
-			if err = saveUserIdToCache(user.WebframeworkUserID,
-				ssid); err != nil {
-				log.Println(err)
-				return false
-			}
-			updateUserCurrentLoginIn(user.WebframeworkUserID)
-			log.Printf("CentionAuth: User `%s` auto logged In", user.Username)
-			cu := controllers.FetchUserObject(user.WebframeworkUserID)
-			ctx.Set("loggedInUser", cu)
-			ctx.Next()
-			return true
-		} else {
+	lastLoginTime := time.Now().Unix()
+	if checkingMemcache() {
+		sValue := fmt.Sprintf("%v/%v/%v", user.WebframeworkUserID,
+			lastLoginTime, true)
+		if err = saveToSessiondCache(ssid, sValue); err != nil {
+			log.Println(err)
 			return false
 		}
+		if err = saveUserIdToCache(user.WebframeworkUserID,
+			ssid); err != nil {
+			log.Println(err)
+			return false
+		}
+		updateUserCurrentLoginIn(user.WebframeworkUserID)
+		log.Printf("CentionAuth: User `%s` auto logged In", user.Username)
+		cu := controllers.FetchUserObject(user.WebframeworkUserID)
+		ctx.Set("loggedInUser", cu)
+		ctx.Next()
+		return true
 	} else {
-		log.Printf("Unable to locate userExtId %s sysGroup %d", userExtId,
-			sysGroup.Id)
+		return false
 	}
-	return false
 }
 
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
