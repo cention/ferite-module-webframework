@@ -138,6 +138,10 @@ func fetchFromCache(key string) error {
 
 func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
 	ssid, err := createNewAuthCookie(ctx)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
 	lastLoginTime := time.Now().Unix()
 	if checkingMemcache() {
 		sValue := fmt.Sprintf("%v/%v/%v", user.WebframeworkUserID,
