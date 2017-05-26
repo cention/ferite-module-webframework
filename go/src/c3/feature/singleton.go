@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	// cention
-	wf "c3/osm/webframework"
+	"c3/osm/webframework"
 )
 
 var onlyonce sync.Once
@@ -68,13 +68,13 @@ func DefaultContext() string {
 	return getSingleton().DefaultContext()
 }
 
-func States(featureTags, contexts []string) (map[string]*wf.FeatureApplication, error) {
+func States(featureTags, contexts []string) (map[string]*webframework.FeatureApplication, error) {
 	protect <- 1
 	defer func() { <-protect }()
 	return getSingleton().States(featureTags, contexts)
 }
 
-func State(tag string) (*wf.FeatureApplication, error) {
+func State(tag string) (*webframework.FeatureApplication, error) {
 	protect <- 1
 	defer func() { <-protect }()
 	return getSingleton().State(tag)
@@ -115,8 +115,8 @@ type Featurer interface {
 	SetDefaultContext(string)
 	SetGlobalContext(string)
 	DefaultContext() string
-	States([]string, []string) (map[string]*wf.FeatureApplication, error)
-	State(string) (*wf.FeatureApplication, error)
+	States([]string, []string) (map[string]*webframework.FeatureApplication, error)
+	State(string) (*webframework.FeatureApplication, error)
 	Bool(string) bool
 	Int(string) int
 	Str(string) string
@@ -148,11 +148,11 @@ func (g globalFeature) DefaultContext() string {
 	return DefaultContext()
 }
 
-func (g globalFeature) States(featureTags, contexts []string) (map[string]*wf.FeatureApplication, error) {
+func (g globalFeature) States(featureTags, contexts []string) (map[string]*webframework.FeatureApplication, error) {
 	return States(featureTags, contexts)
 }
 
-func (g globalFeature) State(tag string) (*wf.FeatureApplication, error) {
+func (g globalFeature) State(tag string) (*webframework.FeatureApplication, error) {
 	return State(tag)
 }
 
