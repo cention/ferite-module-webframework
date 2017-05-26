@@ -1,6 +1,6 @@
 package feature
 
-import wf "c3/osm/webframework"
+import "c3/osm/webframework"
 
 type gofeature struct {
 	*Feature
@@ -55,13 +55,13 @@ func (t *gofeature) DefaultContext() string {
 	return t.Feature.DefaultContext()
 }
 
-func (t *gofeature) States(featureTags, contexts []string) (map[string]*wf.FeatureApplication, error) {
+func (t *gofeature) States(featureTags, contexts []string) (map[string]*webframework.FeatureApplication, error) {
 	t.ch <- struct{}{}
 	defer func() { <-t.ch }()
 	return t.Feature.States(featureTags, contexts)
 }
 
-func (t *gofeature) State(tag string) (*wf.FeatureApplication, error) {
+func (t *gofeature) State(tag string) (*webframework.FeatureApplication, error) {
 	t.ch <- struct{}{}
 	defer func() { <-t.ch }()
 	return t.Feature.State(tag)

@@ -17,7 +17,7 @@
 package feature
 
 import (
-	wf "c3/osm/webframework"
+	"c3/osm/webframework"
 	"log"
 	"strings"
 )
@@ -43,16 +43,16 @@ type All interface {
 type Feature struct {
 	defaultContexts      []string
 	defaultGlobalContext string
-	featureCache         map[string]*wf.FeatureApplication
+	featureCache         map[string]*webframework.FeatureApplication
 }
 
 func New() *Feature {
-	return &Feature{featureCache: map[string]*wf.FeatureApplication{}}
+	return &Feature{featureCache: map[string]*webframework.FeatureApplication{}}
 }
 
 // ClearCache clears the cached features that were loaded from the object server.
 func (f *Feature) ClearCache() {
-	f.featureCache = make(map[string]*wf.FeatureApplication)
+	f.featureCache = make(map[string]*webframework.FeatureApplication)
 }
 
 // Preload loads all the feature for the current default contexts.
@@ -86,18 +86,18 @@ func (f *Feature) SetDefaultContext(ctx string) {
 
 // DefaultContext returns the semicolon-separated default contexts.
 func (f *Feature) DefaultContext() string {
-	return f.defaultGlobalContext + ";" + wf.FeatureApplication_DEFAULT_CONTEXT
+	return f.defaultGlobalContext + ";" + webframework.FeatureApplication_DEFAULT_CONTEXT
 }
 
 // States implements the Go equivalent of webframework/Core/Features.feh's
 // state().
-func (f *Feature) States(featureTags []string, contexts []string) (map[string]*wf.FeatureApplication, error) {
+func (f *Feature) States(featureTags []string, contexts []string) (map[string]*webframework.FeatureApplication, error) {
 	// TODO rename processList to byPriorityDesc
-	var processList wf.FeatureApplicationSlice
+	var processList webframework.FeatureApplicationSlice
 	var err error
 	var featureList []string
 	// TODO rename list to featureMap
-	list := map[string]*wf.FeatureApplication{}
+	list := map[string]*webframework.FeatureApplication{}
 
 	contextList := []string{f.DefaultContext()}
 	for _, v := range contexts {
@@ -105,7 +105,7 @@ func (f *Feature) States(featureTags []string, contexts []string) (map[string]*w
 	}
 
 	if len(featureTags) == 0 {
-		processList, err = wf.QueryFeatureApplication_fetchInContext(contextList)
+		processList, err = webframework.QueryFeatureApplication_fetchInContext(contextList)
 		if err != nil {
 			return nil, err
 		}
@@ -118,7 +118,7 @@ func (f *Feature) States(featureTags []string, contexts []string) (map[string]*w
 			}
 		}
 		if len(featureList) > 0 {
-			processList, err = wf.QueryFeatureApplication_fetchByFeaturesInContext(featureList, contextList)
+			processList, err = webframework.QueryFeatureApplication_fetchByFeaturesInContext(featureList, contextList)
 			if err != nil {
 				return nil, err
 			}
@@ -145,7 +145,7 @@ func (f *Feature) States(featureTags []string, contexts []string) (map[string]*w
 	return list, nil
 }
 
-func (f *Feature) stateForTagWithDefaultContexts(tag string) (*wf.FeatureApplication, error) {
+func (f *Feature) stateForTagWithDefaultContexts(tag string) (*webframework.FeatureApplication, error) {
 	m, err := f.States([]string{tag}, f.defaultContexts)
 	if err != nil {
 		return nil, err
@@ -158,7 +158,7 @@ func (f *Feature) stateForTagWithDefaultContexts(tag string) (*wf.FeatureApplica
 
 // State returns the (possibly cached) feature application state for the given
 // tag.
-func (f *Feature) State(tag string) (*wf.FeatureApplication, error) {
+func (f *Feature) State(tag string) (*webframework.FeatureApplication, error) {
 	if v, exists := f.featureCache[tag]; exists {
 		return v, nil
 	}
