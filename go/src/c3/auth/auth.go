@@ -6,7 +6,7 @@ package auth
  */
 
 import (
-	wf "c3/osm/webframework"
+	"c3/osm/webframework"
 	"c3/osm/workflow"
 	"c3/web/controllers"
 	"crypto/sha256"
@@ -286,8 +286,8 @@ func saveToSessiondCache(key, value string) error {
 	}
 	return nil
 }
-func validateUser(user, pass string) (*wf.User, error) {
-	wu, err := wf.QueryUser_byLogin(user)
+func validateUser(user, pass string) (*webframework.User, error) {
+	wu, err := webframework.QueryUser_byLogin(user)
 	if err != nil {
 		return nil, err
 	}
