@@ -18,6 +18,7 @@ package feature
 
 import (
 	"c3/osm/webframework"
+	"context"
 	"log"
 	"strings"
 )
@@ -105,7 +106,7 @@ func (f *Feature) States(featureTags []string, contexts []string) (map[string]*w
 	}
 
 	if len(featureTags) == 0 {
-		processList, err = webframework.QueryFeatureApplication_fetchInContext(contextList)
+		processList, err = webframework.QueryFeatureApplication_fetchInContextContext(context.TODO(), contextList)
 		if err != nil {
 			return nil, err
 		}
@@ -118,7 +119,7 @@ func (f *Feature) States(featureTags []string, contexts []string) (map[string]*w
 			}
 		}
 		if len(featureList) > 0 {
-			processList, err = webframework.QueryFeatureApplication_fetchByFeaturesInContext(featureList, contextList)
+			processList, err = webframework.QueryFeatureApplication_fetchByFeaturesInContextContext(context.TODO(), featureList, contextList)
 			if err != nil {
 				return nil, err
 			}

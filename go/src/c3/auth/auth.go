@@ -9,6 +9,7 @@ import (
 	"c3/osm/webframework"
 	"c3/osm/workflow"
 	"c3/web/controllers"
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
@@ -215,25 +216,25 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	return ERROR_WF_USER_NULL
 }
 func updateUserCurrentLoginIn(wfUId int) {
-	user, err := workflow.QueryUser_byWebframeworkUser(wfUId)
+	user, err := workflow.QueryUser_byWebframeworkUserContext(context.TODO(), wfUId)
 	if err != nil {
 		log.Println("Error QueryUser_byWebframeworkUser: ", err)
 	}
 	user.SetTimestampLastLogin(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(true)
-	if err := user.Save(); err != nil {
+	if err := user.SaveContext(context.TODO()); err != nil {
 		log.Println("Error on Save: ", err)
 	}
 	updateUserStatusInHistory(user, "Login")
 }
 func updateUserCurrentLoginOut(wfUId int) {
-	user, err := workflow.QueryUser_byWebframeworkUser(wfUId)
+	user, err := workflow.QueryUser_byWebframeworkUserContext(context.TODO(), wfUId)
 	if err != nil {
 		log.Println("Error QueryUser_byWebframeworkUser: ", err)
 	}
 	user.SetTimestampLastLogout(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(false)
-	if err := user.Save(); err != nil {
+	if err := user.SaveContext(context.TODO()); err != nil {
 		log.Println("Error on Save: ", err)
 	}
 	updateUserStatusInHistory(user, "Logout")
@@ -241,9 +242,9 @@ func updateUserCurrentLoginOut(wfUId int) {
 }
 func updateUserStatusInHistory(user *workflow.User, status string) {
 	newstat := workflow.NewUserStatusTrack()
-	currstat, _ := workflow.QueryUserStatus_byName(status)
-	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserID(user.Id)
-	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOn(user.Id)
+	currstat, _ := workflow.QueryUserStatus_byNameContext(context.TODO(), status)
+	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDContext(context.TODO(), user.Id)
+	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOnContext(context.TODO(), user.Id)
 	timeLapsed := 0
 
 	if user.AcceptChat {
@@ -251,7 +252,7 @@ func updateUserStatusInHistory(user *workflow.User, status string) {
 			timeLapsed = int(time.Now().Unix() - chatstat.TimestampCreate)
 			if timeLapsed <= 24*60*60 && timeLapsed > 0 {
 				chatstat.SetTimeSpent(timeLapsed)
-				chatstat.Save()
+				chatstat.SaveContext(context.TODO())
 			}
 		}
 	}
@@ -262,11 +263,11 @@ func updateUserStatusInHistory(user *workflow.User, status string) {
 			newstat.SetSystemGroup(user.SystemGroup)
 			newstat.SetTimestampCreate(time.Now().Unix())
 			newstat.SetLastUpdatedTimestamp(time.Now().Unix())
-			newstat.Save()
+			newstat.SaveContext(context.TODO())
 		} else {
 			prestat.SetTimeSpent(int(time.Now().Unix() - prestat.TimestampCreate))
 			prestat.SetLastUpdatedTimestamp(time.Now().Unix())
-			prestat.Save()
+			prestat.SaveContext(context.TODO())
 		}
 	}
 }
@@ -287,7 +288,7 @@ func saveToSessiondCache(key, value string) error {
 	return nil
 }
 func validateUser(user, pass string) (*webframework.User, error) {
-	wu, err := webframework.QueryUser_byLogin(user)
+	wu, err := webframework.QueryUser_byLoginContext(context.TODO(), user)
 	if err != nil {
 		return nil, err
 	}
