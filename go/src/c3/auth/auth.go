@@ -216,7 +216,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	return ERROR_WF_USER_NULL
 }
 func updateUserCurrentLoginIn(wfUId int) {
-	user, err := workflow.QueryUser_byWebframeworkUserContext(context.TODO(), wfUId)
+	user, err := workflow.QueryUser_byWebframeworkUser(context.TODO(), wfUId)
 	if err != nil {
 		log.Println("Error QueryUser_byWebframeworkUser: ", err)
 	}
@@ -228,7 +228,7 @@ func updateUserCurrentLoginIn(wfUId int) {
 	updateUserStatusInHistory(user, "Login")
 }
 func updateUserCurrentLoginOut(wfUId int) {
-	user, err := workflow.QueryUser_byWebframeworkUserContext(context.TODO(), wfUId)
+	user, err := workflow.QueryUser_byWebframeworkUser(context.TODO(), wfUId)
 	if err != nil {
 		log.Println("Error QueryUser_byWebframeworkUser: ", err)
 	}
@@ -242,9 +242,9 @@ func updateUserCurrentLoginOut(wfUId int) {
 }
 func updateUserStatusInHistory(user *workflow.User, status string) {
 	newstat := workflow.NewUserStatusTrack()
-	currstat, _ := workflow.QueryUserStatus_byNameContext(context.TODO(), status)
-	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDContext(context.TODO(), user.Id)
-	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOnContext(context.TODO(), user.Id)
+	currstat, _ := workflow.QueryUserStatus_byName(context.TODO(), status)
+	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserID(context.TODO(), user.Id)
+	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOn(context.TODO(), user.Id)
 	timeLapsed := 0
 
 	if user.AcceptChat {
@@ -288,7 +288,7 @@ func saveToSessiondCache(key, value string) error {
 	return nil
 }
 func validateUser(user, pass string) (*webframework.User, error) {
-	wu, err := webframework.QueryUser_byLoginContext(context.TODO(), user)
+	wu, err := webframework.QueryUser_byLogin(context.TODO(), user)
 	if err != nil {
 		return nil, err
 	}

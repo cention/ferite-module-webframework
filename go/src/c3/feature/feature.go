@@ -106,7 +106,7 @@ func (f *Feature) States(featureTags []string, contexts []string) (map[string]*w
 	}
 
 	if len(featureTags) == 0 {
-		processList, err = webframework.QueryFeatureApplication_fetchInContextContext(context.TODO(), contextList)
+		processList, err = webframework.QueryFeatureApplication_fetchInContext(context.TODO(), contextList)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +119,7 @@ func (f *Feature) States(featureTags []string, contexts []string) (map[string]*w
 			}
 		}
 		if len(featureList) > 0 {
-			processList, err = webframework.QueryFeatureApplication_fetchByFeaturesInContextContext(context.TODO(), featureList, contextList)
+			processList, err = webframework.QueryFeatureApplication_fetchByFeaturesInContext(context.TODO(), featureList, contextList)
 			if err != nil {
 				return nil, err
 			}
