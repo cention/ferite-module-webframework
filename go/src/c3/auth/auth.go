@@ -222,7 +222,7 @@ func updateUserCurrentLoginIn(wfUId int) {
 	}
 	user.SetTimestampLastLogin(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(true)
-	if err := user.SaveContext(context.TODO()); err != nil {
+	if err := user.Save(); err != nil {
 		log.Println("Error on Save: ", err)
 	}
 	updateUserStatusInHistory(user, "Login")
@@ -234,7 +234,7 @@ func updateUserCurrentLoginOut(wfUId int) {
 	}
 	user.SetTimestampLastLogout(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(false)
-	if err := user.SaveContext(context.TODO()); err != nil {
+	if err := user.Save(); err != nil {
 		log.Println("Error on Save: ", err)
 	}
 	updateUserStatusInHistory(user, "Logout")
@@ -252,7 +252,7 @@ func updateUserStatusInHistory(user *workflow.User, status string) {
 			timeLapsed = int(time.Now().Unix() - chatstat.TimestampCreate)
 			if timeLapsed <= 24*60*60 && timeLapsed > 0 {
 				chatstat.SetTimeSpent(timeLapsed)
-				chatstat.SaveContext(context.TODO())
+				chatstat.Save()
 			}
 		}
 	}
@@ -263,11 +263,11 @@ func updateUserStatusInHistory(user *workflow.User, status string) {
 			newstat.SetSystemGroup(user.SystemGroup)
 			newstat.SetTimestampCreate(time.Now().Unix())
 			newstat.SetLastUpdatedTimestamp(time.Now().Unix())
-			newstat.SaveContext(context.TODO())
+			newstat.Save()
 		} else {
 			prestat.SetTimeSpent(int(time.Now().Unix() - prestat.TimestampCreate))
 			prestat.SetLastUpdatedTimestamp(time.Now().Unix())
-			prestat.SaveContext(context.TODO())
+			prestat.Save()
 		}
 	}
 }
