@@ -241,7 +241,7 @@ func updateUserCurrentLoginOut(wfUId int) {
 	log.Printf("- User %d logout", user.Id)
 }
 func updateUserStatusInHistory(user *workflow.User, status string) {
-	newstat := workflow.NewUserStatusTrack()
+	newstat := workflow.NewUserStatusTrack(context.TODO())
 	currstat, _ := workflow.QueryUserStatus_byName(context.TODO(), status)
 	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserID(context.TODO(), user.Id)
 	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOn(context.TODO(), user.Id)
