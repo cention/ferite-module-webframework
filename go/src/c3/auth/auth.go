@@ -8,6 +8,7 @@ package auth
 import (
 	"c3/osm/webframework"
 	"c3/osm/workflow"
+	"c3/space"
 	"c3/web/controllers"
 	"context"
 	"crypto/sha256"
@@ -138,6 +139,7 @@ func fetchFromCache(key string) error {
 }
 
 func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
+	c3ctx := space.GetContext(ctx)
 	ssid, err := createNewAuthCookie(ctx)
 	if err != nil {
 		log.Println(err)
@@ -156,9 +158,9 @@ func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
 			log.Println(err)
 			return false
 		}
-		updateUserCurrentLoginIn(user.WebframeworkUserID)
+		updateUserCurrentLoginIn(c3ctx, user.WebframeworkUserID)
 		log.Printf("CentionAuth: User `%s` auto logged In", user.Username)
-		cu := controllers.FetchUserObject(user.WebframeworkUserID)
+		cu := controllers.FetchUserObject(ctx, user.WebframeworkUserID)
 		ctx.Set("loggedInUser", cu)
 		ctx.Next()
 		return true
@@ -187,8 +189,9 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		}
 		return ERROR_USER_PASS_EMPTY
 	} else {
+		c3ctx := space.GetContext(ctx)
 		log.Println("!!-- Setting cookie informations to memcache. First time login.")
-		wfUser, err := validateUser(user, pass)
+		wfUser, err := validateUser(c3ctx, user, pass)
 		if err != nil {
 			log.Println("Error on CheckOrCreateAuthCookie() - validateUser: ", err)
 			return err
@@ -203,9 +206,9 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 				if err = saveUserIdToCache(wfUser.Id, ssid); err != nil {
 					return err
 				}
-				updateUserCurrentLoginIn(wfUser.Id)
+				updateUserCurrentLoginIn(c3ctx, wfUser.Id)
 				log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
-				cu := controllers.FetchUserObject(wfUser.Id)
+				cu := controllers.FetchUserObject(ctx, wfUser.Id)
 				ctx.Set("loggedInUser", cu)
 				return nil
 			} else {
@@ -215,8 +218,8 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	}
 	return ERROR_WF_USER_NULL
 }
-func updateUserCurrentLoginIn(wfUId int) {
-	user, err := workflow.QueryUser_byWebframeworkUser(context.TODO(), wfUId)
+func updateUserCurrentLoginIn(c3ctx context.Context, wfUId int) {
+	user, err := workflow.QueryUser_byWebframeworkUser(c3ctx, wfUId)
 	if err != nil {
 		log.Println("Error QueryUser_byWebframeworkUser: ", err)
 	}
@@ -225,10 +228,10 @@ func updateUserCurrentLoginIn(wfUId int) {
 	if err := user.Save(); err != nil {
 		log.Println("Error on Save: ", err)
 	}
-	updateUserStatusInHistory(user, "Login")
+	updateUserStatusInHistory(c3ctx, user, "Login")
 }
-func updateUserCurrentLoginOut(wfUId int) {
-	user, err := workflow.QueryUser_byWebframeworkUser(context.TODO(), wfUId)
+func updateUserCurrentLoginOut(c3ctx context.Context, wfUId int) {
+	user, err := workflow.QueryUser_byWebframeworkUser(c3ctx, wfUId)
 	if err != nil {
 		log.Println("Error QueryUser_byWebframeworkUser: ", err)
 	}
@@ -237,14 +240,14 @@ func updateUserCurrentLoginOut(wfUId int) {
 	if err := user.Save(); err != nil {
 		log.Println("Error on Save: ", err)
 	}
-	updateUserStatusInHistory(user, "Logout")
+	updateUserStatusInHistory(c3ctx, user, "Logout")
 	log.Printf("- User %d logout", user.Id)
 }
-func updateUserStatusInHistory(user *workflow.User, status string) {
-	newstat := workflow.NewUserStatusTrack(context.TODO())
-	currstat, _ := workflow.QueryUserStatus_byName(context.TODO(), status)
-	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserID(context.TODO(), user.Id)
-	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOn(context.TODO(), user.Id)
+func updateUserStatusInHistory(c3ctx context.Context, user *workflow.User, status string) {
+	newstat := workflow.NewUserStatusTrack(c3ctx)
+	currstat, _ := workflow.QueryUserStatus_byName(c3ctx, status)
+	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserID(c3ctx, user.Id)
+	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOn(c3ctx, user.Id)
 	timeLapsed := 0
 
 	if user.AcceptChat {
@@ -287,8 +290,8 @@ func saveToSessiondCache(key, value string) error {
 	}
 	return nil
 }
-func validateUser(user, pass string) (*webframework.User, error) {
-	wu, err := webframework.QueryUser_byLogin(context.TODO(), user)
+func validateUser(c3ctx context.Context, user, pass string) (*webframework.User, error) {
+	wu, err := webframework.QueryUser_byLogin(c3ctx, user)
 	if err != nil {
 		return nil, err
 	}
@@ -379,6 +382,7 @@ func validateByBrowserCookie(ssid string) (bool, error) {
 }
 
 func destroyAuthCookie(ctx *gin.Context) error {
+	c3ctx := space.GetContext(ctx)
 	ssid, err := decodeCookie(ctx)
 	if err != nil {
 		return err
@@ -392,7 +396,7 @@ func destroyAuthCookie(ctx *gin.Context) error {
 			log.Printf("Error on validateByBrowserCookie(): %v", err)
 			return err
 		}
-		updateUserCurrentLoginOut(uid)
+		updateUserCurrentLoginOut(c3ctx, uid)
 		return nil
 	}
 	return ERROR_MEMCACHE_FAILED
@@ -459,7 +463,7 @@ func Middleware() func(*gin.Context) {
 			return
 		}
 		if _, exist := ctx.Get("loggedInUser"); !exist {
-			currUser := controllers.FetchUserObject(wfUserId)
+			currUser := controllers.FetchUserObject(ctx, wfUserId)
 			ctx.Set("loggedInUser", currUser)
 		}
 		ctx.Next()
