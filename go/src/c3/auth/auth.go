@@ -8,7 +8,6 @@ package auth
 import (
 	"c3/osm/webframework"
 	"c3/osm/workflow"
-	"c3/space"
 	"c3/web/controllers"
 	"context"
 	"crypto/sha256"
@@ -139,7 +138,7 @@ func fetchFromCache(key string) error {
 }
 
 func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
-	c3ctx := space.GetContext(ctx)
+	c3ctx := ctx.Request.Context()
 	ssid, err := createNewAuthCookie(ctx)
 	if err != nil {
 		log.Println(err)
@@ -189,7 +188,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		}
 		return ERROR_USER_PASS_EMPTY
 	} else {
-		c3ctx := space.GetContext(ctx)
+		c3ctx := ctx.Request.Context()
 		log.Println("!!-- Setting cookie informations to memcache. First time login.")
 		wfUser, err := validateUser(c3ctx, user, pass)
 		if err != nil {
@@ -382,7 +381,7 @@ func validateByBrowserCookie(ssid string) (bool, error) {
 }
 
 func destroyAuthCookie(ctx *gin.Context) error {
-	c3ctx := space.GetContext(ctx)
+	c3ctx := ctx.Request.Context()
 	ssid, err := decodeCookie(ctx)
 	if err != nil {
 		return err
