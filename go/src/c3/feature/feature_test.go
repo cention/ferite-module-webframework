@@ -3,13 +3,16 @@ package feature
 import (
 	"c3/osm"
 	"c3/osm/webframework"
+	"context"
 	"encoding/json"
 	"testing"
 )
 
+var ctx = context.Background()
+
 func TestNonExistentString(t *testing.T) {
 	osm.SetFakeInvokeResult(`null`, nil)
-	f := New()
+	f := New(ctx)
 	got := f.Str("does-not-exist")
 	want := ""
 	if got != want {
@@ -19,7 +22,7 @@ func TestNonExistentString(t *testing.T) {
 
 func TestNonExistentBool(t *testing.T) {
 	osm.SetFakeInvokeResult(`null`, nil)
-	f := New()
+	f := New(ctx)
 	got := f.Bool("does-not-exist")
 	want := false
 	if got != want {
@@ -29,7 +32,7 @@ func TestNonExistentBool(t *testing.T) {
 
 func TestNonExistentInt(t *testing.T) {
 	osm.SetFakeInvokeResult(`null`, nil)
-	f := New()
+	f := New(ctx)
 	got := f.Int("does-not-exist")
 	want := -1
 	if got != want {
@@ -47,7 +50,7 @@ func TestStates(t *testing.T) {
 	contexts := []string{
 		"context:1;default",
 	}
-	f := New()
+	f := New(ctx)
 	f.SetGlobalContext("context:1")
 	fakeResponse := webframework.FeatureApplicationSlice{
 		&webframework.FeatureApplication{

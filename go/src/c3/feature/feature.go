@@ -42,13 +42,17 @@ type All interface {
 }
 
 type Feature struct {
+	Context              context.Context
 	defaultContexts      []string
 	defaultGlobalContext string
 	featureCache         map[string]*webframework.FeatureApplication
 }
 
-func New() *Feature {
-	return &Feature{featureCache: map[string]*webframework.FeatureApplication{}}
+func New(c3ctx context.Context) *Feature {
+	return &Feature{
+		Context:      c3ctx,
+		featureCache: map[string]*webframework.FeatureApplication{},
+	}
 }
 
 // ClearCache clears the cached features that were loaded from the object server.
@@ -106,7 +110,7 @@ func (f *Feature) States(featureTags []string, contexts []string) (map[string]*w
 	}
 
 	if len(featureTags) == 0 {
-		processList, err = webframework.QueryFeatureApplication_fetchInContext(context.TODO(), contextList)
+		processList, err = webframework.QueryFeatureApplication_fetchInContext(f.Context, contextList)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +123,7 @@ func (f *Feature) States(featureTags []string, contexts []string) (map[string]*w
 			}
 		}
 		if len(featureList) > 0 {
-			processList, err = webframework.QueryFeatureApplication_fetchByFeaturesInContext(context.TODO(), featureList, contextList)
+			processList, err = webframework.QueryFeatureApplication_fetchByFeaturesInContext(f.Context, featureList, contextList)
 			if err != nil {
 				return nil, err
 			}

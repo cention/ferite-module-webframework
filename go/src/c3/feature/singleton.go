@@ -1,6 +1,7 @@
 package feature
 
 import (
+	"context"
 	"sync"
 
 	// cention
@@ -23,7 +24,7 @@ func GetSingleton() Featurer {
 // object and also user declared object.
 func getSingleton() (r *Feature) {
 	onlyonce.Do(func() {
-		singleton = New()
+		singleton = New(context.TODO())
 	})
 	return singleton
 }
