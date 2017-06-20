@@ -6,6 +6,7 @@ package auth
  */
 
 import (
+	"c3/osm"
 	"c3/osm/webframework"
 	"c3/osm/workflow"
 	"c3/web/controllers"
@@ -224,7 +225,7 @@ func updateUserCurrentLoginIn(c3ctx context.Context, wfUId int) {
 	}
 	user.SetTimestampLastLogin(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(true)
-	if err := user.Save(); err != nil {
+	if err := user.Save(c3ctx); err != nil {
 		log.Println("Error on Save: ", err)
 	}
 	updateUserStatusInHistory(c3ctx, user, "Login")
@@ -236,14 +237,15 @@ func updateUserCurrentLoginOut(c3ctx context.Context, wfUId int) {
 	}
 	user.SetTimestampLastLogout(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(false)
-	if err := user.Save(); err != nil {
+	if err := user.Save(c3ctx); err != nil {
 		log.Println("Error on Save: ", err)
 	}
 	updateUserStatusInHistory(c3ctx, user, "Logout")
 	log.Printf("- User %d logout", user.Id)
 }
 func updateUserStatusInHistory(c3ctx context.Context, user *workflow.User, status string) {
-	newstat := workflow.NewUserStatusTrack(c3ctx)
+	space, _ := osm.FromContext(c3ctx)
+	newstat := workflow.NewUserStatusTrack(space)
 	currstat, _ := workflow.QueryUserStatus_byName(c3ctx, status)
 	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserID(c3ctx, user.Id)
 	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOn(c3ctx, user.Id)
@@ -254,7 +256,7 @@ func updateUserStatusInHistory(c3ctx context.Context, user *workflow.User, statu
 			timeLapsed = int(time.Now().Unix() - chatstat.TimestampCreate)
 			if timeLapsed <= 24*60*60 && timeLapsed > 0 {
 				chatstat.SetTimeSpent(timeLapsed)
-				chatstat.Save()
+				chatstat.Save(c3ctx)
 			}
 		}
 	}
@@ -265,11 +267,11 @@ func updateUserStatusInHistory(c3ctx context.Context, user *workflow.User, statu
 			newstat.SetSystemGroup(user.SystemGroup)
 			newstat.SetTimestampCreate(time.Now().Unix())
 			newstat.SetLastUpdatedTimestamp(time.Now().Unix())
-			newstat.Save()
+			newstat.Save(c3ctx)
 		} else {
 			prestat.SetTimeSpent(int(time.Now().Unix() - prestat.TimestampCreate))
 			prestat.SetLastUpdatedTimestamp(time.Now().Unix())
-			prestat.Save()
+			prestat.Save(c3ctx)
 		}
 	}
 }
