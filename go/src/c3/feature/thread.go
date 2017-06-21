@@ -1,6 +1,7 @@
 package feature
 
 import (
+	"c3/osm"
 	"c3/osm/webframework"
 	"context"
 )
@@ -13,7 +14,7 @@ type gofeature struct {
 // threaded feature is thread aware feature.
 func NewTF() Featurer {
 	return &gofeature{
-		Feature: New(context.TODO()),
+		Feature: New(osm.NewContext(context.Background(), "objsrv")),
 		ch:      make(chan struct{}, 1),
 	}
 }
