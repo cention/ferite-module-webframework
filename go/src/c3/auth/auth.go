@@ -6,9 +6,9 @@ package auth
  */
 
 import (
-	"c3/osm"
 	"c3/osm/webframework"
 	"c3/osm/workflow"
+	"c3/space"
 	"c3/web/controllers"
 	"context"
 	"crypto/sha256"
@@ -244,8 +244,8 @@ func updateUserCurrentLoginOut(c3ctx context.Context, wfUId int) {
 	log.Printf("- User %d logout", user.Id)
 }
 func updateUserStatusInHistory(c3ctx context.Context, user *workflow.User, status string) {
-	space, _ := osm.FromContext(c3ctx)
-	newstat := workflow.NewUserStatusTrack(space)
+	spc := space.FromContext(c3ctx)
+	newstat := workflow.NewUserStatusTrack(spc)
 	currstat, _ := workflow.QueryUserStatus_byName(c3ctx, status)
 	prestat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserID(c3ctx, user.Id)
 	chatstat, _ := workflow.QueryUserStatusTrack_getLastStatusByUserIDForChatOn(c3ctx, user.Id)

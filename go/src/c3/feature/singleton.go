@@ -5,8 +5,9 @@ import (
 	"sync"
 
 	// cention
-	"c3/osm"
+
 	"c3/osm/webframework"
+	"c3/space"
 )
 
 var onlyonce sync.Once
@@ -25,7 +26,7 @@ func GetSingleton() Featurer {
 // object and also user declared object.
 func getSingleton() (r *Feature) {
 	onlyonce.Do(func() {
-		singleton = New(osm.NewContext(context.Background(), "objsrv"))
+		singleton = New(space.NewContext(context.Background(), "objsrv"))
 	})
 	return singleton
 }
