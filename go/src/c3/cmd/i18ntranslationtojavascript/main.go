@@ -59,7 +59,7 @@ func main() {
 		content := bytesRead[len("return ") : len(bytesRead)-1]
 		translation, err := ferite.DecodeDict(string(content))
 		if err != nil {
-			fmt.Printf("Unable to decode translation map: %s\n", outputPath, err.Error())
+			fmt.Printf("Unable to decode translation map: %s\n", err.Error())
 			return
 		}
 		if err = os.MkdirAll(outputPath, 0755); err != nil {
