@@ -58,8 +58,11 @@ func main() {
 		// then converts it (ferite code's array) into map[string]interface{}
 		content := bytesRead[len("return ") : len(bytesRead)-1]
 		translation, err := ferite.DecodeDict(string(content))
-
-		if err = os.MkdirAll(outputPath, 755); err != nil {
+		if err != nil {
+			fmt.Printf("Unable to decode translation map: %s\n", outputPath, err.Error())
+			return
+		}
+		if err = os.MkdirAll(outputPath, 0755); err != nil {
 			fmt.Printf("Unable to create path %s: %s\n", outputPath, err.Error())
 			return
 		}
