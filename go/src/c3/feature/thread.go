@@ -2,7 +2,6 @@ package feature
 
 import (
 	"c3/osm/webframework"
-	"c3/space"
 	"context"
 )
 
@@ -12,9 +11,9 @@ type gofeature struct {
 }
 
 // threaded feature is thread aware feature.
-func NewTF() Featurer {
+func NewTF(c3ctx context.Context) Featurer {
 	return &gofeature{
-		Feature: New(space.NewContext(context.Background(), "objsrv")),
+		Feature: New(c3ctx),
 		ch:      make(chan struct{}, 1),
 	}
 }
