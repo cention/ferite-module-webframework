@@ -6,6 +6,7 @@ package auth
  */
 
 import (
+	"c3/logger"
 	"c3/osm/webframework"
 	"c3/osm/workflow"
 	"c3/space"
@@ -15,7 +16,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"strconv"
@@ -58,7 +58,7 @@ type AuthCookieManager struct {
 	LoggedIn      bool
 }
 
-func checkingMemcache() bool {
+func checkingMemcache(log logger.Logger) bool {
 	conn, err := net.Dial("tcp", "localhost:11311")
 	if err != nil {
 		log.Println("Sessiond Server is not running! ", err)
@@ -69,6 +69,8 @@ func checkingMemcache() bool {
 }
 
 func getCookieHashKey(ctx *gin.Context) (string, error) {
+	c3ctx := ctx.Request.Context()
+	log := logger.FromContext(c3ctx)
 	var err error
 	cookie, err := ctx.Request.Cookie("cention-suiteSSID")
 	if err != nil {
@@ -95,7 +97,7 @@ func decodeCookie(ctx *gin.Context) (string, error) {
 	return "", ERROR_COOKIE_NOT_FOUND
 }
 
-func getCurrentSession(v []byte) (int, int, bool, error) {
+func getCurrentSession(log logger.Logger, v []byte) (int, int, bool, error) {
 	sv := string(v)
 	sValue := strings.Split(sv, "/")
 	if len(sValue) != 3 {
@@ -119,7 +121,7 @@ func getCurrentSession(v []byte) (int, int, bool, error) {
 	return uid, ts, currentlyLoggedIn, nil
 }
 
-func fetchFromCache(key string) error {
+func fetchFromCache(log logger.Logger, key string) error {
 	skey := "Session_" + key
 	sItems, err := sessiond.GetRawFromMemcache(skey)
 	if err != nil {
@@ -127,7 +129,7 @@ func fetchFromCache(key string) error {
 		return err
 	}
 	if sItems != nil {
-		uid, _, currentlyLogedin, err := getCurrentSession(sItems.Value)
+		uid, _, currentlyLogedin, err := getCurrentSession(log, sItems.Value)
 		if err != nil {
 			return err
 		}
@@ -140,20 +142,21 @@ func fetchFromCache(key string) error {
 
 func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
 	c3ctx := ctx.Request.Context()
+	log := logger.FromContext(c3ctx)
 	ssid, err := createNewAuthCookie(ctx)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
 	lastLoginTime := time.Now().Unix()
-	if checkingMemcache() {
+	if checkingMemcache(log) {
 		sValue := fmt.Sprintf("%v/%v/%v", user.WebframeworkUserID,
 			lastLoginTime, true)
-		if err = saveToSessiondCache(ssid, sValue); err != nil {
+		if err = saveToSessiondCache(log, ssid, sValue); err != nil {
 			log.Println(err)
 			return false
 		}
-		if err = saveUserIdToCache(user.WebframeworkUserID,
+		if err = saveUserIdToCache(log, user.WebframeworkUserID,
 			ssid); err != nil {
 			log.Println(err)
 			return false
@@ -170,6 +173,8 @@ func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
 }
 
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
+	c3ctx := ctx.Request.Context()
+	log := logger.FromContext(c3ctx)
 	ssid, err := decodeCookie(ctx)
 	if err != nil {
 		_, err := createNewAuthCookie(ctx)
@@ -181,15 +186,14 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	user := strings.TrimSpace(ctx.Request.FormValue("username"))
 	pass := ctx.Request.FormValue("password")
 	if user == "" && pass == "" {
-		if checkingMemcache() {
-			if err = fetchFromCache(ssid); err != nil {
+		if checkingMemcache(log) {
+			if err = fetchFromCache(log, ssid); err != nil {
 				return err
 			}
 			return nil
 		}
 		return ERROR_USER_PASS_EMPTY
 	} else {
-		c3ctx := ctx.Request.Context()
 		log.Println("!!-- Setting cookie informations to memcache. First time login.")
 		wfUser, err := validateUser(c3ctx, user, pass)
 		if err != nil {
@@ -198,12 +202,12 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		}
 		if wfUser != nil {
 			lastLoginTime := time.Now().Unix()
-			if checkingMemcache() {
+			if checkingMemcache(log) {
 				sValue := fmt.Sprintf("%v/%v/%v", wfUser.Id, lastLoginTime, true)
-				if err = saveToSessiondCache(ssid, sValue); err != nil {
+				if err = saveToSessiondCache(log, ssid, sValue); err != nil {
 					return err
 				}
-				if err = saveUserIdToCache(wfUser.Id, ssid); err != nil {
+				if err = saveUserIdToCache(log, wfUser.Id, ssid); err != nil {
 					return err
 				}
 				updateUserCurrentLoginIn(c3ctx, wfUser.Id)
@@ -219,6 +223,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	return ERROR_WF_USER_NULL
 }
 func updateUserCurrentLoginIn(c3ctx context.Context, wfUId int) {
+	log := logger.FromContext(c3ctx)
 	user, err := workflow.QueryUser_byWebframeworkUser(c3ctx, wfUId)
 	if err != nil {
 		log.Println("Error QueryUser_byWebframeworkUser: ", err)
@@ -231,6 +236,7 @@ func updateUserCurrentLoginIn(c3ctx context.Context, wfUId int) {
 	updateUserStatusInHistory(c3ctx, user, "Login")
 }
 func updateUserCurrentLoginOut(c3ctx context.Context, wfUId int) {
+	log := logger.FromContext(c3ctx)
 	user, err := workflow.QueryUser_byWebframeworkUser(c3ctx, wfUId)
 	if err != nil {
 		log.Println("Error QueryUser_byWebframeworkUser: ", err)
@@ -275,7 +281,7 @@ func updateUserStatusInHistory(c3ctx context.Context, user *workflow.User, statu
 		}
 	}
 }
-func saveUserIdToCache(key int, value string) error {
+func saveUserIdToCache(log logger.Logger, key int, value string) error {
 	sKey := fmt.Sprintf("user/%d", key)
 	if err := sessiond.SetRawToMemcache(sKey, value); err != nil {
 		log.Println("[`SetRawToMemcache`] Error on saving:", err)
@@ -283,7 +289,7 @@ func saveUserIdToCache(key int, value string) error {
 	}
 	return nil
 }
-func saveToSessiondCache(key, value string) error {
+func saveToSessiondCache(log logger.Logger, key, value string) error {
 	sKey := "Session_" + key
 	if err := sessiond.SetRawToMemcache(sKey, value); err != nil {
 		log.Println("[`SetRawToMemcache`] Error on saving:", err)
@@ -292,18 +298,19 @@ func saveToSessiondCache(key, value string) error {
 	return nil
 }
 func validateUser(c3ctx context.Context, user, pass string) (*webframework.User, error) {
+	log := logger.FromContext(c3ctx)
 	wu, err := webframework.QueryUser_byLogin(c3ctx, user)
 	if err != nil {
 		return nil, err
 	}
 	if wu != nil {
-		if wu.Active && wu.Password == encodePassword(pass) {
+		if wu.Active && wu.Password == encodePassword(log, pass) {
 			return wu, nil
 		}
 	}
 	return nil, ERROR_USER_PASS_MISMATCH
 }
-func encodePassword(p string) string {
+func encodePassword(log logger.Logger, p string) string {
 	ep := sha256.New()
 	_, err := ep.Write([]byte(p))
 	if err != nil {
@@ -313,6 +320,8 @@ func encodePassword(p string) string {
 	return base64.StdEncoding.EncodeToString(ep.Sum(nil))
 }
 func createNewAuthCookie(ctx *gin.Context) (string, error) {
+	c3ctx := ctx.Request.Context()
+	log := logger.FromContext(c3ctx)
 	value := map[string]interface{}{
 		"cookie-set-date": time.Now().Unix(),
 	}
@@ -329,11 +338,13 @@ func createNewAuthCookie(ctx *gin.Context) (string, error) {
 	return encoded, nil
 }
 func CheckAuthCookie(ctx *gin.Context) (bool, error) {
+	c3ctx := ctx.Request.Context()
+	log := logger.FromContext(c3ctx)
 	cookie, err := decodeCookie(ctx)
 	if err != nil {
 		return false, err
 	}
-	ok, err := validateByBrowserCookie(cookie)
+	ok, err := validateByBrowserCookie(log, cookie)
 	if err != nil {
 		return false, err
 	}
@@ -343,7 +354,7 @@ func CheckAuthCookie(ctx *gin.Context) (bool, error) {
 	return true, nil
 }
 
-func fetchFromCacheWithValue(key string) (int, int, bool, error) {
+func fetchFromCacheWithValue(log logger.Logger, key string) (int, int, bool, error) {
 	skey := "Session_" + key
 	sItems, err := sessiond.GetRawFromMemcache(skey)
 	if err != nil {
@@ -351,7 +362,7 @@ func fetchFromCacheWithValue(key string) (int, int, bool, error) {
 		return 0, 0, false, err
 	}
 	if sItems != nil {
-		uid, timestamp, currentlyLogedin, err := getCurrentSession(sItems.Value)
+		uid, timestamp, currentlyLogedin, err := getCurrentSession(log, sItems.Value)
 		if err != nil {
 			return 0, 0, false, err
 		}
@@ -362,9 +373,9 @@ func fetchFromCacheWithValue(key string) (int, int, bool, error) {
 	return 0, 0, false, ERROR_CACHE_MISSED
 }
 
-func validateByBrowserCookie(ssid string) (bool, error) {
-	if checkingMemcache() {
-		uid, _, currentlyLogedin, err := fetchFromCacheWithValue(ssid)
+func validateByBrowserCookie(log logger.Logger, ssid string) (bool, error) {
+	if checkingMemcache(log) {
+		uid, _, currentlyLogedin, err := fetchFromCacheWithValue(log, ssid)
 		if err != nil {
 			return false, err
 		}
@@ -372,7 +383,7 @@ func validateByBrowserCookie(ssid string) (bool, error) {
 			log.Println("Cookie exist but user logged out by backend script")
 			return false, err
 		}
-		if err := updateTimeStampToCache(ssid, uid, currentlyLogedin); err != nil {
+		if err := updateTimeStampToCache(log, ssid, uid, currentlyLogedin); err != nil {
 			log.Printf("Error on validateByBrowserCookie(): %v", err)
 			return false, err
 		}
@@ -384,16 +395,17 @@ func validateByBrowserCookie(ssid string) (bool, error) {
 
 func destroyAuthCookie(ctx *gin.Context) error {
 	c3ctx := ctx.Request.Context()
+	log := logger.FromContext(c3ctx)
 	ssid, err := decodeCookie(ctx)
 	if err != nil {
 		return err
 	}
-	if checkingMemcache() {
-		uid, _, _, err := fetchFromCacheWithValue(ssid)
+	if checkingMemcache(log) {
+		uid, _, _, err := fetchFromCacheWithValue(log, ssid)
 		if err != nil {
 			return err
 		}
-		if err := updateTimeStampToCache(ssid, uid, false); err != nil {
+		if err := updateTimeStampToCache(log, ssid, uid, false); err != nil {
 			log.Printf("Error on validateByBrowserCookie(): %v", err)
 			return err
 		}
@@ -414,6 +426,8 @@ func fetchCookieFromRequest(r *http.Request) (string, error) {
 	return cookie.Value, nil
 }
 func GetWebframeworkUserFromRequest(r *http.Request) int {
+	c3ctx := r.Context()
+	log := logger.FromContext(c3ctx)
 	ssid, err := fetchCookieFromRequest(r)
 	if err != nil {
 		log.Printf("Error on getting SSID: %v", err)
@@ -422,8 +436,8 @@ func GetWebframeworkUserFromRequest(r *http.Request) int {
 	if ssid == "" {
 		return 0
 	}
-	if checkingMemcache() {
-		uid, _, currentlyLogedin, err := fetchFromCacheWithValue(ssid)
+	if checkingMemcache(log) {
+		uid, _, currentlyLogedin, err := fetchFromCacheWithValue(log, ssid)
 		if err != nil {
 			if !currentlyLogedin {
 				return 0
@@ -435,7 +449,7 @@ func GetWebframeworkUserFromRequest(r *http.Request) int {
 			return 0
 		}
 		//Update timestamp for every request
-		if err := updateTimeStampToCache(ssid, uid, currentlyLogedin); err != nil {
+		if err := updateTimeStampToCache(log, ssid, uid, currentlyLogedin); err != nil {
 			log.Printf("Error on %v", err)
 			return 0
 		}
@@ -444,10 +458,10 @@ func GetWebframeworkUserFromRequest(r *http.Request) int {
 	return 0
 }
 
-func updateTimeStampToCache(ssid string, uid int, loginStatus bool) error {
+func updateTimeStampToCache(log logger.Logger, ssid string, uid int, loginStatus bool) error {
 	lastTimeGetRequest := time.Now().Unix()
 	svalue := fmt.Sprintf("%v/%v/%v", uid, lastTimeGetRequest, loginStatus)
-	if err := saveToSessiondCache(ssid, svalue); err != nil {
+	if err := saveToSessiondCache(log, ssid, svalue); err != nil {
 		return err
 	}
 	return nil
