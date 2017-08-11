@@ -297,6 +297,11 @@ func saveToSessiondCache(log logger.Logger, key, value string) error {
 	}
 	return nil
 }
+
+func ValidateUser(c3ctx context.Context, user, pass string) (*webframework.User, error) {
+	return validateUser(c3ctx, user, pass)
+}
+
 func validateUser(c3ctx context.Context, user, pass string) (*webframework.User, error) {
 	log := logger.FromContext(c3ctx)
 	wu, err := webframework.QueryUser_byLogin(c3ctx, user)
