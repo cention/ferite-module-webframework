@@ -531,6 +531,16 @@ func Middleware() func(*gin.Context) {
 		}
 		wfUserId := GetWebframeworkUserFromRequest(ctx.Request)
 		if wfUserId == 0 {
+			// /ng/logout implies that the user already logged in, but in
+			// case the browser somehow tries to go to /ng/logout when they
+			// are already logged out then we just redirect them to "/".
+			// Without this they are going to get 401 unauthorized response
+			// and the browser page (at /ng/logout) will remain blank.
+			if strings.HasSuffix(ctx.Request.RequestURI, "/logout") {
+				ctx.Redirect(http.StatusFound, "/")
+				return
+			}
+
 			ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
 			return
 		}
