@@ -190,6 +190,9 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	} else {
 		user = strings.TrimSpace(ctx.Request.FormValue("username"))
 		pass = ctx.Request.FormValue("password")
+		if strings.Contains(user, "@") {
+			user = removeSpace(user)
+		}
 		ssid, err = decodeCookie(ctx)
 	}
 
@@ -257,6 +260,17 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		}
 	}
 	return ERROR_WF_USER_NULL
+}
+
+// removeSpace removes anything that comes after and including the "@"
+// character in username. Note: 'Space' here does not mean the space character
+// (' ', 0x20).
+func removeSpace(username string) string {
+	i := strings.LastIndex(username, "@")
+	if i < 0 {
+		return username
+	}
+	return username[0:i]
 }
 
 func GetCloudCacheKey(ssid string) string {
