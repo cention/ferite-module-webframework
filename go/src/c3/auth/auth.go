@@ -214,6 +214,22 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 				log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
 				cu := controllers.FetchUserObject(ctx, wfUser.Id)
 				ctx.Set("loggedInUser", cu)
+
+				// remember where the user logged in so that we
+				// can later redirect them back there when they
+				// log out.
+				lo := GetLoginOrigin(ctx)
+				if lo != "" {
+					type loginData struct {
+						URL string
+					}
+					ld := loginData{URL: lo}
+					err := sessiond.SaveInMemcache(GetCloudCacheKey(ssid), ld)
+					if err != nil {
+						log.Printf("sessiond.SaveInMemcache: %v", err)
+					}
+				}
+
 				return nil
 			} else {
 				return ERROR_MEMCACHE_FAILED
@@ -222,6 +238,24 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	}
 	return ERROR_WF_USER_NULL
 }
+
+func GetCloudCacheKey(ssid string) string {
+	return "cloud_" + ssid
+}
+
+func GetLoginOrigin(ctx *gin.Context) string {
+	v, exist := ctx.Get("loginOrigin")
+	if !exist {
+		return ""
+	}
+	lo, _ := v.(string)
+	return lo
+}
+
+func SetLoginOrigin(ctx *gin.Context, url string) {
+	ctx.Set("loginOrigin", url)
+}
+
 func updateUserCurrentLoginIn(c3ctx context.Context, wfUId int) {
 	log := logger.FromContext(c3ctx)
 	user, err := workflow.QueryUser_byWebframeworkUser(c3ctx, wfUId)
@@ -398,29 +432,47 @@ func validateByBrowserCookie(log logger.Logger, ssid string) (bool, error) {
 	return false, ERROR_MEMCACHE_FAILED
 }
 
-func destroyAuthCookie(ctx *gin.Context) error {
+func destroyAuthCookie(ctx *gin.Context) (url string, err error) {
 	c3ctx := ctx.Request.Context()
 	log := logger.FromContext(c3ctx)
-	ssid, err := decodeCookie(ctx)
+	var ssid string
+	ssid, err = decodeCookie(ctx)
 	if err != nil {
-		return err
+		return
 	}
 	if checkingMemcache(log) {
-		uid, _, _, err := fetchFromCacheWithValue(log, ssid)
+		var uid int
+		uid, _, _, err = fetchFromCacheWithValue(log, ssid)
 		if err != nil {
-			return err
+			return
 		}
-		if err := updateTimeStampToCache(log, ssid, uid, false); err != nil {
+		if err = updateTimeStampToCache(log, ssid, uid, false); err != nil {
 			log.Printf("Error on validateByBrowserCookie(): %v", err)
-			return err
+			return
 		}
 		updateUserCurrentLoginOut(c3ctx, uid)
-		return nil
+		url, err = getLoginURLFromMemcache(log, ssid)
+		return
 	}
-	return ERROR_MEMCACHE_FAILED
+	err = ERROR_MEMCACHE_FAILED
+	return
 }
-func Logout(ctx *gin.Context) error {
+func Logout(ctx *gin.Context) (string, error) {
 	return destroyAuthCookie(ctx)
+}
+
+func getLoginURLFromMemcache(log logger.Logger, ssid string) (url string, err error) {
+	type loginData struct {
+		URL string
+	}
+	ld := loginData{}
+	err = sessiond.GetFromMemcache(GetCloudCacheKey(ssid), &ld)
+	if err != nil {
+		log.Printf("sessiond.GetFromMemcache: %v", err)
+		return
+	}
+	url = ld.URL
+	return
 }
 
 func fetchCookieFromRequest(r *http.Request) (string, error) {
