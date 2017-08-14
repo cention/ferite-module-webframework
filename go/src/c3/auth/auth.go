@@ -175,7 +175,24 @@ func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	c3ctx := ctx.Request.Context()
 	log := logger.FromContext(c3ctx)
-	ssid, err := decodeCookie(ctx)
+
+	var isOTPLogin bool
+	if v, exists := ctx.Get("isOTPLogin"); exists {
+		isOTPLogin, _ = v.(bool)
+	}
+
+	var user, pass, ssid string
+	var err error
+	if isOTPLogin {
+		user = ctx.Value("otpUsername").(string)
+		pass = ctx.Value("otpPassword").(string)
+		ssid, err = createNewAuthCookie(ctx)
+	} else {
+		user = strings.TrimSpace(ctx.Request.FormValue("username"))
+		pass = ctx.Request.FormValue("password")
+		ssid, err = decodeCookie(ctx)
+	}
+
 	if err != nil {
 		_, err := createNewAuthCookie(ctx)
 		if err != nil {
@@ -183,9 +200,12 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		}
 		return nil
 	}
-	user := strings.TrimSpace(ctx.Request.FormValue("username"))
-	pass := ctx.Request.FormValue("password")
+
 	if user == "" && pass == "" {
+		if isOTPLogin {
+			// Undo set-cookie
+			ctx.Writer.Header().Del("Set-Cookie")
+		}
 		if checkingMemcache(log) {
 			if err = fetchFromCache(log, ssid); err != nil {
 				return err
