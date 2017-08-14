@@ -451,7 +451,7 @@ func destroyAuthCookie(ctx *gin.Context) (url string, err error) {
 			return
 		}
 		updateUserCurrentLoginOut(c3ctx, uid)
-		url, err = getLoginURLFromMemcache(log, ssid)
+		url, err = removeLoginURLFromMemcache(log, ssid)
 		return
 	}
 	err = ERROR_MEMCACHE_FAILED
@@ -459,6 +459,12 @@ func destroyAuthCookie(ctx *gin.Context) (url string, err error) {
 }
 func Logout(ctx *gin.Context) (string, error) {
 	return destroyAuthCookie(ctx)
+}
+
+func removeLoginURLFromMemcache(log logger.Logger, ssid string) (url string, err error) {
+	url, err = getLoginURLFromMemcache(log, ssid)
+	sessiond.DeleteFromMemcache(GetCloudCacheKey(ssid))
+	return
 }
 
 func getLoginURLFromMemcache(log logger.Logger, ssid string) (url string, err error) {
