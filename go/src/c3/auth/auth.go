@@ -555,6 +555,22 @@ func GetWebframeworkUserFromRequest(r *http.Request) int {
 	return 0
 }
 
+func IsLoggedIn(r *http.Request) bool {
+	c3ctx := r.Context()
+	log := logger.FromContext(c3ctx)
+	ssid, err := fetchCookieFromRequest(r)
+	if err != nil || ssid == "" {
+		// no cookie
+		return false
+	}
+	if !checkingMemcache(log) {
+		// memcache is not running?
+		return false
+	}
+	_, _, loggedIn, _ := fetchFromCacheWithValue(log, ssid)
+	return loggedIn
+}
+
 func updateTimeStampToCache(log logger.Logger, ssid string, uid int, loginStatus bool) error {
 	lastTimeGetRequest := time.Now().Unix()
 	svalue := fmt.Sprintf("%v/%v/%v", uid, lastTimeGetRequest, loginStatus)
