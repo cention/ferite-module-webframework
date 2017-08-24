@@ -6,6 +6,7 @@ package auth
  */
 
 import (
+	"c3/cloud"
 	"c3/logger"
 	"c3/osm/webframework"
 	"c3/osm/workflow"
@@ -181,10 +182,15 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 		isOTPLogin, _ = v.(bool)
 	}
 
-	var user, pass, ssid string
+	var user, cloudUsername, pass, ssid string
 	var err error
 	if isOTPLogin {
-		user = ctx.Value("otpUsername").(string)
+		cloudUsername = ctx.Value("otpUsername").(string)
+		var err error
+		user, _, err = cloud.SplitUsername(cloudUsername)
+		if err != nil {
+			log.Printf("FIXME this should not happen invalid cloudUsername?? cloud.SplitUsername(%s): %s", cloudUsername, err)
+		}
 		pass = ctx.Value("otpPassword").(string)
 		ssid, err = createNewAuthCookie(ctx)
 	} else {
@@ -238,15 +244,15 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 				cu := controllers.FetchUserObject(ctx, wfUser.Id)
 				ctx.Set("loggedInUser", cu)
 
-				// remember where the user logged in so that we
-				// can later redirect them back there when they
-				// log out.
-				lo := GetLoginOrigin(ctx)
-				if lo != "" {
+				// remember the cloud username so that we can
+				// later pre-fill the cloud login form at
+				// cloud.cention.com when they log out later.
+				cloudUsername := GetCloudUsername(ctx)
+				if cloudUsername != "" {
 					type loginData struct {
-						URL string
+						Username string
 					}
-					ld := loginData{URL: lo}
+					ld := loginData{Username: cloudUsername}
 					err := sessiond.SaveInMemcache(GetCloudCacheKey(ssid), ld)
 					if err != nil {
 						log.Printf("sessiond.SaveInMemcache: %v", err)
@@ -277,17 +283,16 @@ func GetCloudCacheKey(ssid string) string {
 	return "cloud_" + ssid
 }
 
-func GetLoginOrigin(ctx *gin.Context) string {
-	v, exist := ctx.Get("loginOrigin")
-	if !exist {
-		return ""
+func GetCloudUsername(ctx *gin.Context) (cloudUsername string) {
+	v, exist := ctx.Get("cloudUsername")
+	if exist {
+		cloudUsername, _ = v.(string)
 	}
-	lo, _ := v.(string)
-	return lo
+	return
 }
 
-func SetLoginOrigin(ctx *gin.Context, url string) {
-	ctx.Set("loginOrigin", url)
+func SetCloudUsername(ctx *gin.Context, cloudUsername string) {
+	ctx.Set("cloudUsername", cloudUsername)
 }
 
 func updateUserCurrentLoginIn(c3ctx context.Context, wfUId int) {
@@ -466,7 +471,7 @@ func validateByBrowserCookie(log logger.Logger, ssid string) (bool, error) {
 	return false, ERROR_MEMCACHE_FAILED
 }
 
-func destroyAuthCookie(ctx *gin.Context) (url string, err error) {
+func destroyAuthCookie(ctx *gin.Context) (cloudUsername string, err error) {
 	c3ctx := ctx.Request.Context()
 	log := logger.FromContext(c3ctx)
 	var ssid string
@@ -485,7 +490,7 @@ func destroyAuthCookie(ctx *gin.Context) (url string, err error) {
 			return
 		}
 		updateUserCurrentLoginOut(c3ctx, uid)
-		url, err = removeLoginURLFromMemcache(log, ssid)
+		cloudUsername, err = removeCloudUsernameFromMemcache(log, ssid)
 		return
 	}
 	err = ERROR_MEMCACHE_FAILED
@@ -495,15 +500,15 @@ func Logout(ctx *gin.Context) (string, error) {
 	return destroyAuthCookie(ctx)
 }
 
-func removeLoginURLFromMemcache(log logger.Logger, ssid string) (url string, err error) {
-	url, err = getLoginURLFromMemcache(log, ssid)
+func removeCloudUsernameFromMemcache(log logger.Logger, ssid string) (cloudUsername string, err error) {
+	cloudUsername, err = getCloudUsernameFromMemcache(log, ssid)
 	sessiond.DeleteFromMemcache(GetCloudCacheKey(ssid))
 	return
 }
 
-func getLoginURLFromMemcache(log logger.Logger, ssid string) (url string, err error) {
+func getCloudUsernameFromMemcache(log logger.Logger, ssid string) (cloudUsername string, err error) {
 	type loginData struct {
-		URL string
+		Username string
 	}
 	ld := loginData{}
 	err = sessiond.GetFromMemcache(GetCloudCacheKey(ssid), &ld)
@@ -511,7 +516,7 @@ func getLoginURLFromMemcache(log logger.Logger, ssid string) (url string, err er
 		log.Printf("sessiond.GetFromMemcache: %v", err)
 		return
 	}
-	url = ld.URL
+	cloudUsername = ld.Username
 	return
 }
 
