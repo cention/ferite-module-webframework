@@ -186,7 +186,6 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	var err error
 	if isOTPLogin {
 		cloudUsername = ctx.Value("otpUsername").(string)
-		var err error
 		user, _, err = cloud.SplitUsername(cloudUsername)
 		if err != nil {
 			log.Printf("FIXME this should not happen invalid cloudUsername?? cloud.SplitUsername(%s): %s", cloudUsername, err)
