@@ -9,7 +9,9 @@ import (
 	"c3/osm/webframework"
 	"c3/osm/workflow"
 	"c3/web/controllers"
+	"crypto/rand"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -212,6 +214,17 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	}
 	return ERROR_WF_USER_NULL
 }
+
+func generateAuthToken() string {
+	retString := ""
+	hData := make([]byte, 10)
+	if _, err := rand.Read(hData); err == nil {
+		hashed := sha512.Sum512(hData)
+		retString = fmt.Sprintf("%x", hashed)
+	}
+	return retString
+}
+
 func updateUserCurrentLoginIn(wfUId int) {
 	user, err := workflow.QueryUser_byWebframeworkUser(wfUId)
 	if err != nil {
@@ -219,6 +232,7 @@ func updateUserCurrentLoginIn(wfUId int) {
 	}
 	user.SetTimestampLastLogin(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(true)
+	user.SetAuthenticationToken(generateAuthToken())
 	if err := user.Save(); err != nil {
 		log.Println("Error on Save: ", err)
 	}
@@ -231,6 +245,7 @@ func updateUserCurrentLoginOut(wfUId int) {
 	}
 	user.SetTimestampLastLogout(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(false)
+	user.SetAuthenticationToken("")
 	if err := user.Save(); err != nil {
 		log.Println("Error on Save: ", err)
 	}
