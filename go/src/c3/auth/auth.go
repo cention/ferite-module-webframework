@@ -13,7 +13,9 @@ import (
 	"c3/space"
 	"c3/web/controllers"
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -294,6 +296,16 @@ func SetCloudUsername(ctx *gin.Context, cloudUsername string) {
 	ctx.Set("cloudUsername", cloudUsername)
 }
 
+func generateAuthToken() string {
+	retString := ""
+	hData := make([]byte, 10)
+	if _, err := rand.Read(hData); err == nil {
+		hashed := sha512.Sum512(hData)
+		retString = fmt.Sprintf("%x", hashed)
+	}
+	return retString
+}
+
 func updateUserCurrentLoginIn(c3ctx context.Context, wfUId int) {
 	log := logger.FromContext(c3ctx)
 	user, err := workflow.QueryUser_byWebframeworkUser(c3ctx, wfUId)
@@ -302,6 +314,7 @@ func updateUserCurrentLoginIn(c3ctx context.Context, wfUId int) {
 	}
 	user.SetTimestampLastLogin(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(true)
+	user.SetAuthenticationToken(generateAuthToken())
 	if err := user.Save(c3ctx); err != nil {
 		log.Println("Error on Save: ", err)
 	}
@@ -315,6 +328,7 @@ func updateUserCurrentLoginOut(c3ctx context.Context, wfUId int) {
 	}
 	user.SetTimestampLastLogout(time.Now().Unix())
 	user.SetCurrentlyLoggedIn(false)
+	user.SetAuthenticationToken("")
 	if err := user.Save(c3ctx); err != nil {
 		log.Println("Error on Save: ", err)
 	}
