@@ -505,6 +505,23 @@ func removeCloudUsernameFromMemcache(log logger.Logger, ssid string) (cloudUsern
 	return
 }
 
+//GetCloudWorkspace provide cloud's workspace from memcache
+func GetCloudWorkspace(ctx *gin.Context) (space string, err error) {
+	c3ctx := ctx.Request.Context()
+	log := logger.FromContext(c3ctx)
+	var ssid string
+	ssid, err = decodeCookie(ctx)
+	if err != nil {
+		return
+	}
+	user, err := getCloudUsernameFromMemcache(log, ssid)
+	if err != nil {
+		return
+	}
+	_, space, err = cloud.SplitUsername(user)
+	return
+}
+
 func getCloudUsernameFromMemcache(log logger.Logger, ssid string) (cloudUsername string, err error) {
 	type loginData struct {
 		Username string
