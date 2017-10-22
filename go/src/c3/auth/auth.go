@@ -423,7 +423,6 @@ func fetchCookieFromRequest(r *http.Request) (string, error) {
 func GetWebframeworkUserFromRequest(r *http.Request) int {
 	ssid, err := fetchCookieFromRequest(r)
 	if err != nil {
-		log.Printf("Error on getting SSID: %v", err)
 		return 0
 	}
 	if ssid == "" {
