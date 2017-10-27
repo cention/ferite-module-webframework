@@ -30,12 +30,16 @@ import (
 	"github.com/gorilla/securecookie"
 )
 
+type contextKey int
+
 const (
 	HTTP_UNAUTHORIZE_ACCESS = 401
 	HTTP_FORBIDDEN_ACCESS   = 403
 	HTTP_FOUND              = 302
 	DayEpoch                = 86400
 	CookieExpireAt          = DayEpoch * 30
+
+	userContextKey contextKey = 1
 )
 
 var (
@@ -599,6 +603,20 @@ func updateTimeStampToCache(log logger.Logger, ssid string, uid int, loginStatus
 	}
 	return nil
 }
+
+func NewContextWithUser(parent context.Context, u *workflow.User) context.Context {
+	return context.WithValue(parent, userContextKey, u)
+}
+
+func UserFromContext(ctx context.Context) *workflow.User {
+	v := ctx.Value(userContextKey)
+	u, ok := v.(*workflow.User)
+	if ok {
+		return u
+	}
+	return nil
+}
+
 func Middleware() func(*gin.Context) {
 	return func(ctx *gin.Context) {
 		if strings.HasPrefix(ctx.Request.RequestURI, "/debug/pprof/") {
@@ -624,6 +642,7 @@ func Middleware() func(*gin.Context) {
 			currUser := controllers.FetchUserObject(ctx, wfUserId)
 			ctx.Set("loggedInUser", currUser)
 		}
+		ctx.Request = ctx.Request.WithContext(NewContextWithUser(ctx.Request.Context(), currUser))
 		ctx.Next()
 	}
 }
