@@ -638,8 +638,9 @@ func Middleware() func(*gin.Context) {
 			ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
 			return
 		}
+		var currUser *workflow.User
 		if _, exist := ctx.Get("loggedInUser"); !exist {
-			currUser := controllers.FetchUserObject(ctx, wfUserId)
+			currUser = controllers.FetchUserObject(ctx, wfUserId)
 			ctx.Set("loggedInUser", currUser)
 		}
 		ctx.Request = ctx.Request.WithContext(NewContextWithUser(ctx.Request.Context(), currUser))
