@@ -8,7 +8,6 @@ package auth
 import (
 	"c3/osm/webframework"
 	"c3/osm/workflow"
-	"c3/web/controllers"
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
@@ -141,6 +140,14 @@ func fetchFromCache(key string) error {
 		}
 	}
 	return ERROR_CACHE_MISSED
+}
+
+func FetchUserObject(wfUId int) *workflow.User {
+	user, err := workflow.QueryUser_byWebframeworkUser(wfUId)
+	if err != nil {
+		log.Printf("error QueryUser_byWebframeworkUser(%d): %s", wfUId, err)
+	}
+	return user
 }
 
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
@@ -457,7 +464,7 @@ func Middleware() func(*gin.Context) {
 			ctx.AbortWithStatus(HTTP_UNAUTHORIZE_ACCESS)
 			return
 		}
-		currUser := controllers.FetchUserObject(wfUserId)
+		currUser := FetchUserObject(wfUserId)
 		ctx.Set("loggedInUser", currUser)
 		ctx.Request = ctx.Request.WithContext(NewContextWithUser(ctx.Request.Context(), currUser))
 		ctx.Next()
