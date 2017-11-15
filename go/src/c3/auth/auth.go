@@ -11,7 +11,6 @@ import (
 	"c3/osm/webframework"
 	"c3/osm/workflow"
 	"c3/space"
-	"c3/web/controllers"
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
@@ -164,13 +163,23 @@ func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
 		}
 		updateUserCurrentLoginIn(c3ctx, user.WebframeworkUserID)
 		log.Printf("CentionAuth: User `%s` auto logged In", user.Username)
-		cu := controllers.FetchUserObject(ctx, user.WebframeworkUserID)
+		cu := FetchUserObject(ctx, user.WebframeworkUserID)
 		ctx.Set("loggedInUser", cu)
 		ctx.Next()
 		return true
 	} else {
 		return false
 	}
+}
+
+func FetchUserObject(ctx *gin.Context, wfUId int) *workflow.User {
+	c3ctx := ctx.Request.Context()
+	user, err := workflow.QueryUser_byWebframeworkUser(c3ctx, wfUId)
+	if err != nil {
+		log := logger.FromContext(c3ctx)
+		log.Printf("error QueryUser_byWebframeworkUser(%d): %s", wfUId, err)
+	}
+	return user
 }
 
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
@@ -241,7 +250,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 				}
 				updateUserCurrentLoginIn(c3ctx, wfUser.Id)
 				log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
-				cu := controllers.FetchUserObject(ctx, wfUser.Id)
+				cu := FetchUserObject(ctx, wfUser.Id)
 				ctx.Set("loggedInUser", cu)
 
 				// remember the cloud username so that we can
@@ -624,7 +633,7 @@ func Middleware() func(*gin.Context) {
 		}
 		var currUser *workflow.User
 		if _, exist := ctx.Get("loggedInUser"); !exist {
-			currUser = controllers.FetchUserObject(ctx, wfUserId)
+			currUser = FetchUserObject(ctx, wfUserId)
 			ctx.Set("loggedInUser", currUser)
 		}
 		ctx.Next()
