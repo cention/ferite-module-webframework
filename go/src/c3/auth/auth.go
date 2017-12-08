@@ -26,6 +26,7 @@ import (
 	"github.com/cention-mujibur-rahman/gobcache"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/securecookie"
+	uuid "github.com/satori/go.uuid"
 )
 
 type contextKey int
@@ -297,7 +298,7 @@ func encodePassword(p string) string {
 }
 func createNewAuthCookie(ctx *gin.Context) error {
 	value := map[string]interface{}{
-		"cookie-set-date": time.Now().Unix(),
+		"uuid": uuid.NewV4().String(),
 	}
 	encoded, err := sc.Encode("cention-suiteSSID", value)
 	if err != nil {
