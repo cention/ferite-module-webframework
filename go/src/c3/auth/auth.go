@@ -27,6 +27,7 @@ import (
 	"github.com/cention-mujibur-rahman/gobcache"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/securecookie"
+	uuid "github.com/satori/go.uuid"
 )
 
 type contextKey int
@@ -413,7 +414,7 @@ func createNewAuthCookie(ctx *gin.Context) (string, error) {
 	c3ctx := ctx.Request.Context()
 	log := logger.FromContext(c3ctx)
 	value := map[string]interface{}{
-		"cookie-set-date": time.Now().Unix(),
+		"uuid": uuid.NewV4().String(),
 	}
 	encoded, err := sc.Encode("cention-suiteSSID", value)
 	if err != nil {
