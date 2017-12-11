@@ -23,6 +23,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bradfitz/gomemcache/memcache"
 	"github.com/cention-mujibur-rahman/gobcache"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/securecookie"
@@ -158,6 +159,14 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	if user == "" && pass == "" {
 		if checkingMemcache() {
 			if err = fetchFromCache(ssid); err != nil {
+				if ctx.Request.Method == http.MethodGet && err == memcache.ErrCacheMiss {
+					// Browser gave obsolete cookie, give it a new one
+					ssid, _ = createNewAuthCookie(ctx)
+					if len(ssid) > 0 {
+						// And remember this cookie
+						updateTimeStampToCache(ssid, 0, false)
+					}
+				}
 				return err
 			}
 			return nil
