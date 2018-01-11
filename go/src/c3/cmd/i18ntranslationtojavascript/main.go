@@ -76,6 +76,7 @@ func main() {
 	defer ioWriter.Close()
 	ioWriter.WriteString(translationsForJavascript(language, translation) + "\n")
 
-	log.Println("Created", javascriptFile)
+	var logger = log.New(os.Stdout, "", log.LstdFlags)
+	logger.Println("Created", javascriptFile)
 	os.Exit(0)
 }
