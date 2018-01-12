@@ -151,7 +151,6 @@ func fetchFromCache(log logger.Logger, key string) error {
 func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
 	c3ctx := ctx.Request.Context()
 	log := logger.FromContext(c3ctx)
-	spc := space.FromContext(c3ctx)
 	ssid, err := createNewAuthCookie(ctx)
 	if err != nil {
 		log.Println(err)
@@ -165,8 +164,7 @@ func CreateAuthCookie(ctx *gin.Context, user *workflow.User) bool {
 			log.Println(err)
 			return false
 		}
-		if err = saveUserIdToCache(log, user.WebframeworkUserID, ssid,
-			string(spc)); err != nil {
+		if err = saveUserIdToCache(c3ctx, user.WebframeworkUserID, ssid); err != nil {
 			log.Println(err)
 			return false
 		}
@@ -194,7 +192,6 @@ func FetchUserObject(ctx *gin.Context, wfUId int) *workflow.User {
 func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	c3ctx := ctx.Request.Context()
 	log := logger.FromContext(c3ctx)
-	spc := space.FromContext(c3ctx)
 
 	var isOTPLogin bool
 	if v, exists := ctx.Get("isOTPLogin"); exists {
@@ -259,7 +256,7 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 				if err = saveToSessiondCache(log, ssid, sValue); err != nil {
 					return err
 				}
-				if err = saveUserIdToCache(log, wfUser.Id, ssid, string(spc)); err != nil {
+				if err = saveUserIdToCache(c3ctx, wfUser.Id, ssid); err != nil {
 					return err
 				}
 				updateUserCurrentLoginIn(c3ctx, wfUser.Id)
@@ -378,9 +375,9 @@ func updateUserStatusInHistory(c3ctx context.Context, user *workflow.User, statu
 		}
 	}
 }
-func saveUserIdToCache(log logger.Logger, key int, value string,
-	spc string) error {
-	sKey := fmt.Sprintf("%s/user/%d", spc, key)
+func saveUserIdToCache(c3ctx context.Context, key int, value string) error {
+	log := logger.FromContext(c3ctx)
+	sKey := space.CacheKey(c3ctx, fmt.Sprintf("user/%d", key))
 	if err := sessiond.SetRawToMemcache(sKey, value); err != nil {
 		log.Println("[`SetRawToMemcache`] Error on saving:", err)
 		return err
