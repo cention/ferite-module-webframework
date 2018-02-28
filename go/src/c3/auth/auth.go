@@ -69,12 +69,9 @@ func checkingMemcache(log logger.Logger) bool {
 }
 
 func getCookieHashKey(ctx *gin.Context) (string, error) {
-	c3ctx := ctx.Request.Context()
-	log := logger.FromContext(c3ctx)
 	var err error
 	cookie, err := ctx.Request.Cookie("cention-suiteSSID")
 	if err != nil {
-		log.Println("getCookieHashKey(): Cookie is empty - ", err)
 		return "", err
 	}
 	if cookie == nil {
