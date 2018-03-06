@@ -5,7 +5,7 @@
 		if (args.length == 0) return;
 		cb = args[args.length-1];
 		if (typeof cb !== 'function') return;
-		cb(what);
+		cb({"acked":what});
 	}
 	;
 	cs.io = io;
