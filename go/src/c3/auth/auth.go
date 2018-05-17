@@ -574,7 +574,9 @@ func getCloudUsernameFromMemcache(log logger.Logger, ssid string,
 	}
 	err = osc.Cache.GetFromMemcache(GetCloudCacheKey(ssid), &ld)
 	if err != nil {
-		log.Printf("sessiond.GetFromMemcache: %v", err)
+		if !strings.Contains(err.Error(), "memcache: cache miss") {
+			log.Printf("sessiond.GetFromMemcache: %v", err)
+		}
 		return
 	}
 	cloudUsername = ld.Username
