@@ -236,36 +236,9 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 			return err
 		}
 		if wfUser != nil {
-			lastLoginTime := time.Now().Unix()
 			if checkingMemcache(log) {
-				sValue := fmt.Sprintf("%v/%v/%v", wfUser.Id, lastLoginTime, true)
-				if err = saveToSessiondCache(log, ssid, sValue); err != nil {
-					return err
-				}
-				if err = saveUserIdToCache(log, wfUser.Id, ssid); err != nil {
-					return err
-				}
-				updateUserCurrentLoginIn(c3ctx, wfUser.Id)
-				log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
-				cu := FetchUserObject(ctx, wfUser.Id)
-				ctx.Set("loggedInUser", cu)
-
-				// remember the cloud username so that we can
-				// later pre-fill the cloud login form at
-				// cloud.cention.com when they log out later.
 				cloudUsername := GetCloudUsername(ctx)
-				if cloudUsername != "" {
-					type loginData struct {
-						Username string
-					}
-					ld := loginData{Username: cloudUsername}
-					err := sessiond.SaveInMemcache(GetCloudCacheKey(ssid), ld)
-					if err != nil {
-						log.Printf("sessiond.SaveInMemcache: %v", err)
-					}
-				}
-
-				return nil
+				return LogInUser(c3ctx, ctx, log, wfUser, cloudUsername, ssid)
 			} else {
 				return ERROR_MEMCACHE_FAILED
 			}
@@ -283,6 +256,45 @@ func removeSpace(username string) string {
 		return username
 	}
 	return username[0:i]
+}
+
+// LogInUser logs in the given user, no questions asked.
+func LogInUser(c3ctx context.Context, ctx *gin.Context, log logger.Logger, wfUser *webframework.User, cloudUsername, ssid string) error {
+	var err error
+	if ssid == "" {
+		ssid, err = createNewAuthCookie(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	lastLoginTime := time.Now().Unix()
+	sValue := fmt.Sprintf("%v/%v/%v", wfUser.Id, lastLoginTime, true)
+	if err := saveToSessiondCache(log, ssid, sValue); err != nil {
+		return err
+	}
+	if err := saveUserIdToCache(log, wfUser.Id, ssid); err != nil {
+		return err
+	}
+	updateUserCurrentLoginIn(c3ctx, wfUser.Id)
+	log.Printf("CentionAuth: User `%s` just now Logged In", wfUser.Username)
+	cu := FetchUserObject(ctx, wfUser.Id)
+	ctx.Set("loggedInUser", cu)
+
+	// remember the cloud username so that we can
+	// later pre-fill the cloud login form at
+	// cloud.cention.com when they log out later.
+	if cloudUsername != "" {
+		type loginData struct {
+			Username string
+		}
+		ld := loginData{Username: cloudUsername}
+		err := sessiond.SaveInMemcache(GetCloudCacheKey(ssid), ld)
+		if err != nil {
+			log.Printf("sessiond.SaveInMemcache: %v", err)
+		}
+	}
+
+	return nil
 }
 
 func GetCloudCacheKey(ssid string) string {
