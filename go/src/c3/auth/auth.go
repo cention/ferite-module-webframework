@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -26,6 +27,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/securecookie"
 )
+
+var (
+	setSecureCookieFlag = true
+)
+
+func init() {
+	_, err := os.Stat("/cention/var/web.allow.http")
+	if err == nil {
+		// file exist, do not set "Secure" cookie flag
+		setSecureCookieFlag = false
+	}
+}
 
 const (
 	HTTP_UNAUTHORIZE_ACCESS = 401
@@ -424,12 +437,18 @@ func createNewAuthCookie(ctx *gin.Context) (string, error) {
 	encoded, err := sc.Encode("cention-suiteSSID", value)
 	if err != nil {
 		log.Printf("createNewAuthCookie(): Error %v, creating `guest` cookie", err)
-		cookie := fmt.Sprintf("cention-suiteSSID=%s; Path=/", "guest")
+		cookie := fmt.Sprintf("cention-suiteSSID=%s; Path=/;HttpOnly", "guest")
+		if setSecureCookieFlag {
+			cookie += ";Secure"
+		}
 		ctx.Writer.Header().Add("Set-Cookie", cookie)
 		return "", err
 	}
 	expiration := time.Now().Add(CookieExpireAt * time.Second).Format(time.RFC1123)
 	cookie := fmt.Sprintf("cention-suiteSSID=%s; Path=/;Expires=%v;Max-Age=%d;HttpOnly", encoded, expiration, CookieExpireAt)
+	if setSecureCookieFlag {
+		cookie += ";Secure"
+	}
 	ctx.Writer.Header().Add("Set-Cookie", cookie)
 	return encoded, nil
 }
