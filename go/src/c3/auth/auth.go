@@ -222,11 +222,8 @@ func CheckOrCreateAuthCookie(ctx *gin.Context) error {
 	}
 
 	if err != nil {
-		_, err := createNewAuthCookie(ctx)
-		if err != nil {
-			return err
-		}
-		return nil
+		createNewAuthCookie(ctx)
+		return err
 	}
 
 	if user == "" && pass == "" {
