@@ -21,11 +21,13 @@ func JSProcessString(key string) string {
 }
 
 func translationsForJavascript(language string, catalog map[string]interface{}) string {
-	output := "// Desired language: " + language + "\n"
+	s := make([]string, 0, len(catalog))
+	output := "var TranslationDictionary = {"
 	for key, translation := range catalog {
 		translation = strings.Replace(translation.(string), "'", "\\'", -1)
-		output += "TranslationDictionary['" + JSProcessString(key) + "'] = '" + translation.(string) + "';\n"
+		s = append(s, "'"+JSProcessString(key)+"':'"+translation.(string)+"'")
 	}
+	output += strings.Join(s, ",") + "};"
 	return output
 }
 
